@@ -142,14 +142,13 @@ class RemoveBracesIntention extends PsiElementBaseIntentionAction {
     // Create the action to unwrap that block.
     oneLinerBlock.map {
       case (blkExpr, onlyExpr, comments) =>
-        () =>
-          {
-            IntentionUtil.addComments(comments, blkExpr.getParent, blkExpr)
-            CodeEditUtil.replaceChild(
-              blkExpr.getParent.getNode,
-              blkExpr.getNode,
-              onlyExpr.getNode)
-          }
+        () => {
+          IntentionUtil.addComments(comments, blkExpr.getParent, blkExpr)
+          CodeEditUtil.replaceChild(
+            blkExpr.getParent.getNode,
+            blkExpr.getNode,
+            onlyExpr.getNode)
+        }
     }
   }
 }

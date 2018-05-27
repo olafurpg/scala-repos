@@ -15,7 +15,7 @@ class ScalatraTestServlet extends ScalatraServlet {
   }
 
   get("/xml/:must/:val") {
-    <h1>{ params("must") + params("val") }</h1>
+    <h1>{params("must") + params("val")}</h1>
   }
 
   post("/post/test") {

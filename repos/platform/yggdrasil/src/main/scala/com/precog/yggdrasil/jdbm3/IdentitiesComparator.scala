@@ -29,7 +29,7 @@ import com.precog.util.{Vector0, Vector1, Vector2, Vector3, Vector4}
 import com.precog.util.VectorCase
 
 object IdentitiesComparator {
-  private final val serialVersionUID = 20120724l
+  private final val serialVersionUID = 20120724L
 
   def apply(ascending: Boolean) = new IdentitiesComparator(ascending)
 }

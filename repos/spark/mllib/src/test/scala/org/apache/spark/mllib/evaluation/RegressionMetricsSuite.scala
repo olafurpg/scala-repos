@@ -23,7 +23,7 @@ import org.apache.spark.mllib.util.TestingUtils._
 
 class RegressionMetricsSuite extends SparkFunSuite with MLlibTestSparkContext {
   val obs = List[Double](77, 85, 62, 55, 63, 88, 57, 81, 51)
-  val eps = 1E-5
+  val eps = 1e-5
 
   test("regression metrics for unbiased (includes intercept term) predictor") {
     /* Verify results in R:

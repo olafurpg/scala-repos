@@ -30,8 +30,8 @@ class ExpressionSQLBuilderSuite extends SQLBuilderTest {
     checkSQL(Literal(2: Short), "2S")
     checkSQL(Literal(4: Int), "4")
     checkSQL(Literal(8: Long), "8L")
-    checkSQL(Literal(1.5F), "CAST(1.5 AS FLOAT)")
-    checkSQL(Literal(2.5D), "2.5D")
+    checkSQL(Literal(1.5f), "CAST(1.5 AS FLOAT)")
+    checkSQL(Literal(2.5d), "2.5D")
     checkSQL(
       Literal(Timestamp.valueOf("2016-01-01 00:00:00")),
       "TIMESTAMP('2016-01-01 00:00:00.0')")

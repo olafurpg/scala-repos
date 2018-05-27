@@ -5,8 +5,7 @@ class C1(a: () => Any)
 class D1
     extends C1({
       def x = 0;
-      () =>
-        { object X { x } }
+      () => { object X { x } }
     })
 
 class C2(a: => Any)

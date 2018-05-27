@@ -51,8 +51,9 @@ trait RelationalProfile
       ColumnOrdered[T](c, Ordering())
     implicit def tableQueryToTableQueryExtensionMethods[
         T <: RelationalProfile#Table[_],
-        U](q: Query[T, U, Seq] with TableQuery[T])
-      : TableQueryExtensionMethods[T, U] =
+        U](
+        q: Query[T, U, Seq]
+          with TableQuery[T]): TableQueryExtensionMethods[T, U] =
       new TableQueryExtensionMethods[T, U](q)
 
     implicit def streamableCompiledInsertActionExtensionMethods[EU](

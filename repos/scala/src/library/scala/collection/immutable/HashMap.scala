@@ -277,7 +277,10 @@ object HashMap extends ImmutableMapFactory[HashMap] with BitOperations.Int {
     override def foreach[U](f: ((A, B)) => U): Unit = f(ensurePair)
     // this method may be called multiple times in a multithreaded environment, but that's ok
     private[HashMap] def ensurePair: (A, B) =
-      if (kv ne null) kv else { kv = (key, value); kv }
+      if (kv ne null) kv
+      else {
+        kv = (key, value); kv
+      }
     protected override def merge0[B1 >: B](
         that: HashMap[A, B1],
         level: Int,

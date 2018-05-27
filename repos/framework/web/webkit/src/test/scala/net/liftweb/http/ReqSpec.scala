@@ -123,8 +123,8 @@ object ReqSpec extends Specification with XmlMatchers with Mockito {
           GetRequest,
           Full(contentType),
           mockHttpRequest,
-          0l,
-          1l,
+          0L,
+          1L,
           true,
           () => paramCalcInfo,
           Map.empty

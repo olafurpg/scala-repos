@@ -127,8 +127,8 @@ object TestUtils extends Logging {
       .continually(new File(parentDir, "kafka-" + random.nextInt(1000000)))
       .take(attempts)
       .find(_.mkdir())
-      .getOrElse(sys.error(
-        s"Failed to create directory after $attempts attempts"))
+      .getOrElse(
+        sys.error(s"Failed to create directory after $attempts attempts"))
     f.deleteOnExit()
     f
   }
@@ -991,7 +991,7 @@ object TestUtils extends Logging {
                 partitionState.leaderIsrAndControllerEpoch.leaderAndIsr.leader
               result && Request.isValidBrokerId(leader)
           }
-      },
+        },
       "Partition [%s,%d] metadata not propagated after %d ms"
         .format(topic, partition, timeout),
       waitTime = timeout
@@ -1011,7 +1011,7 @@ object TestUtils extends Logging {
           server.replicaManager
             .getPartition(topic, partition)
             .exists(_.leaderReplicaIfLocal().isDefined)
-      },
+        },
       "Partition [%s,%d] leaders not made yet after %d ms"
         .format(topic, partition, timeout),
       waitTime = timeout
@@ -1299,7 +1299,7 @@ object TestUtils extends Logging {
             }
             checkpoints.forall(checkpointsPerLogDir =>
               !checkpointsPerLogDir.contains(tp))
-        }),
+          }),
       "Cleaner offset for deleted partition should have been removed"
     )
   }

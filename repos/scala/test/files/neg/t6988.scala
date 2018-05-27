@@ -2,7 +2,7 @@ case class User()
 
 @SerialVersionUID(13.asInstanceOf[Long])
 case class IdentifyMessage1(userName: String, user: User, code: Int)
-@SerialVersionUID(13l)
+@SerialVersionUID(13L)
 case class IdentifyMessage2(userName: String, user: User, code: Int)
 object O {
   val SerialUID = "13".toLong

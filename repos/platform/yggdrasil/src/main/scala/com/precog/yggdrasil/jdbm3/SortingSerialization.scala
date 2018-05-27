@@ -33,7 +33,7 @@ import java.io.{
 import java.util.Comparator
 
 object SortingKeyComparator {
-  final val serialVersionUID = 20120730l
+  final val serialVersionUID = 20120730L
 
   def apply(rowFormat: RowFormat, ascending: Boolean) =
     new SortingKeyComparator(rowFormat, ascending)

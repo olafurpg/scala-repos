@@ -96,7 +96,7 @@ object EventService {
           serviceLocation = serviceLoc,
           shardLocation = shardLoc,
           ingestTimeout = akka.util
-            .Timeout(config[Long]("insert.timeout", 10000l)),
+            .Timeout(config[Long]("insert.timeout", 10000L)),
           ingestBatchSize = config[Int]("ingest.batch_size", 500),
           ingestMaxFields = config[Int]("ingest.max_fields", 1024),
           ingestTmpDir = config
@@ -109,7 +109,7 @@ object EventService {
                   .getParentFile))
             .get, //fail fast
           deleteTimeout =
-            akka.util.Timeout(config[Long]("delete.timeout", 10000l))
+            akka.util.Timeout(config[Long]("delete.timeout", 10000L))
         )
       }
     }

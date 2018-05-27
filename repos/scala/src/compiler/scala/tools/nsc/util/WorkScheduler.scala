@@ -47,7 +47,7 @@ class WorkScheduler {
       val result = Some(throwables.dequeue())
       if (!throwables.isEmpty)
         postWorkItem { () =>
-          }
+        }
       result
     }
   }

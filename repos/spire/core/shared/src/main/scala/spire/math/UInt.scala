@@ -16,7 +16,7 @@ class UInt(val signed: Int) extends AnyVal {
   def toChar: Char = signed.toChar
   def toShort: Short = signed.toShort
   def toInt: Int = signed
-  def toLong: Long = signed & 0xffffffffL
+  def toLong: Long = signed & 0XFFFFFFFFL
   def toFloat: Float = toLong.toFloat
   def toDouble: Double = toLong.toDouble
   def toBigInt: BigInt = BigInt(toLong)

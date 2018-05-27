@@ -70,7 +70,9 @@ object Sorting {
           else iK
         val pivot = a(pL)
         // pL is the start of the pivot block; move it into the middle if needed
-        if (pL != iK) { a(pL) = a(iK); a(iK) = pivot; pL = iK }
+        if (pL != iK) {
+          a(pL) = a(iK); a(iK) = pivot; pL = iK
+        }
         // Elements equal to the pivot will be in range pL until pR
         var pR = pL + 1
         // Items known to be less than pivot are below iA (range i0 until iA)
@@ -218,7 +220,9 @@ object Sorting {
       var k = i0
       j = 0
       while (i < iN && j < jN) {
-        if (ord.compare(a(i), scratch(j)) < 0) { a(k) = a(i); i += 1 } else {
+        if (ord.compare(a(i), scratch(j)) < 0) {
+          a(k) = a(i); i += 1
+        } else {
           a(k) = scratch(j); j += 1
         }
         k += 1

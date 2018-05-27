@@ -33,7 +33,7 @@ class MarshallingDirectivesSpec extends RoutingSpec with Inside {
       `application/xhtml+xml`,
       `text/xxml`) { mediaType ⇒
       nodeSeqMarshaller(mediaType).wrap(mediaType) { (i: Int) ⇒
-        <int>{ i }</int>
+        <int>{i}</int>
       }
     }
 

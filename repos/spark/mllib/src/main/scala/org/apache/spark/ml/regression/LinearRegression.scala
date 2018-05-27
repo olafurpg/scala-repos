@@ -147,7 +147,7 @@ class LinearRegression @Since("1.3.0")(@Since("1.3.0") override val uid: String)
     */
   @Since("1.4.0")
   def setTol(value: Double): this.type = set(tol, value)
-  setDefault(tol -> 1E-6)
+  setDefault(tol -> 1e-6)
 
   /**
     * Whether to over-/under-sample training instances according to the given weights in weightCol.
@@ -221,7 +221,7 @@ class LinearRegression @Since("1.3.0")(@Since("1.3.0") override val uid: String)
         summaryModel,
         model.diagInvAtWA.toArray,
         $(featuresCol),
-        Array(0D))
+        Array(0d))
 
       return lrModel.setSummary(trainingSummary)
     }
@@ -285,9 +285,9 @@ class LinearRegression @Since("1.3.0")(@Since("1.3.0") override val uid: String)
           predictionColName,
           $(labelCol),
           model,
-          Array(0D),
+          Array(0d),
           $(featuresCol),
-          Array(0D))
+          Array(0d))
         return copyValues(model.setSummary(trainingSummary))
       } else {
         require(
@@ -416,7 +416,7 @@ class LinearRegression @Since("1.3.0")(@Since("1.3.0") override val uid: String)
       predictionColName,
       $(labelCol),
       model,
-      Array(0D),
+      Array(0d),
       $(featuresCol),
       objectiveHistory)
     model.setSummary(trainingSummary)
@@ -488,7 +488,7 @@ class LinearRegressionModel private[ml] (
       predictionColName,
       $(labelCol),
       this,
-      Array(0D))
+      Array(0d))
   }
 
   /**

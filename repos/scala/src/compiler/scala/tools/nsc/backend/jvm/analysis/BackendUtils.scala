@@ -54,9 +54,9 @@ class BackendUtils[BT <: BTypes](val btypes: BT) {
     // with the limits below, analysis should not take more than one second
 
     private val nullnessSizeLimit =
-      5000l * 600l * 600l // 5000 insns, 600 locals
-    private val basicValueSizeLimit = 9000l * 1000l * 1000l
-    private val sourceValueSizeLimit = 8000l * 950l * 950l
+      5000L * 600L * 600L // 5000 insns, 600 locals
+    private val basicValueSizeLimit = 9000L * 1000L * 1000L
+    private val sourceValueSizeLimit = 8000L * 950L * 950L
 
     def sizeOKForAliasing(method: MethodNode): Boolean =
       size(method) < nullnessSizeLimit

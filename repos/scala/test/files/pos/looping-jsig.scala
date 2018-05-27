@@ -15,5 +15,5 @@ trait BugTrack {
       cache.get(p) match {
         case Some(res) => res
         case None      => p(in)
-    }).giveMeSame.asInstanceOf[A[T]]
+      }).giveMeSame.asInstanceOf[A[T]]
 }

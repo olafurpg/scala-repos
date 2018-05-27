@@ -175,7 +175,9 @@ object OrderedSerialization {
     */
   def orderingTransitive[T](implicit ordb: OrderedSerialization[T]): Law3[T] =
     Law3("transitivity", { (a: T, b: T, c: T) =>
-      if (ordb.lteq(a, b) && ordb.lteq(b, c)) { ordb.lteq(a, c) } else true
+      if (ordb.lteq(a, b) && ordb.lteq(b, c)) {
+        ordb.lteq(a, c)
+      } else true
     })
 
   /**
@@ -184,7 +186,9 @@ object OrderedSerialization {
     */
   def orderingAntisymmetry[T](implicit ordb: OrderedSerialization[T]): Law2[T] =
     Law2("antisymmetry", { (a: T, b: T) =>
-      if (ordb.lteq(a, b) && ordb.lteq(b, a)) { ordb.equiv(a, b) } else true
+      if (ordb.lteq(a, b) && ordb.lteq(b, a)) {
+        ordb.equiv(a, b)
+      } else true
     })
 
   /**

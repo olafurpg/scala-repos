@@ -113,7 +113,11 @@ object Boilerplate {
           ""
         }
 
-      val n = if (arity == 1) { "" } else { arity.toString }
+      val n = if (arity == 1) {
+        ""
+      } else {
+        arity.toString
+      }
 
       val map =
         if (arity == 1)
@@ -189,7 +193,12 @@ object Boilerplate {
         (a until arity) map { n =>
           "a" + n + ":A" + n
         } mkString ","
-      def apN(n: Int) = if (n == 1) { "ap" } else { s"ap$n" }
+      def apN(n: Int) =
+        if (n == 1) {
+          "ap"
+        } else {
+          s"ap$n"
+        }
       def allArgs = (0 until arity) map { "a" + _ } mkString ","
 
       val apply = block"""

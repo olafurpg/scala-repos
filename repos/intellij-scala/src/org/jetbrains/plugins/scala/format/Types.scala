@@ -18,8 +18,8 @@ object Types {
     case types.Short   => 0.toShort
     case types.Int     => 0
     case types.Long    => 0L
-    case types.Float   => 0.0F
-    case types.Double  => 0D
+    case types.Float   => 0.0f
+    case types.Double  => 0d
     case ScDesignatorType(element) =>
       element.name match {
         case "String"                => ""

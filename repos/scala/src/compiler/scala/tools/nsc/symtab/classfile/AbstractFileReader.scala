@@ -70,7 +70,7 @@ class AbstractFileReader(val file: AbstractFile) {
   /** extract a long integer at position bp from buf
     */
   def getLong(mybp: Int): Long =
-    (getInt(mybp).toLong << 32) + (getInt(mybp + 4) & 0xffffffffL)
+    (getInt(mybp).toLong << 32) + (getInt(mybp + 4) & 0XFFFFFFFFL)
 
   /** extract a float at position bp from buf
     */

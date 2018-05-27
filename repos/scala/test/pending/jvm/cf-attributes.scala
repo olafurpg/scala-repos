@@ -100,13 +100,17 @@ trait Test2 {
   //   in.close()
   // }
   def printClass(name: String) {
-    try { printClass(Class.forName(name)) } catch {
+    try {
+      printClass(Class.forName(name))
+    } catch {
       case e: Exception => println(e)
     }
   }
   def printClass(cls: Class[_]) {
     println("\n[[ " + cls.getName + " ]]");
-    try { printInnerClasses(cls) } catch { case e: Exception => println(e) }
+    try {
+      printInnerClasses(cls)
+    } catch { case e: Exception => println(e) }
   }
 }
 

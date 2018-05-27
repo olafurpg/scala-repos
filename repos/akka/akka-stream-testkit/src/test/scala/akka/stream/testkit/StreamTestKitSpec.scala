@@ -35,7 +35,7 @@ class StreamTestKitSpec extends AkkaSpec {
                   case n ⇒ n
                 }
               }
-          })
+            })
           .runWith(TestSink.probe)
           .toStrict(300.millis)
       }

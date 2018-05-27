@@ -36,7 +36,9 @@ object Test extends Properties("TreeSet") {
       val values = (1 to highest).reverse
       val subject = TreeSet(values: _*)
       val it = subject.iterator
-      try { while (it.hasNext) it.next; true } catch { case _ => false }
+      try {
+        while (it.hasNext) it.next; true
+      } catch { case _ => false }
     }
 
   property("sorted") = forAll { (subject: TreeSet[Int]) =>

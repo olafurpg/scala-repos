@@ -44,7 +44,7 @@ object Implicits extends DoubleImplicits with IteratorImplicits {
 
 trait DoubleImplicits {
   class RichDouble(x: Double) {
-    def closeTo(y: Double, tol: Double = 1E-5) = {
+    def closeTo(y: Double, tol: Double = 1e-5) = {
       (math.abs(x - y) / (math.abs(x) + math.abs(y) + 1e-10) < tol);
     }
     def isDangerous = x.isNaN || x.isInfinite

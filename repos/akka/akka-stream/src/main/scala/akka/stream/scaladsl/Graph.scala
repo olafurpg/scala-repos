@@ -183,8 +183,7 @@ final class MergePreferred[T] private (
 
       val pullMe = Array.tabulate(secondaryPorts)(i ⇒ {
         val port = in(i)
-        () ⇒
-          tryPull(port)
+        () ⇒ tryPull(port)
       })
 
       /*
@@ -382,7 +381,9 @@ final class MergeSorted[T: Ordering] extends GraphStage[FanInShape2[T, T, T]] {
     def nullOut(): Unit = other = null.asInstanceOf[T]
 
     def dispatch(l: T, r: T): Unit =
-      if (l < r) { other = r; emit(out, l, readL) } else {
+      if (l < r) {
+        other = r; emit(out, l, readL)
+      } else {
         other = l; emit(out, r, readR)
       }
 

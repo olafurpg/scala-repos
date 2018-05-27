@@ -309,7 +309,7 @@ object DumpLogSegments {
     println("Starting offset: " + startOffset)
     val messageSet = new FileMessageSet(file, false)
     var validBytes = 0L
-    var lastOffset = -1l
+    var lastOffset = -1L
     val shallowIterator = messageSet.iterator(maxMessageSize)
     for (shallowMessageAndOffset <- shallowIterator) {
       // this only does shallow iteration

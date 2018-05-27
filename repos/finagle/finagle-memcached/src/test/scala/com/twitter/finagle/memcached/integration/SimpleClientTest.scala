@@ -156,7 +156,9 @@ class SimpleClientTest extends FunSuite with BeforeAndAfter {
       Await.result(client.set("    ", Buf.Utf8("bar")))
     }
 
-    try { Await.result(client.set("\t", Buf.Utf8("bar"))) } catch {
+    try {
+      Await.result(client.set("\t", Buf.Utf8("bar")))
+    } catch {
       case _: ClientError => fail("\t is allowed")
     }
 

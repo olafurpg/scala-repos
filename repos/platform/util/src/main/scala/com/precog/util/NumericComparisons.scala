@@ -35,7 +35,7 @@ object NumericComparisons {
     if (b.toLong == bl) {
       if (a < b) -1 else if (a == b) 0 else 1
     } else {
-      val error = math.abs(b * 2.220446049250313E-16)
+      val error = math.abs(b * 2.220446049250313e-16)
       if (a < b - error) -1 else if (a > b + error) 1 else bl.signum
     }
   }
@@ -58,7 +58,7 @@ object NumericComparisons {
     else 0
   }
 
-  @inline def eps(b: Double): Double = math.abs(b * 2.220446049250313E-16)
+  @inline def eps(b: Double): Double = math.abs(b * 2.220446049250313e-16)
 
   def approxCompare(a: Double, b: Double): Int = {
     val aError = eps(a)

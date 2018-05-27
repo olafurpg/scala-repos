@@ -43,7 +43,13 @@ private[ui] class StoragePage(parent: StorageTab) extends WebUIPage("") {
     } else {
       <div>
         <h4>RDDs</h4>
-        {UIUtils.listingTable(rddHeader, rddRow, rdds, id = Some("storage-by-rdd-table"))}
+        {
+        UIUtils.listingTable(
+          rddHeader,
+          rddRow,
+          rdds,
+          id = Some("storage-by-rdd-table"))
+      }
       </div>
     }
   }
@@ -62,7 +68,11 @@ private[ui] class StoragePage(parent: StorageTab) extends WebUIPage("") {
     // scalastyle:off
     <tr>
       <td>
-        <a href={"%s/storage/rdd?id=%s".format(UIUtils.prependBaseUri(parent.basePath), rdd.id)}>
+        <a href={
+      "%s/storage/rdd?id=%s".format(
+        UIUtils.prependBaseUri(parent.basePath),
+        rdd.id)
+    }>
           {rdd.name}
         </a>
       </td>
@@ -70,8 +80,12 @@ private[ui] class StoragePage(parent: StorageTab) extends WebUIPage("") {
       </td>
       <td>{rdd.numCachedPartitions.toString}</td>
       <td>{"%.0f%%".format(rdd.numCachedPartitions * 100.0 / rdd.numPartitions)}</td>
-      <td sorttable_customkey={rdd.memSize.toString}>{Utils.bytesToString(rdd.memSize)}</td>
-      <td sorttable_customkey={rdd.diskSize.toString} >{Utils.bytesToString(rdd.diskSize)}</td>
+      <td sorttable_customkey={rdd.memSize.toString}>{
+      Utils.bytesToString(rdd.memSize)
+    }</td>
+      <td sorttable_customkey={rdd.diskSize.toString} >{
+      Utils.bytesToString(rdd.diskSize)
+    }</td>
     </tr>
     // scalastyle:on
   }
@@ -100,8 +114,13 @@ private[ui] class StoragePage(parent: StorageTab) extends WebUIPage("") {
       statuses: Seq[ExecutorStreamBlockStatus]): Seq[Node] = {
     <div>
       <h5>Aggregated Block Metrics by Executor</h5>
-      {UIUtils.listingTable(executorMetricsTableHeader, executorMetricsTableRow, statuses,
-        id = Some("storage-by-executor-stream-blocks"))}
+      {
+      UIUtils.listingTable(
+        executorMetricsTableHeader,
+        executorMetricsTableRow,
+        statuses,
+        id = Some("storage-by-executor-stream-blocks"))
+    }
     </div>
   }
 
@@ -140,12 +159,14 @@ private[ui] class StoragePage(parent: StorageTab) extends WebUIPage("") {
     } else {
       <div>
         <h5>Blocks</h5>
-        {UIUtils.listingTable(
+        {
+        UIUtils.listingTable(
           streamBlockTableHeader,
           streamBlockTableRow,
           blocks,
           id = Some("storage-by-block-table"),
-          sortable = false)}
+          sortable = false)
+      }
       </div>
     }
   }
@@ -183,15 +204,15 @@ private[ui] class StoragePage(parent: StorageTab) extends WebUIPage("") {
 
     <tr>
       {
-        if (firstSubrow) {
-          <td rowspan={replication.toString}>
+      if (firstSubrow) {
+        <td rowspan={replication.toString}>
             {block.blockId.toString}
           </td>
           <td rowspan={replication.toString}>
             {replication.toString}
           </td>
-        }
       }
+    }
       <td>{block.location}</td>
       <td>{storageLevel}</td>
       <td>{Utils.bytesToString(size)}</td>

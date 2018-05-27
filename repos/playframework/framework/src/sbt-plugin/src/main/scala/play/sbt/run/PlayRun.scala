@@ -80,7 +80,7 @@ object PlayRun {
             .toEither
             .right
             .toOption
-    )
+      )
 
     val runSbtTask: String => AnyRef = (task: String) => {
       val parser = Act.scopedKeyParser(state)

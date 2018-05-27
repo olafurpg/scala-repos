@@ -31,7 +31,7 @@ object ZipWith {
             ss =>
               n match {
                 case Succ(i) => zw.manyApp(i)(zapp(xs, ss))
-        }
+              }
     }
 }
 

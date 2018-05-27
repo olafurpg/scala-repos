@@ -521,7 +521,7 @@ protected[kestrel] class ConnectedClient(
           case Values(Seq())               => Return(None)
           case _ =>
             Throw(new IllegalArgumentException("invalid reply from kestrel"))
-      },
+        },
       open,
       (Unit) => closeAndOpen,
       (Unit) => abort
@@ -585,7 +585,7 @@ protected[kestrel] class ThriftConnectedClient(
           .flushQueue(queueName)
           .map { _ =>
             Values(Nil)
-        })
+          })
 
   def delete(queueName: String): Future[Response] =
     withClient[Response](
@@ -594,7 +594,7 @@ protected[kestrel] class ThriftConnectedClient(
           .deleteQueue(queueName)
           .map { _ =>
             Deleted()
-        })
+          })
 
   def set(
       queueName: String,
@@ -607,7 +607,7 @@ protected[kestrel] class ThriftConnectedClient(
           .put(queueName, List(Buf.ByteBuffer.Owned.extract(value)), timeout)
           .map { _ =>
             Stored()
-        })
+          })
   }
 
   def get(
@@ -622,7 +622,7 @@ protected[kestrel] class ThriftConnectedClient(
             case Seq()           => None
             case Seq(item: Item) => Some(Buf.ByteBuffer.Owned(item.data))
             case _               => throw new IllegalArgumentException
-        })
+          })
   }
 
   private def openRead(queueName: String)(
@@ -654,7 +654,7 @@ protected[kestrel] class ThriftConnectedClient(
           case Seq() => Return(None)
           case _ =>
             Throw(new IllegalArgumentException("invalid reply from kestrel"))
-      },
+        },
       openRead(queueName),
       confirmAndOpenRead(queueName),
       abortReadCommand(queueName)

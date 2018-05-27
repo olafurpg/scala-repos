@@ -352,7 +352,7 @@ private[mesos] trait MesosSchedulerUtils extends Logging {
               Set[String]()
             } else {
               v.split(',').toSet
-          })
+            })
       } catch {
         case NonFatal(e) =>
           throw new IllegalArgumentException(

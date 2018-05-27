@@ -166,7 +166,7 @@ object AnnotatorHighlighter {
                   simpleAnnotate(
                     ScalaBundle.message("scala.immutable.collection"),
                     DefaultHighlighter.IMMUTABLE_COLLECTION)
-              })
+                })
             case _ =>
           }
       }
@@ -242,7 +242,7 @@ object AnnotatorHighlighter {
               if (SCALA_PREDEFINED_OBJECTS.contains(a.qualifiedName)) {
                 x.getType(TypingContext.empty)
                   .foreach(annotateCollectionByType)
-            })
+              })
 
             getParentByStub(parent) match {
               case _: ScTemplateBody | _: ScEarlyDefinitions =>

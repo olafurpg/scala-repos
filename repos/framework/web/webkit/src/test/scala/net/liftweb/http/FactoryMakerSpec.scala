@@ -28,8 +28,8 @@ object FactoryMakerSpec extends Specification {
   "FactoryMaker Specification".title
 
   object MyFactory extends Factory {
-    val f1: FactoryMaker[List[String]] = new FactoryMaker(
-      () => List("Hello", "World")) {}
+    val f1: FactoryMaker[List[String]] = new FactoryMaker(() =>
+      List("Hello", "World")) {}
     val f2: FactoryMaker[Boolean] = new FactoryMaker(() => false) {}
   }
 

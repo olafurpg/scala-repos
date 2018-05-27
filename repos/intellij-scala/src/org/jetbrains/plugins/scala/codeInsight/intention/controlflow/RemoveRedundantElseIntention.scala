@@ -62,20 +62,24 @@ class RemoveRedundantElseIntention extends PsiElementBaseIntentionAction {
       PsiTreeUtil.getParentOfType(element, classOf[ScIfStmt], false)
     if (ifStmt == null || !ifStmt.isValid) return
 
-    val thenBranch = ifStmt.thenBranch.getOrElse(return )
+    val thenBranch = ifStmt.thenBranch.getOrElse(return
+    )
     val elseKeyWord = thenBranch.getNextSiblingNotWhitespaceComment
 
-    val elseBranch = ifStmt.elseBranch.getOrElse(return )
+    val elseBranch = ifStmt.elseBranch.getOrElse(return
+    )
 
     val children = elseBranch.copy().children.toList
     var from = children
       .find(_.getNode.getElementType != ScalaTokenTypes.tLBRACE)
-      .getOrElse(return )
+      .getOrElse(return
+      )
     if (ScalaTokenTypes.WHITES_SPACES_TOKEN_SET.contains(
           from.getNode.getElementType)) from = from.getNextSibling
     val to = children.reverse
       .find(_.getNode.getElementType != ScalaTokenTypes.tRBRACE)
-      .getOrElse(return )
+      .getOrElse(return
+      )
 
     inWriteAction {
       elseKeyWord.delete()

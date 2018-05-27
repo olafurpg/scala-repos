@@ -48,8 +48,7 @@ private[sql] object ParquetFilters {
       (n: String, v: Any) =>
         FilterApi.eq(booleanColumn(n), v.asInstanceOf[java.lang.Boolean])
     case IntegerType =>
-      (n: String, v: Any) =>
-        FilterApi.eq(intColumn(n), v.asInstanceOf[Integer])
+      (n: String, v: Any) => FilterApi.eq(intColumn(n), v.asInstanceOf[Integer])
     case LongType =>
       (n: String, v: Any) =>
         FilterApi.eq(longColumn(n), v.asInstanceOf[java.lang.Long])
@@ -108,8 +107,7 @@ private[sql] object ParquetFilters {
   private val makeLt
     : PartialFunction[DataType, (String, Any) => FilterPredicate] = {
     case IntegerType =>
-      (n: String, v: Any) =>
-        FilterApi.lt(intColumn(n), v.asInstanceOf[Integer])
+      (n: String, v: Any) => FilterApi.lt(intColumn(n), v.asInstanceOf[Integer])
     case LongType =>
       (n: String, v: Any) =>
         FilterApi.lt(longColumn(n), v.asInstanceOf[java.lang.Long])

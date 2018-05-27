@@ -458,6 +458,6 @@ trait SyntheticMethods extends ast.TreeDSL { self: Analyzer =>
           synthesize() match {
             case Nil => body // avoiding unnecessary copy
             case ms  => body ++ ms
-        })
+          })
   }
 }

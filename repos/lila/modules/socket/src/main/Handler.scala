@@ -108,7 +108,7 @@ object Handler {
             obj str "t" foreach { t =>
               control.lift(t -> obj)
             }
-        })
+          })
         .map(_ => socket ! Quit(uid))
     }
 

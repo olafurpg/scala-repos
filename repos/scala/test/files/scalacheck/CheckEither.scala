@@ -22,7 +22,7 @@ object Test extends Properties("Either") {
     e match {
       case Left(a)  => e.swap.right.get == a
       case Right(b) => e.swap.left.get == b
-  })
+    })
 
   val prop_isLeftRight = forAll((e: Either[Int, Int]) => e.isLeft != e.isRight)
 
@@ -162,13 +162,13 @@ object Test extends Properties("Either") {
     e match {
       case Left(ee) => e.joinLeft == ee
       case Right(n) => e.joinLeft == Right(n)
-  })
+    })
 
   val prop_Either_joinRight = forAll((e: Either[Int, Either[Int, Int]]) =>
     e match {
       case Left(n)   => e.joinRight == Left(n)
       case Right(ee) => e.joinRight == ee
-  })
+    })
 
   val prop_Either_reduce = forAll(
     (e: Either[Int, Int]) =>

@@ -41,7 +41,7 @@ class FlowStageSpec
               tot += elem
               ctx.push(tot)
             }
-        })
+          })
         .runWith(Sink.asPublisher(false))
       val subscriber = TestSubscriber.manualProbe[Int]()
       p2.subscribe(subscriber)
@@ -77,7 +77,7 @@ class FlowStageSpec
               if (current eq waitForNext) ctx.finish()
               else ctx.absorbTermination()
             }
-        })
+          })
         .runWith(Sink.asPublisher(false))
       val subscriber = TestSubscriber.manualProbe[Int]()
       p2.subscribe(subscriber)
@@ -115,7 +115,7 @@ class FlowStageSpec
                   ctx.pull()
                 } else ctx.push(elem)
             }
-        })
+          })
         .runWith(Sink.asPublisher(false))
 
       val subscriber = TestSubscriber.manualProbe[Int]()
@@ -153,7 +153,7 @@ class FlowStageSpec
               if (elem % 2 == 0) ctx.pull()
               else ctx.push(tot)
             }
-        })
+          })
         .runWith(Sink.asPublisher(false))
       val subscriber = TestSubscriber.manualProbe[Int]()
       p2.subscribe(subscriber)
@@ -178,7 +178,7 @@ class FlowStageSpec
               concat += elem
               ctx.push(concat.length)
             }
-        })
+          })
         .transform(() ⇒
           new PushStage[Int, Int] {
             var tot = 0
@@ -186,7 +186,7 @@ class FlowStageSpec
               tot += length
               ctx.push(tot)
             }
-        })
+          })
         .runWith(Sink.asPublisher(true))
       val c1 = TestSubscriber.manualProbe[Int]()
       p2.subscribe(c1)
@@ -224,7 +224,7 @@ class FlowStageSpec
             }
             override def onUpstreamFinish(ctx: Context[String]) =
               terminationEmit(Iterator.single(s + "B"), ctx)
-        })
+          })
         .runWith(Sink.asPublisher(false))
       val c = TestSubscriber.manualProbe[String]()
       p2.subscribe(c)
@@ -245,7 +245,7 @@ class FlowStageSpec
               if (s == "1") ctx.pushAndFinish(element)
               else ctx.push(element)
             }
-        })
+          })
         .toMat(TestSink.probe[Int])(Keep.both)
         .run
       p2.request(10)
@@ -269,7 +269,7 @@ class FlowStageSpec
                 }
               }
             }
-        })
+          })
         .runWith(TestSink.probe[Int])
       EventFilter[IllegalArgumentException]("two not allowed") intercept {
         p2.request(100)
@@ -302,7 +302,7 @@ class FlowStageSpec
                 ctx: Context[Int]) = {
               terminationEmit(Iterator(100, 101), ctx)
             }
-        })
+          })
         .filter(elem ⇒ elem != 1)
         . // it's undefined if element 1 got through before the error or not
         runWith(TestSink.probe[Int])
@@ -325,7 +325,7 @@ class FlowStageSpec
               override def onPush(elem: Int, ctx: Context[Int]) =
                 emit(Iterator(elem, elem), ctx)
             }
-        })
+          })
         .runWith(TestSink.probe[Int])
         .request(1000)
         .expectNext(1)
@@ -351,7 +351,7 @@ class FlowStageSpec
             }
             override def onUpstreamFinish(ctx: Context[Int]) =
               terminationEmit(Iterator(1, 2, 3), ctx)
-        })
+          })
         .runWith(TestSink.probe[Int])
         .request(4)
         .expectNext(1)
@@ -382,7 +382,7 @@ class FlowStageSpec
                   with NoStackTrace
                 case _ ⇒ ctx.finish()
               }
-        })
+          })
         .runWith(TestSink.probe[Int])
         .request(10)
         .expectNext(1)
@@ -401,7 +401,7 @@ class FlowStageSpec
             count += 1
             ctx.push(count)
           }
-      })
+        })
 
       flow
         .runWith(TestSink.probe[Int])
@@ -430,7 +430,7 @@ class FlowStageSpec
               onDownstreamFinishProbe.ref ! "onDownstreamFinish"
               ctx.finish()
             }
-        })
+          })
         .to(Sink.fromSubscriber(down))
         .run()
 
@@ -458,7 +458,7 @@ class FlowStageSpec
             override def onUpstreamFinish(
                 ctx: Context[Int]): TerminationDirective =
               terminationEmit(Iterator(42), ctx)
-        })
+          })
         .runWith(Sink.asPublisher(false))
 
       val inSub = in.expectSubscription()
@@ -488,7 +488,7 @@ class FlowStageSpec
             override def onUpstreamFinish(ctx: Context[String]) = {
               terminationEmit(Iterator("byebye"), ctx)
             }
-        })
+          })
         .runWith(TestSink.probe[String])
         .request(1)
         .expectNext("hi1")

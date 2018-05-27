@@ -338,7 +338,6 @@ class TestFileFormat extends FileFormat {
     LastArguments.filters = filters
     LastArguments.options = options
 
-    (file: PartitionedFile) =>
-      { Iterator.empty }
+    (file: PartitionedFile) => { Iterator.empty }
   }
 }

@@ -430,7 +430,7 @@ class BufChannelBufferTest extends FunSuite with BeforeAndAfter {
 
     random.setSeed(seed)
     0.until(CAPACITY - 3, 4) foreach { i =>
-      val value = random.nextInt() & 0xFFFFFFFFL
+      val value = random.nextInt() & 0XFFFFFFFFL
       assert(value == bcb.getUnsignedInt(i))
     }
   }
@@ -630,7 +630,7 @@ class BufChannelBufferTest extends FunSuite with BeforeAndAfter {
 
     random.setSeed(seed)
     0.until(CAPACITY, 4) foreach { i =>
-      val value = random.nextInt() & 0xFFFFFFFFL
+      val value = random.nextInt() & 0XFFFFFFFFL
       assert(i == bcb.readerIndex())
       assert(bcb.readable())
       assert(value == bcb.readUnsignedInt())

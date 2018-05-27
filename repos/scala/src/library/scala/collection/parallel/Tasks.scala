@@ -304,12 +304,11 @@ trait ThreadPoolTasks extends Tasks {
     // debuglog("-----------> Executing without wait: " + task)
     t.start()
 
-    () =>
-      {
-        t.sync()
-        t.body.forwardThrowable()
-        t.body.result
-      }
+    () => {
+      t.sync()
+      t.body.forwardThrowable()
+      t.body.result
+    }
   }
 
   def executeAndWaitResult[R, Tp](task: Task[R, Tp]): R = {
@@ -406,12 +405,11 @@ trait ForkJoinTasks extends Tasks with HavingForkJoinPool {
       forkJoinPool.execute(fjtask)
     }
 
-    () =>
-      {
-        fjtask.sync()
-        fjtask.body.forwardThrowable()
-        fjtask.body.result
-      }
+    () => {
+      fjtask.sync()
+      fjtask.body.forwardThrowable()
+      fjtask.body.result
+    }
   }
 
   /** Executes a task on a fork/join pool and waits for it to finish.

@@ -112,7 +112,7 @@ object BinaryFormat {
             )
           case x =>
             sys error s"BinaryFormat.clock.read invalid bytes: ${ba.showBytes}"
-      }
+        }
 
     private def decay = (since.getMillis / 10) - 10
 

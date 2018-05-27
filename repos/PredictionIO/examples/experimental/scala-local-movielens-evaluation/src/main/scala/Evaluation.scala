@@ -36,7 +36,7 @@ object CommonParams {
     itemSimilarity = "LogLikelihoodSimilarity",
     weighted = false,
     nearestN = 10,
-    threshold = 4.9E-324,
+    threshold = 4.9e-324,
     numSimilarItems = 50,
     numUserActions = 50,
     freshness = 0,
@@ -75,8 +75,8 @@ object Evaluation1 {
     val engineParams = new EngineParams(
       dataSourceParams = dsp,
       preparatorParams = CommonParams.PreparatorParams,
-      algorithmParamsList =
-        Seq(("mahoutItemBased", CommonParams.MahoutAlgoParams0))
+      algorithmParamsList = Seq(
+        ("mahoutItemBased", CommonParams.MahoutAlgoParams0))
     )
 
     // Evaluator Setting
@@ -107,8 +107,8 @@ object Evaluation2 {
     val engineParams = new EngineParams(
       dataSourceParams = CommonParams.CompleteDataSourceParams,
       preparatorParams = CommonParams.PreparatorParams,
-      algorithmParamsList =
-        Seq(("mahoutItemBased", CommonParams.MahoutAlgoParams0))
+      algorithmParamsList = Seq(
+        ("mahoutItemBased", CommonParams.MahoutAlgoParams0))
     )
 
     // Evaluator Setting

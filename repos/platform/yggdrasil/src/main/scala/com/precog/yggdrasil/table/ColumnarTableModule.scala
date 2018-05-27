@@ -418,7 +418,7 @@ trait ColumnarTableModule[M[+ _]]
 
   def newScratchDir(): File =
     IOUtils.createTmpDir("ctmscratch").unsafePerformIO
-  def jdbmCommitInterval: Long = 200000l
+  def jdbmCommitInterval: Long = 200000L
 
   implicit def liftF1(f: F1) = new F1Like {
     def compose(f1: F1) = f compose f1
@@ -2046,8 +2046,7 @@ trait ColumnarTableModule[M[+ _]]
             }
           }
 
-          (i: Int) =>
-            rowComparator.compare(spanStart, i)
+          (i: Int) => rowComparator.compare(spanStart, i)
         }
 
         val groupTable = subTable(comparatorGen, head.drop(spanStart) :: tail)

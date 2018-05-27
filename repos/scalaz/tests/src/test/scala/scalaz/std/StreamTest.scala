@@ -60,8 +60,7 @@ object StreamTest extends SpecLite {
         case h #:: t      => h #:: loop(t)
       }
     }
-    (a: Stream[Int], b: Int) =>
-      (a.intersperse(b) must_=== (intersperse(a, b)))
+    (a: Stream[Int], b: Int) => (a.intersperse(b) must_=== (intersperse(a, b)))
   }
 
   "foldl is foldLeft" ! forAll { (rnge: Stream[List[Int]]) =>

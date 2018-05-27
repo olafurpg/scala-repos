@@ -44,10 +44,9 @@ final case class AdaptiveLoadBalancingRoutingLogic(
   // The current weighted routees, if any. Weights are produced by the metricsSelector
   // via the metricsListener Actor. It's only updated by the actor, but accessed from
   // the threads of the sender()s.
-  private val weightedRouteesRef = new AtomicReference[(
-      immutable.IndexedSeq[Routee],
-      Set[NodeMetrics],
-      Option[WeightedRoutees])]((Vector.empty, Set.empty, None))
+  private val weightedRouteesRef = new AtomicReference[
+    (immutable.IndexedSeq[Routee], Set[NodeMetrics], Option[WeightedRoutees])](
+    (Vector.empty, Set.empty, None))
 
   @tailrec final def metricsChanged(event: ClusterMetricsChanged): Unit = {
     val oldValue = weightedRouteesRef.get

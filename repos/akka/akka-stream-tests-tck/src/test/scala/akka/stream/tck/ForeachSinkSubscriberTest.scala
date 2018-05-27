@@ -12,7 +12,7 @@ class ForeachSinkSubscriberTest
   override def createSubscriber(): Subscriber[Int] =
     Flow[Int]
       .to(Sink.foreach { _ ⇒
-        })
+      })
       .runWith(Source.asSubscriber)
 
   override def createElement(element: Int): Int = element

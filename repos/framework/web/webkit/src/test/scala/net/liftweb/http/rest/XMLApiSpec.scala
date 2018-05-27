@@ -56,21 +56,17 @@ object XmlApiSpec extends Specification {
     // This method tests the XML implicit conversions on XMLApiHelper
     def calculator: LiftRules.DispatchPF = {
       case r @ Req(List("api", "sum"), _, GetRequest) =>
-        () =>
-          doSum(r)
+        () => doSum(r)
       case r @ Req(List("api", "product"), _, GetRequest) =>
-        () =>
-          doProduct(r)
+        () => doProduct(r)
       case r @ Req(List("api", "max"), _, GetRequest) =>
-        () =>
-          doMax(r)
+        () => doMax(r)
       case r @ Req(List("api", "min"), _, GetRequest) =>
         () =>
           doMin(r)
-      // Tests putResponseInBox
+        // Tests putResponseInBox
       case Req("api" :: _, _, _) =>
-        () =>
-          BadRequestResponse()
+        () => BadRequestResponse()
     }
 
     // ===== Handler methods =====

@@ -18,7 +18,7 @@ final class StateT[F[_], S, A](val runF: F[S => F[(S, A)]])
           case (s, a) =>
             fas(a).run(s)
         }
-    })
+      })
 
   def map[B](f: A => B)(implicit F: Monad[F]): StateT[F, S, B] =
     transform { case (s, a) => (s, f(a)) }

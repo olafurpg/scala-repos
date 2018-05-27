@@ -144,7 +144,7 @@ class StringConcatTest extends ClearAfterClass {
       3: Byte,
       12: Short,
       3,
-      -32l,
+      -32L,
       12.3f,
       -4.2d,
       "me",

@@ -57,7 +57,7 @@ object StrictForm {
         implicit mat ⇒ {
           case FromString(value) ⇒ um.unmarshalString(value)
           case FromPart(value) ⇒ um.unmarshalPart(value)
-      })
+        })
 
     def unmarshallerFromFSU[T](
         fsu: FromStringUnmarshaller[T]): FromStrictFormFieldUnmarshaller[T] =
@@ -71,7 +71,7 @@ object StrictForm {
               .nioCharset
               .name
             fsu(value.entity.data.decodeString(charsetName))
-      })
+        })
 
     @implicitNotFound("In order to unmarshal a `StrictForm.Field` to type `${T}` you need to supply a " +
       "`FromStringUnmarshaller[${T}]` and/or a `FromEntityUnmarshaller[${T}]`")

@@ -55,7 +55,11 @@ trait Invoker[+R] { self =>
   final def foreach(f: R => Unit, maxRows: Int = 0)(
       implicit session: JdbcBackend#Session) {
     val it = iteratorTo(maxRows)
-    try { it.foreach(f) } finally { it.close() }
+    try {
+      it.foreach(f)
+    } finally {
+      it.close()
+    }
   }
 }
 

@@ -24,7 +24,9 @@ object Test {
   }
 
   def main(args: Array[String]): Unit = {
-    try { nullReference } catch { case _: NoSuchElementException => }
+    try {
+      nullReference
+    } catch { case _: NoSuchElementException => }
     literal
     expectedUnitInABranch(true) // Was: VerifyError under GenICode
   }

@@ -170,7 +170,10 @@ private[ui] class JobPage(parent: JobsTab) extends WebUIPage("job") {
         </div>
       </div>
     </div> ++ <script type="text/javascript">
-      {Unparsed(s"drawJobTimeline(${groupJsonArrayAsStr}, ${eventArrayAsStr}, ${appStartTime});")}
+      {
+      Unparsed(
+        s"drawJobTimeline(${groupJsonArrayAsStr}, ${eventArrayAsStr}, ${appStartTime});")
+    }
     </script>
   }
 
@@ -274,54 +277,54 @@ private[ui] class JobPage(parent: JobsTab) extends WebUIPage("job") {
               {jobData.status}
             </li>
             {
-              if (jobData.jobGroup.isDefined) {
-                <li>
+        if (jobData.jobGroup.isDefined) {
+          <li>
                   <strong>Job Group:</strong>
                   {jobData.jobGroup.get}
                 </li>
-              }
-            }
+        }
+      }
             {
-              if (shouldShowActiveStages) {
-                <li>
+        if (shouldShowActiveStages) {
+          <li>
                   <a href="#active"><strong>Active Stages:</strong></a>
                   {activeStages.size}
                 </li>
-              }
-            }
+        }
+      }
             {
-              if (shouldShowPendingStages) {
-                <li>
+        if (shouldShowPendingStages) {
+          <li>
                   <a href="#pending">
                     <strong>Pending Stages:</strong>
                   </a>{pendingOrSkippedStages.size}
                 </li>
-              }
-            }
+        }
+      }
             {
-              if (shouldShowCompletedStages) {
-                <li>
+        if (shouldShowCompletedStages) {
+          <li>
                   <a href="#completed"><strong>Completed Stages:</strong></a>
                   {completedStages.size}
                 </li>
-              }
-            }
+        }
+      }
             {
-              if (shouldShowSkippedStages) {
-              <li>
+        if (shouldShowSkippedStages) {
+          <li>
                 <a href="#skipped"><strong>Skipped Stages:</strong></a>
                 {pendingOrSkippedStages.size}
               </li>
-            }
-            }
+        }
+      }
             {
-              if (shouldShowFailedStages) {
-                <li>
+        if (shouldShowFailedStages) {
+          <li>
                   <a href="#failed"><strong>Failed Stages:</strong></a>
                   {failedStages.size}
                 </li>
-              }
-            }
+        }
+      }
           </ul>
         </div>
 

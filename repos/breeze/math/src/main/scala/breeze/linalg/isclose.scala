@@ -8,7 +8,7 @@ import breeze.macros.expand
   */
 object isClose extends UFunc {
 
-  val DEFAULT_TOLERANCE = 1E-8
+  val DEFAULT_TOLERANCE = 1e-8
 
   implicit def defaultTolImpl[A, B](
       implicit impl3: Impl3[A, B, Double, Boolean]): Impl2[A, B, Boolean] = {

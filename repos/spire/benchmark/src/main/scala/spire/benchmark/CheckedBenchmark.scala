@@ -36,7 +36,9 @@ class CheckedBenchmarks extends MyBenchmark {
     var i = start
     var sum = 0
     while (i < limit) {
-      try { sum = Checked.checked(sum + i * i + i) } catch {
+      try {
+        sum = Checked.checked(sum + i * i + i)
+      } catch {
         case _: Exception => sum = 0
       }
       i += 1

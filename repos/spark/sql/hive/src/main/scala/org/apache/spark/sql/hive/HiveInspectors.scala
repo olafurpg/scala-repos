@@ -452,43 +452,41 @@ private[hive] trait HiveInspectors {
           case (ref, field) =>
             wrapperFor(ref.getFieldObjectInspector, field.dataType)
         }
-      (o: Any) =>
-        {
-          if (o != null) {
-            val struct = soi.create()
-            val row = o.asInstanceOf[InternalRow]
-            soi.getAllStructFieldRefs.asScala
-              .zip(wrappers)
-              .zipWithIndex
-              .foreach {
-                case ((field, wrapper), i) =>
-                  soi.setStructFieldData(
-                    struct,
-                    field,
-                    wrapper(row.get(i, schema(i).dataType)))
-              }
-            struct
-          } else {
-            null
-          }
+      (o: Any) => {
+        if (o != null) {
+          val struct = soi.create()
+          val row = o.asInstanceOf[InternalRow]
+          soi.getAllStructFieldRefs.asScala
+            .zip(wrappers)
+            .zipWithIndex
+            .foreach {
+              case ((field, wrapper), i) =>
+                soi.setStructFieldData(
+                  struct,
+                  field,
+                  wrapper(row.get(i, schema(i).dataType)))
+            }
+          struct
+        } else {
+          null
         }
+      }
 
     case loi: ListObjectInspector =>
       val elementType = dataType.asInstanceOf[ArrayType].elementType
       val wrapper = wrapperFor(loi.getListElementObjectInspector, elementType)
-      (o: Any) =>
-        {
-          if (o != null) {
-            val array = o.asInstanceOf[ArrayData]
-            val values = new java.util.ArrayList[Any](array.numElements())
-            array.foreach(elementType, (_, e) => {
-              values.add(wrapper(e))
-            })
-            values
-          } else {
-            null
-          }
+      (o: Any) => {
+        if (o != null) {
+          val array = o.asInstanceOf[ArrayData]
+          val values = new java.util.ArrayList[Any](array.numElements())
+          array.foreach(elementType, (_, e) => {
+            values.add(wrapper(e))
+          })
+          values
+        } else {
+          null
         }
+      }
 
     case moi: MapObjectInspector =>
       val mt = dataType.asInstanceOf[MapType]
@@ -496,19 +494,18 @@ private[hive] trait HiveInspectors {
       val valueWrapper =
         wrapperFor(moi.getMapValueObjectInspector, mt.valueType)
 
-      (o: Any) =>
-        {
-          if (o != null) {
-            val map = o.asInstanceOf[MapData]
-            val jmap = new java.util.HashMap[Any, Any](map.numElements())
-            map.foreach(mt.keyType, mt.valueType, (k, v) => {
-              jmap.put(keyWrapper(k), valueWrapper(v))
-            })
-            jmap
-          } else {
-            null
-          }
+      (o: Any) => {
+        if (o != null) {
+          val map = o.asInstanceOf[MapData]
+          val jmap = new java.util.HashMap[Any, Any](map.numElements())
+          map.foreach(mt.keyType, mt.valueType, (k, v) => {
+            jmap.put(keyWrapper(k), valueWrapper(v))
+          })
+          jmap
+        } else {
+          null
         }
+      }
 
     case _ =>
       identity[Any]

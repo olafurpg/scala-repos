@@ -20,7 +20,10 @@ class InputStreamTest extends CommonStreamsTests {
 
   class DummyInputStream(val length: Int) extends InputStream {
     private var i: Int = 0
-    def read(): Int = if (i < length) { i += 1; i } else -1
+    def read(): Int =
+      if (i < length) {
+        i += 1; i
+      } else -1
   }
 
   @Test

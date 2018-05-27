@@ -337,7 +337,7 @@ class PathDirectivesSpec extends RoutingSpec with Inside {
           case None ⇒
             failTest(
               "Example '" + exampleString + "' doesn't contain a test uri")
-      }
+        }
   }
 
   import akka.http.scaladsl.model.StatusCodes._

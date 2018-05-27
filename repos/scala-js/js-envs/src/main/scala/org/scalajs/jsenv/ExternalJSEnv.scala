@@ -85,14 +85,20 @@ abstract class ExternalJSEnv(
     final protected def pipeVMData(vmInst: Process): Unit = {
       // Send stdin to VM.
       val out = vmInst.getOutputStream()
-      try { sendVMStdin(out) } finally { out.close() }
+      try {
+        sendVMStdin(out)
+      } finally {
+        out.close()
+      }
 
       // Pipe stdout to console
       pipeToConsole(vmInst.getInputStream(), console)
 
       // We are probably done (stdin is closed). Report any errors
       val errSrc = Source.fromInputStream(vmInst.getErrorStream(), "UTF-8")
-      try { errSrc.getLines.foreach(err => logger.error(err)) } finally {
+      try {
+        errSrc.getLines.foreach(err => logger.error(err))
+      } finally {
         errSrc.close
       }
     }
@@ -141,7 +147,11 @@ abstract class ExternalJSEnv(
     /** pipe lines from input stream to JSConsole */
     final protected def pipeToConsole(in: InputStream, console: JSConsole) = {
       val source = Source.fromInputStream(in, "UTF-8")
-      try { source.getLines.foreach(console.log _) } finally { source.close() }
+      try {
+        source.getLines.foreach(console.log _)
+      } finally {
+        source.close()
+      }
     }
   }
 

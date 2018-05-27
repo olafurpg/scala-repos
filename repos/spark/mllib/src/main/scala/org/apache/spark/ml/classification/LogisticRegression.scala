@@ -159,7 +159,7 @@ private[classification] trait LogisticRegressionParams
       )
       val t = 1.0 / (1.0 + ts(0) / ts(1))
       require(
-        math.abs($(threshold) - t) < 1E-5,
+        math.abs($(threshold) - t) < 1e-5,
         "Logistic Regression getThreshold found" +
           s" inconsistent values for threshold (${$(threshold)}) and thresholds (equivalent to $t)"
       )
@@ -230,7 +230,7 @@ class LogisticRegression @Since("1.2.0")(
     */
   @Since("1.4.0")
   def setTol(value: Double): this.type = set(tol, value)
-  setDefault(tol -> 1E-6)
+  setDefault(tol -> 1e-6)
 
   /**
     * Whether to fit an intercept term.

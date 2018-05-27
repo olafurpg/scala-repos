@@ -29,5 +29,4 @@ private[niocharset] object ISO_8859_1
         "819",
         "IBM819"
       ),
-      maxValue = 0xff
-    )
+      maxValue = 0xff)

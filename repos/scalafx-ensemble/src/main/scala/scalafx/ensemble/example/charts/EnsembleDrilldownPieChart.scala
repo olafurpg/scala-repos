@@ -76,6 +76,6 @@ class EnsembleDrilldownPieChart extends EnsembleExample {
           PieChart.Data(labelPrefix + "-3", 5),
           PieChart.Data(labelPrefix + "-4", 3),
           PieChart.Data(labelPrefix + "-5", 2)
-      )
+        )
     }
 }

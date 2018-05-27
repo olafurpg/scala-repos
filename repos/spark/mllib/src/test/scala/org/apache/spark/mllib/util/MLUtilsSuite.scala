@@ -278,12 +278,12 @@ class MLUtilsSuite extends SparkFunSuite with MLlibTestSparkContext {
   }
 
   test("log1pExp") {
-    assert(log1pExp(76.3) ~== math.log1p(math.exp(76.3)) relTol 1E-10)
-    assert(log1pExp(87296763.234) ~== 87296763.234 relTol 1E-10)
+    assert(log1pExp(76.3) ~== math.log1p(math.exp(76.3)) relTol 1e-10)
+    assert(log1pExp(87296763.234) ~== 87296763.234 relTol 1e-10)
 
-    assert(log1pExp(-13.8) ~== math.log1p(math.exp(-13.8)) absTol 1E-10)
+    assert(log1pExp(-13.8) ~== math.log1p(math.exp(-13.8)) absTol 1e-10)
     assert(
       log1pExp(-238423789.865) ~==
-        math.log1p(math.exp(-238423789.865)) absTol 1E-10)
+        math.log1p(math.exp(-238423789.865)) absTol 1e-10)
   }
 }

@@ -22,7 +22,9 @@ abstract class Driver {
 
   /** True to continue compilation. */
   protected def processSettingsHook(): Boolean = {
-    if (settings.version) { reporter echo versionMsg; false } else
+    if (settings.version) {
+      reporter echo versionMsg; false
+    } else
       !reporter.hasErrors
   }
 

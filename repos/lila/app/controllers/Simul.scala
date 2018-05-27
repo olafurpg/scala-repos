@@ -89,7 +89,7 @@ object Simul extends LilaController {
         setup =>
           env.api.create(setup, me) map { simul =>
             Redirect(routes.Simul.show(simul.id))
-        })
+          })
     }
   }
 

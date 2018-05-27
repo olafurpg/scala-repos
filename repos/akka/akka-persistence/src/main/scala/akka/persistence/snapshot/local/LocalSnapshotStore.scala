@@ -143,7 +143,11 @@ private[persistence] class LocalSnapshotStore
       p)
 
   private def withStream[A <: Closeable, B](stream: A, p: A ⇒ B): B =
-    try { p(stream) } finally { stream.close() }
+    try {
+      p(stream)
+    } finally {
+      stream.close()
+    }
 
   /** Only by persistenceId and sequenceNr, timestamp is informational - accomodates for 2.13.x series files */
   private def snapshotFileForWrite(

@@ -52,7 +52,7 @@ object AtLeastOnceDeliveryCrashSpec {
       case Message ⇒ persist(Message)(_ ⇒ send())
       case CrashMessage ⇒
         persist(CrashMessage) { evt ⇒
-          }
+        }
     }
 
     def send() = {

@@ -108,7 +108,7 @@ trait LogisticRegressionLibModule[M[+ _]]
         if (seq.isEmpty) {
           sys.error("empty sequence should never occur")
         } else {
-          val result = seq.foldLeft(0D) {
+          val result = seq.foldLeft(0d) {
             case (sum, colVal) => {
               val xs = java.util.Arrays.copyOf(colVal, colVal.length - 1)
               val y = colVal.last

@@ -61,11 +61,13 @@ object Head extends DispatchSnippet {
     val xhtml = validHeadTagsOnly(_xhtml)
 
     <head>{
-       if ((S.attr("withResourceId") or S.attr("withresourceid")).filter(Helpers.toBoolean).isDefined) {
-         WithResourceId.render(xhtml)
-       } else {
-         xhtml
-       }
-     }</head>
+      if ((S.attr("withResourceId") or S.attr("withresourceid"))
+            .filter(Helpers.toBoolean)
+            .isDefined) {
+        WithResourceId.render(xhtml)
+      } else {
+        xhtml
+      }
+    }</head>
   }
 }

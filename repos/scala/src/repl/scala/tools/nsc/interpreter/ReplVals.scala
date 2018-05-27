@@ -85,7 +85,6 @@ object ReplVals {
             compilerTypeFromTag(m2).asInstanceOf[Type])
     }
 
-    (sym: Symbol) =>
-      new AppliedTypeFromTags(sym)
+    (sym: Symbol) => new AppliedTypeFromTags(sym)
   }
 }

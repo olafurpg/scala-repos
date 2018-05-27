@@ -402,14 +402,13 @@ abstract class SymbolTable
       recordCache(new Clearable {
         def clear(): Unit = cached = NoCached
       })
-      () =>
-        {
-          if (currentRunId != cachedRunId || cached == NoCached) {
-            cached = f
-            cachedRunId = currentRunId
-          }
-          cached
+      () => {
+        if (currentRunId != cachedRunId || cached == NoCached) {
+          cached = f
+          cachedRunId = currentRunId
         }
+        cached
+      }
     }
   }
 

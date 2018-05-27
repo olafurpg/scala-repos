@@ -450,20 +450,15 @@ final class DataFrameStatFunctions private[sql] (df: DataFrame) {
       // For string type, we can get bytes of our `UTF8String` directly, and call the `addBinary`
       // instead of `addString` to avoid unnecessary conversion.
       case StringType =>
-        (sketch, row) =>
-          sketch.addBinary(row.getUTF8String(0).getBytes)
+        (sketch, row) => sketch.addBinary(row.getUTF8String(0).getBytes)
       case ByteType =>
-        (sketch, row) =>
-          sketch.addLong(row.getByte(0))
+        (sketch, row) => sketch.addLong(row.getByte(0))
       case ShortType =>
-        (sketch, row) =>
-          sketch.addLong(row.getShort(0))
+        (sketch, row) => sketch.addLong(row.getShort(0))
       case IntegerType =>
-        (sketch, row) =>
-          sketch.addLong(row.getInt(0))
+        (sketch, row) => sketch.addLong(row.getInt(0))
       case LongType =>
-        (sketch, row) =>
-          sketch.addLong(row.getLong(0))
+        (sketch, row) => sketch.addLong(row.getLong(0))
       case _ =>
         throw new IllegalArgumentException(
           s"Count-min Sketch only supports string type and integral types, " +
@@ -554,20 +549,15 @@ final class DataFrameStatFunctions private[sql] (df: DataFrame) {
       // For string type, we can get bytes of our `UTF8String` directly, and call the `putBinary`
       // instead of `putString` to avoid unnecessary conversion.
       case StringType =>
-        (filter, row) =>
-          filter.putBinary(row.getUTF8String(0).getBytes)
+        (filter, row) => filter.putBinary(row.getUTF8String(0).getBytes)
       case ByteType =>
-        (filter, row) =>
-          filter.putLong(row.getByte(0))
+        (filter, row) => filter.putLong(row.getByte(0))
       case ShortType =>
-        (filter, row) =>
-          filter.putLong(row.getShort(0))
+        (filter, row) => filter.putLong(row.getShort(0))
       case IntegerType =>
-        (filter, row) =>
-          filter.putLong(row.getInt(0))
+        (filter, row) => filter.putLong(row.getInt(0))
       case LongType =>
-        (filter, row) =>
-          filter.putLong(row.getLong(0))
+        (filter, row) => filter.putLong(row.getLong(0))
       case _ =>
         throw new IllegalArgumentException(
           s"Bloom filter only supports string type and integral types, " +

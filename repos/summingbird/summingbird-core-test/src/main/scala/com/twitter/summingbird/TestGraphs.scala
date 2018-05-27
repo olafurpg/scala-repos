@@ -428,8 +428,8 @@ object TestGraphs {
 
   def leftJoinWithDependentStoreJob[P <: Platform[P], T, V1, U, K, V: Monoid](
       source1: Producer[P, T],
-      storeAndService: P#Store[K, V] with P#Service[K, V])(
-      simpleFM1: T => TraversableOnce[(K, U)])(
+      storeAndService: P#Store[K, V]
+        with P#Service[K, V])(simpleFM1: T => TraversableOnce[(K, U)])(
       valuesFlatMap1: ((U, Option[V])) => TraversableOnce[V1])(
       valuesFlatMap2: (V1) => TraversableOnce[V])
     : TailProducer[P, (K, (Option[V], V))] = {

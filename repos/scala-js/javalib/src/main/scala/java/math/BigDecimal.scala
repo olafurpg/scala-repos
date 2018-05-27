@@ -477,8 +477,8 @@ class BigDecimal() extends Number with Comparable[BigDecimal] {
     _scale = 1075 - ((bits >> 52) & 2047).toInt
     // Extracting the 52 bits of the mantissa.
     val mantissa =
-      if (_scale == 1075) (bits & 0xFFFFFFFFFFFFFL) << 1
-      else (bits & 0xFFFFFFFFFFFFFL) | 0x10000000000000L
+      if (_scale == 1075) (bits & 0XFFFFFFFFFFFFFL) << 1
+      else (bits & 0XFFFFFFFFFFFFFL) | 0X10000000000000L
 
     if (mantissa == 0) {
       _scale = 0
@@ -1568,7 +1568,7 @@ class BigDecimal() extends Number with Comparable[BigDecimal] {
         if ((bits & 3) == 3) bits += 2
       }
       // Testing bit 54 to check if the carry creates a new binary digit
-      if ((bits & 0x40000000000000L) == 0) {
+      if ((bits & 0X40000000000000L) == 0) {
         // To drop the last bit of mantissa (first discarded)
         bits >>= 1
         exponent += discardedSize
@@ -1600,8 +1600,8 @@ class BigDecimal() extends Number with Comparable[BigDecimal] {
 
         // Construct the 64 double bits: [sign(1), exponent(11), mantissa(52)]
         val resultBits =
-          (sign & 0x8000000000000000L) | (exponent.toLong << 52) |
-            (bits & 0xFFFFFFFFFFFFFL)
+          (sign & 0X8000000000000000L) | (exponent.toLong << 52) |
+            (bits & 0XFFFFFFFFFFFFFL)
         java.lang.Double.longBitsToDouble(resultBits)
       }
     }

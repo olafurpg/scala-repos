@@ -121,7 +121,7 @@ class HikariCPConfig(dbConfig: DatabaseConfig, configuration: PlayConfig) {
 
     def toMillis(duration: Duration) = {
       if (duration.isFinite()) duration.toMillis
-      else 0l
+      else 0L
     }
 
     // Frequently used

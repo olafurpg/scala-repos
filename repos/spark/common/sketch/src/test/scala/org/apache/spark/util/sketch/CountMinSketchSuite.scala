@@ -75,7 +75,7 @@ class CountMinSketchSuite extends FunSuite {
           if (ratio > epsOfTotalCount) 1 else 0
         }.sum
 
-        1D - numErrors.toDouble / numAllItems
+        1d - numErrors.toDouble / numAllItems
       }
 
       assert(

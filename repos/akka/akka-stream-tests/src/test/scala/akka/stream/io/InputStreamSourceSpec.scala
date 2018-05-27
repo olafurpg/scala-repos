@@ -29,7 +29,7 @@ class InputStreamSourceSpec extends AkkaSpec(UnboundedMailboxConfig) {
       val f = StreamConverters.fromInputStream(() ⇒
         new InputStream {
           override def read(): Int = 42
-      })
+        })
 
       Await.result(f.takeWithin(5.seconds).runForeach(it ⇒ ()), 10.seconds)
     }
@@ -48,7 +48,7 @@ class InputStreamSourceSpec extends AkkaSpec(UnboundedMailboxConfig) {
                   -1
               }
             }
-        })
+          })
         .runWith(Sink.head)
 
       f.futureValue should ===(ByteString("abc"))
@@ -70,7 +70,7 @@ class InputStreamSourceSpec extends AkkaSpec(UnboundedMailboxConfig) {
                   -1
                 }
               }
-          },
+            },
           chunkSize = 1)
         .runWith(TestSink.probe)
 

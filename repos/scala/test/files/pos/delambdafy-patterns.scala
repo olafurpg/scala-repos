@@ -13,5 +13,5 @@ class DelambdafyPatterns {
           // to be a free variable for enclosing lambda
           val b = a
           ()
-    }
+      }
 }

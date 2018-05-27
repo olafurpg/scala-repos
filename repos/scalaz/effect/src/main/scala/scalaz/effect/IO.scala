@@ -57,14 +57,14 @@ sealed abstract class IO[A] {
     io(rw =>
       apply(rw) map {
         case (nw, a) => (nw, f(a))
-    })
+      })
 
   /** Continues this action with the given action. */
   def flatMap[B](f: A => IO[B]): IO[B] =
     io(rw =>
       apply(rw) flatMap {
         case (nw, a) => f(a)(nw)
-    })
+      })
 
   /** Lift this action to a given IO-like monad. */
   def liftIO[M[_]](implicit m: MonadIO[M]): M[A] =
@@ -73,9 +73,11 @@ sealed abstract class IO[A] {
   /** Executes the handler if an exception is raised. */
   def except(handler: Throwable => IO[A]): IO[A] =
     io(rw =>
-      try { Free.pure(this(rw).run) } catch {
+      try {
+        Free.pure(this(rw).run)
+      } catch {
         case e: Throwable => handler(e)(rw)
-    })
+      })
 
   /**
     * Executes the handler for exceptions that are raised and match the given predicate.
@@ -86,7 +88,7 @@ sealed abstract class IO[A] {
       p(e) match {
         case Some(z) => handler(z)
         case None    => throw e
-    })
+      })
 
   /**
     * Returns a disjunction result which is right if no exception was raised, or left if an

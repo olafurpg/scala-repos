@@ -77,7 +77,9 @@ class HashSet[T >: Null <: AnyRef](val label: String, initialCapacity: Int)
       i < table.length
     }
     def next(): T =
-      if (hasNext) { i += 1; table(i - 1).asInstanceOf[T] } else null
+      if (hasNext) {
+        i += 1; table(i - 1).asInstanceOf[T]
+      } else null
   }
 
   private def addOldEntry(x: T) {

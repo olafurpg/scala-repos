@@ -135,7 +135,7 @@ class ReceivePipelineSpec extends AkkaSpec with ImplicitSender {
           with AdderInterceptor with ToStringInterceptor))
       replier ! 8L // unhandled by all interceptors but still replied
       expectMsg(8L)
-      replier ! Set(8F) // unhandled by all but ToString Interceptor, so replied as String
+      replier ! Set(8f) // unhandled by all but ToString Interceptor, so replied as String
       expectMsg("Set(8.0)")
     }
 

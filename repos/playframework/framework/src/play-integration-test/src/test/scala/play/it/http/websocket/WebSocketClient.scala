@@ -215,7 +215,7 @@ object WebSocketClient {
               case other =>
                 ctx.push(other)
             }
-      })
+        })
 
       val messagesToFrames = Flow[ExtendedMessage].map {
         case SimpleMessage(TextMessage(data), finalFragment) =>
@@ -316,7 +316,7 @@ object WebSocketClient {
                       ctx.fail(cause)
                     }
                   }
-              })
+                })
 
             /**
               * Since we've got two consumers of the messages when we broadcast, we need to ensure that they get retained for each.

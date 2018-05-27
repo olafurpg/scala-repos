@@ -229,7 +229,7 @@ sealed class SiteMapSingleton {
       l.testAccess match {
         case Left(true) => Full(l)
         case _          => Empty
-    })
+      })
 
   def buildLink(name: String, text: NodeSeq): NodeSeq = {
     val options = for {

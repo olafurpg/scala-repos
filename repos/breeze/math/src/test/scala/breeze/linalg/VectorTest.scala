@@ -84,13 +84,13 @@ class VectorOps_DoubleTest
     : Arbitrary[(Vector[Double], Vector[Double], Vector[Double])] = {
     Arbitrary {
       for {
-        x <- Arbitrary.arbitrary[Double].map { _ % 1E100 }
+        x <- Arbitrary.arbitrary[Double].map { _ % 1e100 }
         bx <- Arbitrary.arbitrary[Boolean]
         xl <- Arbitrary.arbitrary[List[Int]]
-        y <- Arbitrary.arbitrary[Double].map { _ % 1E100 }
+        y <- Arbitrary.arbitrary[Double].map { _ % 1e100 }
         by <- Arbitrary.arbitrary[Boolean]
         yl <- Arbitrary.arbitrary[List[Int]]
-        z <- Arbitrary.arbitrary[Double].map { _ % 1E100 }
+        z <- Arbitrary.arbitrary[Double].map { _ % 1e100 }
         bz <- Arbitrary.arbitrary[Boolean]
         zl <- Arbitrary.arbitrary[List[Int]]
       } yield {
@@ -106,7 +106,7 @@ class VectorOps_DoubleTest
   }
 
   def genScalar: Arbitrary[Double] =
-    Arbitrary(Arbitrary.arbitrary[Double].map { _ % 1E10 })
+    Arbitrary(Arbitrary.arbitrary[Double].map { _ % 1e10 })
 }
 
 @RunWith(classOf[JUnitRunner])
@@ -114,7 +114,7 @@ class VectorOps_FloatTest
     extends TensorSpaceTestBase[Vector[Float], Int, Float] {
   val space = Vector.space[Float]
 
-  override val TOL: Double = 1E-2
+  override val TOL: Double = 1e-2
   val N = 30
   implicit def genTriple
     : Arbitrary[(Vector[Float], Vector[Float], Vector[Float])] = {

@@ -1,11 +1,17 @@
 object Test {
-  val x1 = try { "aaa".asInstanceOf[Int] } catch {
+  val x1 = try {
+    "aaa".asInstanceOf[Int]
+  } catch {
     case _: Throwable => "cce1"
   }
-  val x2 = try { (5: Any).asInstanceOf[Int] } catch {
+  val x2 = try {
+    (5: Any).asInstanceOf[Int]
+  } catch {
     case _: Throwable => "cce2"
   }
-  val x3 = try { (new java.lang.Short(100.toShort).asInstanceOf[Int]) } catch {
+  val x3 = try {
+    (new java.lang.Short(100.toShort).asInstanceOf[Int])
+  } catch {
     case _: Throwable => "cce3"
   }
 

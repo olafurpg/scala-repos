@@ -36,37 +36,37 @@ object SwimmingRecord {
   val allRecords = List[SwimmingRecord](
     SwimmingRecord(
       "50 m freestyle",
-      20.91F,
+      20.91f,
       "Cesar Cielo",
       "Brazil",
       Date.valueOf("2009-12-18")),
     SwimmingRecord(
       "100 m freestyle",
-      46.91F,
+      46.91f,
       "Cesar Cielo",
       "Brazil",
       Date.valueOf("2009-08-02")),
     SwimmingRecord(
       "50 m backstroke",
-      24.04F,
+      24.04f,
       "Liam Tancock",
       "Great Britain",
       Date.valueOf("2009-08-02")),
     SwimmingRecord(
       "100 m backstroke",
-      51.94F,
+      51.94f,
       "Aaron Peirsol",
       "United States",
       Date.valueOf("2009-07-08")),
     SwimmingRecord(
       "50 m butterfly",
-      22.43F,
+      22.43f,
       "Rafael Munoz",
       "Spain",
       Date.valueOf("2009-05-05")),
     SwimmingRecord(
       "100 m butterfly",
-      49.82F,
+      49.82f,
       "Michael Phelps",
       "United States",
       Date.valueOf("2009-07-29"))

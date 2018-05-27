@@ -83,7 +83,7 @@ class ScAnnotationImpl private (
                 }
               case _ if attributeName == "value" => (true, expr)
               case _                             => (false, expr)
-          })
+            })
           .find(p => p._1)
           .getOrElse(false, null)
           ._2

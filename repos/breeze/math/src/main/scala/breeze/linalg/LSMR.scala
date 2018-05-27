@@ -27,7 +27,7 @@ object LSMR extends SerializableLogging {
       A: M,
       b: V,
       regularization: Double = 0.0,
-      tolerance: Double = 1E-9,
+      tolerance: Double = 1e-9,
       maxIter: Int = 1000,
       quiet: Boolean = false)(
       implicit multMV: OpMulMatrix.Impl2[M, V, V],
@@ -78,7 +78,7 @@ object LSMR extends SerializableLogging {
 
     var normA2 = sqr(alpha)
     var maxrbar = 0.0
-    var minrbar = 1E100
+    var minrbar = 1e100
 
     var converged = false
     var iter = 0

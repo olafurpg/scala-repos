@@ -54,7 +54,7 @@ object OneVsRestExample {
       input: String = null,
       testInput: Option[String] = None,
       maxIter: Int = 100,
-      tol: Double = 1E-6,
+      tol: Double = 1e-6,
       fitIntercept: Boolean = true,
       regParam: Option[Double] = None,
       elasticNetParam: Option[Double] = None,

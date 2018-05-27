@@ -141,7 +141,7 @@ class LBFGSSuite
         convergenceTol)
 
     assert(
-      lossGD(0) ~= lossLBFGS(0) absTol 1E-5,
+      lossGD(0) ~= lossLBFGS(0) absTol 1e-5,
       "The first losses of LBFGS and GD should be the same.")
 
     // The 2% difference here is based on observation, but is not theoretically guaranteed.

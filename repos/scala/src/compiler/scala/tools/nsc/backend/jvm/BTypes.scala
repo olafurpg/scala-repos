@@ -976,7 +976,7 @@ abstract class BTypes {
         i.superClass match {
           case None     => Right(Nil)
           case Some(sc) => sc.superClassesTransitive.map(sc :: _)
-      })
+        })
 
     /**
       * The prefix of the internal name until the last '/', or the empty string.
@@ -1022,7 +1022,7 @@ abstract class BTypes {
                 else 0
               ) & BCodeHelpers.INNER_CLASSES_FLAGS
             )
-      })
+        })
 
     def inlineInfoAttribute: Either[NoClassBTypeInfo, InlineInfoAttribute] =
       info.map(i => {

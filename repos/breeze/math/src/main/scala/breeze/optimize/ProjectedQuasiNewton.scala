@@ -213,7 +213,7 @@ class ProjectedQuasiNewton(
     var alpha = if (state.iter == 0.0) min(1.0, 1.0 / norm(dir)) else 1.0
     alpha = search.minimize(ff, alpha)
 
-    if (alpha * norm(grad) < 1E-10) throw new StepSizeUnderflow
+    if (alpha * norm(grad) < 1e-10) throw new StepSizeUnderflow
 
     alpha
   }

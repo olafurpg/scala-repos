@@ -316,7 +316,7 @@ trait DefaultReads extends LowPriorityDefaultReads {
             JsError(ValidationError("error.expected.numberformatexception")))
       case JsNumber(d) => JsSuccess(d.underlying)
       case _           => JsError(ValidationError("error.expected.jsnumberorjsstring"))
-  })
+    })
 
   /**
     * Deserializer for BigDecimal
@@ -331,7 +331,7 @@ trait DefaultReads extends LowPriorityDefaultReads {
             JsError(ValidationError("error.expected.numberformatexception")))
       case JsNumber(d) => JsSuccess(d.underlying)
       case _           => JsError(ValidationError("error.expected.jsnumberorjsstring"))
-  })
+    })
 
   /**
     * Reads for the `java.util.Date` type.
@@ -366,7 +366,9 @@ trait DefaultReads extends LowPriorityDefaultReads {
     // REMEMBER THAT SIMPLEDATEFORMAT IS NOT THREADSAFE
     val df = new java.text.SimpleDateFormat(pattern)
     df.setLenient(false)
-    try { Some(df.parse(input)) } catch {
+    try {
+      Some(df.parse(input))
+    } catch {
       case x: java.text.ParseException =>
         None
     }

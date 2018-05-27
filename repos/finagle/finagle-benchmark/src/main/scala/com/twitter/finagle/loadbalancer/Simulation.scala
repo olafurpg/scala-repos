@@ -23,8 +23,7 @@ private object LatencyProfile {
       }
     val size = latencies.size
     var i = rng.nextInt(size)
-    () =>
-      { i = i + 1; latencies(i % size) }
+    () => { i = i + 1; latencies(i % size) }
   }
 
   /**
@@ -33,8 +32,7 @@ private object LatencyProfile {
     */
   def between(low: Duration, high: Duration): () => Duration = {
     require(low <= high)
-    () =>
-      low + ((high - low) * math.random)
+    () => low + ((high - low) * math.random)
   }
 
   /**
@@ -70,8 +68,7 @@ private object LatencyProfile {
       latencies: IndexedSeq[() => Duration]
   ): () => Duration = {
     val drv = Drv(dist)
-    () =>
-      latencies(drv(rng))()
+    () => latencies(drv(rng))()
   }
 }
 
@@ -219,7 +216,9 @@ private[finagle] object Simulation extends com.twitter.app.App {
         n += 1
       }
 
-      if (Rem > 0 && ms % (1000 / Rem) == 0) { call() }
+      if (Rem > 0 && ms % (1000 / Rem) == 0) {
+        call()
+      }
 
       ms += 1
 

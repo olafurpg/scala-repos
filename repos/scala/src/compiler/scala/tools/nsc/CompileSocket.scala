@@ -207,7 +207,9 @@ class CompileSocket extends CompileOutputCommon {
 
   // XXX way past time for this to be central
   def parseInt(x: String): Option[Int] =
-    try { Some(x.toInt) } catch { case _: NumberFormatException => None }
+    try {
+      Some(x.toInt)
+    } catch { case _: NumberFormatException => None }
 
   def getSocket(serverAdr: String): Option[Socket] =
     (for ((name, portStr) <- splitWhere(

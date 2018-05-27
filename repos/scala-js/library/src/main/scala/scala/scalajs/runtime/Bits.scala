@@ -116,7 +116,7 @@ object Bits {
     if (areTypedArraysSupported) {
       float64Array(0) = value
       ((int32Array(highOffset).toLong << 32) |
-        (int32Array(lowOffset).toLong & 0xffffffffL))
+        (int32Array(lowOffset).toLong & 0XFFFFFFFFL))
     } else {
       doubleToLongBitsPolyfill(value)
     }
@@ -160,7 +160,7 @@ object Bits {
     val lo = bits.toInt.toUint
     val s = hi < 0
     val e = (hi >> hifbits) & ((1 << ebits) - 1)
-    val f = (hi & ((1 << hifbits) - 1)).toDouble * 0x100000000L.toDouble + lo
+    val f = (hi & ((1 << hifbits) - 1)).toDouble * 0X100000000L.toDouble + lo
     decodeIEEE754(ebits, fbits, s, e, f)
   }
 
@@ -169,10 +169,10 @@ object Bits {
     val fbits = 52
     val hifbits = fbits - 32
     val (s, e, f) = encodeIEEE754(ebits, fbits, value)
-    val hif = rawToInt(f / 0x100000000L.toDouble)
+    val hif = rawToInt(f / 0X100000000L.toDouble)
     val hi = (if (s) 0x80000000 else 0) | (e << hifbits) | hif
     val lo = rawToInt(f)
-    (hi.toLong << 32) | (lo.toLong & 0xffffffffL)
+    (hi.toLong << 32) | (lo.toLong & 0XFFFFFFFFL)
   }
 
   @inline private def decodeIEEE754(

@@ -41,7 +41,7 @@ private object AnalysisBuilder {
                           s"Analysis $debug has ${analysis.nbEmptyInfos} empty infos out of ${analysis.infos.size}")
                       else fuccess(analysis)
                     } else fufail(s"[analysis] Analysis $debug is empty")
-              }
+                }
             )
         }
     }

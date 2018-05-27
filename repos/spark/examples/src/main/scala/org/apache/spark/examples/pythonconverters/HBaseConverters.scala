@@ -44,7 +44,7 @@ class HBaseResultToStringConverter extends Converter[Any, String] {
           "timestamp" -> cell.getTimestamp.toString,
           "type" -> Type.codeToType(cell.getTypeByte).toString,
           "value" -> Bytes.toStringBinary(CellUtil.cloneValue(cell))
-      ))
+        ))
     output.map(JSONObject(_).toString()).mkString("\n")
   }
 }

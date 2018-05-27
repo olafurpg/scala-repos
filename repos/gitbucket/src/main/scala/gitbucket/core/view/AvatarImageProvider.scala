@@ -50,11 +50,15 @@ trait AvatarImageProvider { self: RequestCache =>
       }
 
     if (tooltip) {
-      Html(s"""<img src="${src}" class="${if (size > 20) { "avatar" } else {
+      Html(s"""<img src="${src}" class="${if (size > 20) {
+        "avatar"
+      } else {
         "avatar-mini"
       }}" style="width: ${size}px; height: ${size}px;" data-toggle="tooltip" title="${userName}"/>""")
     } else {
-      Html(s"""<img src="${src}" class="${if (size > 20) { "avatar" } else {
+      Html(s"""<img src="${src}" class="${if (size > 20) {
+        "avatar"
+      } else {
         "avatar-mini"
       }}" style="width: ${size}px; height: ${size}px;" />""")
     }

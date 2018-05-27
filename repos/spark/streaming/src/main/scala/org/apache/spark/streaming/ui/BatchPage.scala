@@ -131,11 +131,15 @@ private[ui] class BatchPage(parent: StreamingTab) extends WebUIPage("batch") {
     // scalastyle:off
     val prefixCells =
       if (isFirstRow) {
-        <td class="output-op-id-cell" rowspan={numSparkJobRowsInOutputOp.toString}>{outputOpData.id.toString}</td>
+        <td class="output-op-id-cell" rowspan={
+          numSparkJobRowsInOutputOp.toString
+        }>{outputOpData.id.toString}</td>
         <td rowspan={numSparkJobRowsInOutputOp.toString}>
           {outputOpDescription}
         </td>
-        <td rowspan={numSparkJobRowsInOutputOp.toString}>{formattedOutputOpDuration}</td> ++ {
+        <td rowspan={numSparkJobRowsInOutputOp.toString}>{
+          formattedOutputOpDuration
+        }</td> ++ {
           outputOpStatusCell(outputOpData, numSparkJobRowsInOutputOp)
         }
       } else {
@@ -154,19 +158,27 @@ private[ui] class BatchPage(parent: StreamingTab) extends WebUIPage("batch") {
         {formattedDuration}
       </td>
       <td class="stage-progress-cell">
-        {sparkJob.completedStageIndices.size}/{sparkJob.stageIds.size - sparkJob.numSkippedStages}
-        {if (sparkJob.numFailedStages > 0) s"(${sparkJob.numFailedStages} failed)"}
-        {if (sparkJob.numSkippedStages > 0) s"(${sparkJob.numSkippedStages} skipped)"}
+        {sparkJob.completedStageIndices.size}/{
+      sparkJob.stageIds.size - sparkJob.numSkippedStages
+    }
+        {
+      if (sparkJob.numFailedStages > 0) s"(${sparkJob.numFailedStages} failed)"
+    }
+        {
+      if (sparkJob.numSkippedStages > 0)
+        s"(${sparkJob.numSkippedStages} skipped)"
+    }
       </td>
       <td class="progress-cell">
         {
-          SparkUIUtils.makeProgressBar(
-            started = sparkJob.numActiveTasks,
-            completed = sparkJob.numCompletedTasks,
-            failed = sparkJob.numFailedTasks,
-            skipped = sparkJob.numSkippedTasks,
-            total = sparkJob.numTasks - sparkJob.numSkippedTasks)
-        }
+      SparkUIUtils.makeProgressBar(
+        started = sparkJob.numActiveTasks,
+        completed = sparkJob.numCompletedTasks,
+        failed = sparkJob.numFailedTasks,
+        skipped = sparkJob.numSkippedTasks,
+        total = sparkJob.numTasks - sparkJob.numSkippedTasks
+      )
+    }
       </td>
       {UIUtils.failureReasonCell(lastFailureReason)}
     </tr>
@@ -188,9 +200,13 @@ private[ui] class BatchPage(parent: StreamingTab) extends WebUIPage("batch") {
     // scalastyle:off
     val prefixCells =
       if (isFirstRow) {
-        <td class="output-op-id-cell" rowspan={numSparkJobRowsInOutputOp.toString}>{outputOpData.id.toString}</td>
+        <td class="output-op-id-cell" rowspan={
+          numSparkJobRowsInOutputOp.toString
+        }>{outputOpData.id.toString}</td>
           <td rowspan={numSparkJobRowsInOutputOp.toString}>{outputOpDescription}</td>
-          <td rowspan={numSparkJobRowsInOutputOp.toString}>{formattedOutputOpDuration}</td> ++ {
+          <td rowspan={numSparkJobRowsInOutputOp.toString}>{
+          formattedOutputOpDuration
+        }</td> ++ {
           outputOpStatusCell(outputOpData, numSparkJobRowsInOutputOp)
         }
       } else {
@@ -324,10 +340,11 @@ private[ui] class BatchPage(parent: StreamingTab) extends WebUIPage("batch") {
         </thead>
         <tbody>
           {
-            outputOpWithJobs.map { case (outputOpData, sparkJobIds) =>
-              generateOutputOpIdRow(outputOpData, sparkJobIds)
-            }
-          }
+        outputOpWithJobs.map {
+          case (outputOpData, sparkJobIds) =>
+            generateOutputOpIdRow(outputOpData, sparkJobIds)
+        }
+      }
         </tbody>
       </table>
     }
@@ -386,12 +403,14 @@ private[ui] class BatchPage(parent: StreamingTab) extends WebUIPage("batch") {
             {formattedTotalDelay}
           </li>
           {
-            if (inputMetadatas.nonEmpty) {
-              <li>
-                <strong>Input Metadata:</strong>{generateInputMetadataTable(inputMetadatas)}
-              </li>
-            }
+        if (inputMetadatas.nonEmpty) {
+          <li>
+                <strong>Input Metadata:</strong>{
+            generateInputMetadataTable(inputMetadatas)
           }
+              </li>
+        }
+      }
         </ul>
       </div>
 
@@ -422,7 +441,9 @@ private[ui] class BatchPage(parent: StreamingTab) extends WebUIPage("batch") {
     val streamId = inputMetadata._1
 
     <tr>
-      <td>{streamingListener.streamName(streamId).getOrElse(s"Stream-$streamId")}</td>
+      <td>{
+      streamingListener.streamName(streamId).getOrElse(s"Stream-$streamId")
+    }</td>
       <td>{metadataDescriptionToHTML(inputMetadata._2)}</td>
     </tr>
   }

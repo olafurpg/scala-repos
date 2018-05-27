@@ -97,8 +97,8 @@ object User {
 
   case class PlayTime(total: Int, tv: Int) {
     import org.joda.time.Period
-    def totalPeriod = new Period(total * 1000l)
-    def tvPeriod = (tv > 0) option new Period(tv * 1000l)
+    def totalPeriod = new Period(total * 1000L)
+    def tvPeriod = (tv > 0) option new Period(tv * 1000L)
   }
   import lila.db.BSON.BSONJodaDateTimeHandler
   implicit def playTimeHandler = reactivemongo.bson.Macros.handler[PlayTime]

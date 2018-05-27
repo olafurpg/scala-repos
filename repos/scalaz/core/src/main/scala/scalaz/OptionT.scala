@@ -239,7 +239,7 @@ private trait OptionTBindRec[F[_]]
       B.tailrecM[A, Option[B]](a0 =>
         F.map(f(a0).run) {
           _.fold(\/.right[A, Option[B]](None: Option[B]))(_.map(Some.apply))
-      })(a)
+        })(a)
     )
 }
 

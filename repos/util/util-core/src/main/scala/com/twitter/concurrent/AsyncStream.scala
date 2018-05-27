@@ -632,7 +632,7 @@ sealed abstract class AsyncStream[+A] {
     * values.
     */
   def force: Future[Unit] = foreach { _ =>
-    }
+  }
 }
 
 object AsyncStream {

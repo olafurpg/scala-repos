@@ -280,7 +280,7 @@ object PersistentFSM {
       replies: List[Any] = Nil,
       domainEvents: Seq[E] = Nil,
       afterTransitionDo: D ⇒ Unit = { _: D ⇒
-        })(private[akka] val notifies: Boolean = true) {
+      })(private[akka] val notifies: Boolean = true) {
 
     /**
       * Copy object and update values if needed.

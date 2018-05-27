@@ -946,9 +946,9 @@ trait IdentitiesRowFormat extends RowFormat {
     @inline
     def loop(i: Int, n: Long): Int = {
       val m = n >>> 7
-      val b = n & 0x7FL
+      val b = n & 0X7FL
       if (m != 0) {
-        bytes(i) = (b | 0x80L).toByte
+        bytes(i) = (b | 0X80L).toByte
         loop(i + 1, m)
       } else {
         bytes(i) = b.toByte
@@ -960,7 +960,7 @@ trait IdentitiesRowFormat extends RowFormat {
   }
 
   @inline private final def shiftIn(b: Byte, shift: Int, n: Long): Long =
-    n | ((b.toLong & 0x7FL) << shift)
+    n | ((b.toLong & 0X7FL) << shift)
 
   @inline private final def more(b: Byte): Boolean = (b & 0x80) != 0
 

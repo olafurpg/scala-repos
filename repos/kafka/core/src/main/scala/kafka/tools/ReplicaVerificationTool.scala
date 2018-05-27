@@ -155,7 +155,7 @@ object ReplicaVerificationTool extends Logging {
                     topic = topicMetadataResponse.topic,
                     partitionId = partitionMetadata.partitionId,
                     replicaId = broker.id))
-        )
+          )
       )
     debug("Selected topic partitions: " + topicPartitionReplicaList)
     val topicAndPartitionsPerBroker: Map[Int, Seq[TopicAndPartition]] =
@@ -194,7 +194,7 @@ object ReplicaVerificationTool extends Logging {
         .mapValues(topicAndPartitionAndLeaderIds =>
           topicAndPartitionAndLeaderIds.map {
             case (topicAndPartition, leaderId) => topicAndPartition
-        })
+          })
     debug("Leaders per broker: " + leadersPerBroker)
 
     val replicaBuffer = new ReplicaBuffer(

@@ -184,7 +184,7 @@ object Storage extends Logging {
             error(e.getMessage)
             errors += 1
             r -> DataObjectMeta("", "")
-      })
+        })
       .toMap
 
   if (errors > 0) {

@@ -100,13 +100,13 @@ class KeyValueSpec
 
   it should "have a convenient apply construction format for longs" in {
     val property = new LongProperty(null, name)
-    val endValue = 50l
+    val endValue = 50L
     evaluateFromSfx(property, endValue, KeyValue(property, endValue))
   }
 
   it should "have a convenient apply construction format for jfx longs" in {
     val property = new LongProperty(null, name).delegate
-    val endValue = 50l
+    val endValue = 50L
     evaluateFromJfx(property, endValue, KeyValue(property, endValue))
   }
 

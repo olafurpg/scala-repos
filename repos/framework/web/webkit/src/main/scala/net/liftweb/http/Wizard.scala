@@ -66,11 +66,10 @@ object WizardRules extends Factory with FormVendor {
 trait Wizard extends StatefulSnippet with Factory with ScreenWizardRendered {
   def dispatch = {
     case _ =>
-      template =>
-        {
-          _defaultXml.set(template)
-          this.toForm
-        }
+      template => {
+        _defaultXml.set(template)
+        this.toForm
+      }
   }
 
   /**

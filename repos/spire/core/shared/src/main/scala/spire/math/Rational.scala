@@ -201,7 +201,9 @@ sealed abstract class Rational
     case that: Algebraic => that == this
     case that: BigInt    => isWhole && toBigInt == that
     case that: BigDecimal =>
-      try { toBigDecimal(that.mc) == that } catch {
+      try {
+        toBigDecimal(that.mc) == that
+      } catch {
         case ae: ArithmeticException => false
       }
     case that: SafeLong      => SafeLong(toBigInt) == that
@@ -246,7 +248,7 @@ object Rational extends RationalInstances {
         val e = d.bitLength - n.bitLength + addBit
         val ln = n << (53 + e) // We add 1 bit for rounding.
         val lm = (ln / d).toLong
-        val m = ((lm >> 1) + (lm & 1)) & 0x000fffffffffffffL
+        val m = ((lm >> 1) + (lm & 1)) & 0X000FFFFFFFFFFFFFL
         val bits = (m | ((1023L - e) << 52))
         java.lang.Double.longBitsToDouble(bits)
     }
@@ -309,14 +311,14 @@ object Rational extends RationalInstances {
   implicit def apply(x: Float): Rational = apply(x.toDouble)
 
   implicit def apply(x: Double): Rational =
-    if (x == 0D) {
+    if (x == 0d) {
       zero
     } else {
       val bits = java.lang.Double.doubleToLongBits(x)
       val value =
         if ((bits >> 63) < 0)
-          -(bits & 0x000FFFFFFFFFFFFFL | 0x0010000000000000L)
-        else (bits & 0x000FFFFFFFFFFFFFL | 0x0010000000000000L)
+          -(bits & 0X000FFFFFFFFFFFFFL | 0X0010000000000000L)
+        else (bits & 0X000FFFFFFFFFFFFFL | 0X0010000000000000L)
       val exp = ((bits >> 52) & 0x7FF).toInt - 1075 // 1023 + 52
       if (exp > 10) {
         apply(SafeLong(value) << exp, SafeLong.one)

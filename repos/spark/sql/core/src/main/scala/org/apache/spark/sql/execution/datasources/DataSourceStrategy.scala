@@ -197,7 +197,7 @@ private[sql] object DataSourceStrategy extends Strategy with Logging {
             execution.Filter(cf, scan)
           } else {
             execution.Project(projects, execution.Filter(cf, scan))
-        })
+          })
         .getOrElse(scan) :: Nil
 
     // TODO: The code for planning bucketed/unbucketed/partitioned/unpartitioned tables contains

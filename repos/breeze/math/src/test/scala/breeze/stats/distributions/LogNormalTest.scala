@@ -41,12 +41,12 @@ class LogNormalTest
   }
 
   def paramsClose(p: (Double, Double), b: (Double, Double)) = {
-    val y1 = (p._1 - b._1).abs / (p._1.abs / 2 + b._1.abs / 2 + 1) < 1E-1
-    val y2 = (p._2 - b._2).abs / (p._2.abs / 2 + b._2.abs / 2 + 1) < 1E-1
+    val y1 = (p._1 - b._1).abs / (p._1.abs / 2 + b._1.abs / 2 + 1) < 1e-1
+    val y2 = (p._2 - b._2).abs / (p._2.abs / 2 + b._2.abs / 2 + 1) < 1e-1
     y1 && y2
   }
 
-  override val VARIANCE_TOLERANCE: Double = 9E-2
+  override val VARIANCE_TOLERANCE: Double = 9e-2
 
   type Distr = LogNormal
 

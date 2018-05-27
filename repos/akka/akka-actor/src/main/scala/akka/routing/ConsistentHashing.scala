@@ -180,9 +180,9 @@ final case class ConsistentHashingRoutingLogic(
 
   // tuple of routees and the ConsistentHash, updated together in updateConsistentHash
   private val consistentHashRef =
-    new AtomicReference[(
-        immutable.IndexedSeq[Routee],
-        ConsistentHash[ConsistentRoutee])]((null, null))
+    new AtomicReference[
+      (immutable.IndexedSeq[Routee], ConsistentHash[ConsistentRoutee])](
+      (null, null))
 
   override def select(
       message: Any,

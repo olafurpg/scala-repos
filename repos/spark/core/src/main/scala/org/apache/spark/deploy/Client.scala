@@ -62,7 +62,7 @@ private class ClientEndpoint(
         case e: Throwable =>
           logError(e.getMessage, e)
           System.exit(SparkExitCode.UNCAUGHT_EXCEPTION)
-    }
+      }
   )
 
   private val lostMasters = new HashSet[RpcAddress]

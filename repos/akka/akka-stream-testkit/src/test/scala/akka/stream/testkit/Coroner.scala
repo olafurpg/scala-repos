@@ -69,7 +69,9 @@ object Coroner {
     }
 
     override def result(atMost: Duration)(implicit permit: CanAwait): Boolean =
-      try { Await.result(cancelPromise.future, atMost) } catch {
+      try {
+        Await.result(cancelPromise.future, atMost)
+      } catch {
         case _: TimeoutException ⇒ false
       }
   }

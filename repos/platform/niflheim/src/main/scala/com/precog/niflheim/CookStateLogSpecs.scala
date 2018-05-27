@@ -40,7 +40,7 @@ class CookStateLogSpecs extends Specification {
     "Properly initialize" in new LogState {
       val txLog = new CookStateLog(workDir, txLogScheduler)
 
-      txLog.currentBlockId mustEqual 0l
+      txLog.currentBlockId mustEqual 0L
       txLog.pendingCookIds must beEmpty
     }
 

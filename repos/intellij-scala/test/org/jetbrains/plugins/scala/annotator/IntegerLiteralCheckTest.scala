@@ -45,10 +45,10 @@ class IntegerLiteralCheckTest extends SimpleTestCase {
 
   val intValues = List(0, -0, 1, -1, 1234, -1234, Int.MinValue, Int.MaxValue)
   val longValues = List(
-    1l + Int.MaxValue,
-    12345l + Int.MaxValue,
-    -1l + Int.MinValue,
-    -1234l + Int.MinValue,
+    1L + Int.MaxValue,
+    12345L + Int.MaxValue,
+    -1L + Int.MinValue,
+    -1234L + Int.MinValue,
     Long.MinValue,
     Long.MaxValue)
   val numOfGenInteger = 10

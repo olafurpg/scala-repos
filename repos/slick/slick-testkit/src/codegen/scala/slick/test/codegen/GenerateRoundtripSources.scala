@@ -31,7 +31,7 @@ object GenerateRoundtripSources {
               "null" // testing null as table name
             case n => super.tableName(n)
           }
-      })
+        })
     val a2 = profile
       .createModel(ignoreInvalidDefaults = false)
       .map(m =>
@@ -39,7 +39,7 @@ object GenerateRoundtripSources {
           override def Table = new Table(_) {
             override def autoIncLastAsOption = true
           }
-      })
+        })
     val db = Database.forURL(
       url = url,
       driver = jdbcDriver,
@@ -193,7 +193,7 @@ class Tables(val profile: JdbcProfile) {
     def Int = column[Int]("Int", O.Default(-5))
     def Long = column[Long]("Long", O.Default(5L))
     //def java_math_BigInteger = column[java.math.BigInteger]("java_math_BigInteger")
-    def Float = column[Float]("Float", O.Default(9.999F))
+    def Float = column[Float]("Float", O.Default(9.999f))
     def Double = column[Double]("Double", O.Default(9.999))
     //def java_math_BigDecimal = column[java.math.BigDecimal]("java_math_BigDecimal")
     def String =
@@ -215,7 +215,7 @@ class Tables(val profile: JdbcProfile) {
     def Option_Long = column[Option[Long]]("Option_Long", O.Default(Some(5L)))
     //def java_math_BigInteger = column[Option[java.math.BigInteger]]("java_math_BigInteger")
     def Option_Float =
-      column[Option[Float]]("Option_Float", O.Default(Some(9.999F)))
+      column[Option[Float]]("Option_Float", O.Default(Some(9.999f)))
     def Option_Double =
       column[Option[Double]]("Option_Double", O.Default(Some(9.999)))
     //def java_math_BigDecimal = column[Option[java.math.BigDecimal]]("java_math_BigDecimal")

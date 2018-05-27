@@ -55,13 +55,17 @@ object JsonParser {
   /** Return parsed JSON.
     */
   def parseOpt(s: String): Option[JValue] =
-    try { parse(s).toOpt } catch { case e: Exception => None }
+    try {
+      parse(s).toOpt
+    } catch { case e: Exception => None }
 
   /** Return parsed JSON.
     * @param closeAutomatically true (default) if the Reader is automatically closed on EOF
     */
   def parseOpt(s: Reader, closeAutomatically: Boolean = true): Option[JValue] =
-    try { parse(s, closeAutomatically).toOpt } catch {
+    try {
+      parse(s, closeAutomatically).toOpt
+    } catch {
       case e: Exception => None
     }
 
@@ -85,7 +89,9 @@ object JsonParser {
     } catch {
       case e: ParseException => throw e
       case e: Exception      => throw new ParseException("parsing failed", e)
-    } finally { buf.release }
+    } finally {
+      buf.release
+    }
   }
 
   private[json] def unquote(string: String): String =
@@ -227,7 +233,9 @@ object JsonParser {
 
     private def convert[A](x: Any, expectedType: Class[A]): A = {
       if (x == null) parser.fail("expected object or array")
-      try { x.asInstanceOf[A] } catch {
+      try {
+        x.asInstanceOf[A]
+      } catch {
         case _: ClassCastException => parser.fail("unexpected " + x)
       }
     }

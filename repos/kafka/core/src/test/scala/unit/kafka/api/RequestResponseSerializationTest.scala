@@ -79,7 +79,7 @@ object SerializationTestUtils {
       partitionDataProducerRequestArray.zipWithIndex.map {
         case (partitionDataMessage, partition) =>
           (TopicAndPartition(topic, partition), partitionDataMessage)
-    })
+      })
     collection.mutable.Map(groupedData: _*)
   }
 
@@ -228,7 +228,7 @@ object SerializationTestUtils {
       collection.immutable.Map(
         TopicAndPartition(topic1, 1) -> PartitionOffsetsResponse(
           Errors.NONE.code,
-          Seq(1000l, 2000l, 3000l, 4000l))))
+          Seq(1000L, 2000L, 3000L, 4000L))))
   }
 
   def createTestOffsetCommitRequestV2: OffsetCommitRequest = {

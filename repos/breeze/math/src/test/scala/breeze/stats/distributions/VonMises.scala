@@ -42,8 +42,8 @@ class VonMisesTest
   def paramsClose(p: (Double, Double), b: (Double, Double)) = {
     val y1 =
       (math.sin(p._1) - math.sin(b._1)).abs /
-        (math.sin(p._1).abs / 2 + math.sin(b._1).abs / 2 + 1) < 1E-1
-    val y2 = (p._2 - b._2).abs / (p._2.abs / 2 + b._2.abs / 2 + 1) < 1E-1
+        (math.sin(p._1).abs / 2 + math.sin(b._1).abs / 2 + 1) < 1e-1
+    val y2 = (p._2 - b._2).abs / (p._2.abs / 2 + b._2.abs / 2 + 1) < 1e-1
     y1 && y2
   }
 

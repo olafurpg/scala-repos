@@ -310,7 +310,7 @@ class ExecutorBasedEventDrivenDispatcherConfigurator
             Dispatchers.THROUGHPUT_DEADLINE_TIME_MILLIS),
           mailboxType(config),
           threadPoolConfig
-      )
+        )
     ).build
   }
 }
@@ -329,7 +329,7 @@ class ExecutorBasedEventDrivenWorkStealingDispatcherConfigurator
             Dispatchers.THROUGHPUT_DEADLINE_TIME_MILLIS),
           mailboxType(config),
           threadPoolConfig
-      )
+        )
     ).build
   }
 }

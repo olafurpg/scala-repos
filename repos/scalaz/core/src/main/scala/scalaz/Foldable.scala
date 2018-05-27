@@ -322,7 +322,7 @@ trait Foldable[F[_]] { self =>
             else x,
             pa)
         }
-    })._1
+      })._1
 
   /** ``O(n log n)`` complexity */
   def distinct[A](fa: F[A])(implicit A: Order[A]): IList[A] =

@@ -223,26 +223,26 @@ object build extends Build {
         </scm>
         <developers>
           {
-          Seq(
-            ("runarorama", "Runar Bjarnason"),
-            ("pchiusano", "Paul Chiusano"),
-            ("tonymorris", "Tony Morris"),
-            ("retronym", "Jason Zaugg"),
-            ("ekmett", "Edward Kmett"),
-            ("alexeyr", "Alexey Romanov"),
-            ("copumpkin", "Daniel Peebles"),
-            ("rwallace", "Richard Wallace"),
-            ("nuttycom", "Kris Nuttycombe"),
-            ("larsrh", "Lars Hupel")
-          ).map {
-            case (id, name) =>
-              <developer>
+        Seq(
+          ("runarorama", "Runar Bjarnason"),
+          ("pchiusano", "Paul Chiusano"),
+          ("tonymorris", "Tony Morris"),
+          ("retronym", "Jason Zaugg"),
+          ("ekmett", "Edward Kmett"),
+          ("alexeyr", "Alexey Romanov"),
+          ("copumpkin", "Daniel Peebles"),
+          ("rwallace", "Richard Wallace"),
+          ("nuttycom", "Kris Nuttycombe"),
+          ("larsrh", "Lars Hupel")
+        ).map {
+          case (id, name) =>
+            <developer>
                 <id>{id}</id>
                 <name>{name}</name>
                 <url>http://github.com/{id}</url>
               </developer>
-          }
         }
+      }
         </developers>),
       // kind-projector plugin
       resolvers += Resolver.sonatypeRepo("releases"),

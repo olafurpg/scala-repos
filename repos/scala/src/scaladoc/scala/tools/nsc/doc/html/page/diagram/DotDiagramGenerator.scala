@@ -449,7 +449,11 @@ class DotDiagramGenerator(settings: doc.Settings, dotRunner: DotRunner)
             val yposition = getPosition(g, "y", -11.3334)
             if (xposition.isDefined && yposition.isDefined) {
               val imageNode =
-                <image xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href={ ("./lib/" + kind + "_diagram.png") } width="16px" height="16px" preserveAspectRatio="xMinYMin meet" x={ xposition.get.toString } y={ yposition.get.toString }/>
+                <image xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href={
+                  ("./lib/" + kind + "_diagram.png")
+                } width="16px" height="16px" preserveAspectRatio="xMinYMin meet" x={
+                  xposition.get.toString
+                } y={yposition.get.toString}/>
               val anchorNode = (g \ "a") match {
                 case Seq(Elem(prefix, "a", attribs, scope, children @ _*)) =>
                   transform(
@@ -474,7 +478,7 @@ class DotDiagramGenerator(settings: doc.Settings, dotRunner: DotRunner)
       } else res
     }
     // remove titles
-    case <title>{ _* }</title> =>
+    case <title>{_*}</title> =>
       scala.xml.Text("")
     // apply recursively
     case Elem(prefix, label, attribs, scope, child @ _*) =>

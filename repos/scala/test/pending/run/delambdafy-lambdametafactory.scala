@@ -11,8 +11,7 @@ class C {
   }
   def test2: Unit = {
     val capture1 = "capture1"
-    (x: String) =>
-      capture1 + " " + x.reverse
+    (x: String) => capture1 + " " + x.reverse
   }
   def test3: Unit = { (x: String) =>
     C.this + " " + x.reverse

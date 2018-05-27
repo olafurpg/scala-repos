@@ -157,7 +157,12 @@ abstract class MappedDate[T <: Mapper[T]](val fieldOwner: T)
     }) { funcName =>
       Full(appendFieldId(<input type={formInputType}
                      name={funcName}
-                     value={get match {case null => "" case s => format(s)}}/>))
+                     value={
+        get match {
+          case null => ""
+          case s    => format(s)
+        }
+      }/>))
     }
 
   override def setFromAny(f: Any): Date = f match {

@@ -483,7 +483,7 @@ object Future {
     Async((cb: A => Trampoline[Unit]) =>
       listen { a =>
         cb(a).run
-    })
+      })
 
   /** Create a `Future` that will evaluate `a` using the given `ExecutorService`. */
   def apply[A](a: => A)(

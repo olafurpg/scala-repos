@@ -79,11 +79,11 @@ class TypedArrayConversionTest {
     val y = x.toArray
 
     assertTrue(y.getClass == classOf[scala.Array[Float]])
-    assertEquals(sum(0.2), y.sum, 1E-6)
+    assertEquals(sum(0.2), y.sum, 1e-6)
 
     // Ensure its a copy
     x(0) = 0
-    assertEquals(sum(0.2), y.sum, 1E-6)
+    assertEquals(sum(0.2), y.sum, 1e-6)
   }
 
   @Test def convert_a_Float64Array_to_a_scala_Array_Double(): Unit = {

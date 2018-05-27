@@ -128,7 +128,7 @@ object VonMises extends ExponentialFamily[VonMises, Double] {
   def likelihoodFunction(stats: SufficientStatistic) =
     new DiffFunction[(Double, Double)] {
       def calculate(x: (Double, Double)) = {
-        val DELTA = 1E-5
+        val DELTA = 1e-5
         val (mu, k) = x
         if (mu < 0 || mu > 2 * Pi || k < 0)
           (Double.PositiveInfinity, (0.0, 0.0))

@@ -40,7 +40,9 @@ class MapSemiring[K, V](implicit val scalar: Semiring[V])
   def plus(x: Map[K, V], y: Map[K, V]): Map[K, V] = {
     var xx = x
     var yy = y
-    if (x.size < y.size) { xx = y; yy = x }
+    if (x.size < y.size) {
+      xx = y; yy = x
+    }
     yy.foldLeft(xx) { (z, kv) =>
       z.updated(
         kv._1,
@@ -81,7 +83,9 @@ class MapVectorSpace[K, V](override implicit val scalar: Field[V])
     var xx = x
     var yy = y
     var f = scalar.times _
-    if (x.size < y.size) { xx = y; yy = x }
+    if (x.size < y.size) {
+      xx = y; yy = x
+    }
     yy.foldLeft(zero) { (z, kv) =>
       (xx get kv._1)
         .map(u => z.updated(kv._1, scalar.times(u, kv._2)))

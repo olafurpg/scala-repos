@@ -69,9 +69,10 @@ object StormLaws {
     TestStore.createStore[Int, Int]()
 
   def genSink: () => ((Int) => Future[Unit]) =
-    () => { x: Int =>
-      append(x)
-      Future.Unit
+    () => {
+      x: Int =>
+        append(x)
+        Future.Unit
     }
 
   def memoryPlanWithoutSummer(original: List[Int])(

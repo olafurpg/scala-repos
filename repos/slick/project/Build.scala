@@ -127,7 +127,7 @@ object SlickBuild extends Build {
             "-implicits",
             "-diagrams", // requires graphviz
             "-groups"
-        )),
+          )),
       logBuffered := false,
       repoKind <<= (version)(
         v => if (v.trim.endsWith("SNAPSHOT")) "snapshots" else "releases"),
@@ -247,7 +247,7 @@ object SlickBuild extends Build {
               v + "/slick/src/main€{FILE_PATH}.scala",
             "-doc-root-content",
             "scaladoc-root.txt"
-        )),
+          )),
       (sphinxEnv in Sphinx) := (sphinxEnv in Sphinx).value +
         ("version" -> version.value.replaceFirst("""(\d*.\d*).*""", """$1""")) +
         ("release" -> version.value),
@@ -333,7 +333,7 @@ object SlickBuild extends Build {
               "-doc-source-url",
               "https://github.com/slick/slick/blob/" + v +
                 "/slick-testkit/src/main€{FILE_PATH}.scala"
-          )),
+            )),
         testOptions += Tests.Argument(
           TestFrameworks.JUnit,
           "-q",
@@ -399,7 +399,7 @@ object SlickBuild extends Build {
               "-doc-source-url",
               "https://github.com/slick/slick/blob/" + v +
                 "/slick-codegen/src/main€{FILE_PATH}.scala"
-          )),
+            )),
         unmanagedResourceDirectories in Test +=
           (baseDirectory in aRootProject).value / "common-test-resources",
         test := (),
@@ -421,7 +421,7 @@ object SlickBuild extends Build {
               "-doc-source-url",
               "https://github.com/slick/slick/blob/" + v +
                 "/slick-hikaricp/src/main€{FILE_PATH}.scala"
-          )),
+            )),
         libraryDependencies += Dependencies.hikariCP,
         test := (),
         testOnly := (), // suppress test status output

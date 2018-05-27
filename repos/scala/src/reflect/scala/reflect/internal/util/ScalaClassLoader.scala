@@ -30,7 +30,9 @@ trait ScalaClassLoader extends JClassLoader {
   /** Executing an action with this classloader as context classloader */
   def asContext[T](action: => T): T = {
     val saved = contextLoader
-    try { setContext(this); action } finally setContext(saved)
+    try {
+      setContext(this); action
+    } finally setContext(saved)
   }
   def setAsContext() { setContext(this) }
 

@@ -720,7 +720,7 @@ abstract class RefChecks
                 val tp1 = uncurryAndErase(clazz.thisType.memberType(sym))
                 val tp2 = uncurryAndErase(clazz.thisType.memberType(other))
                 exitingErasure(tp1 matches tp2)
-            })
+              })
 
         def ignoreDeferred(member: Symbol) =
           ((member.isAbstractType &&
@@ -1425,9 +1425,9 @@ abstract class RefChecks
         val newTrees =
           cdef ::
             (if (module.isStatic)
-             // trait T { def f: Object }; object O extends T { object f }. Need to generate method f in O.
-             if (module.isOverridingSymbol) matchingInnerObject() else Nil
-           else newInnerObject(site, module))
+               // trait T { def f: Object }; object O extends T { object f }. Need to generate method f in O.
+               if (module.isOverridingSymbol) matchingInnerObject() else Nil
+             else newInnerObject(site, module))
         transformTrees(newTrees map localTyper.typedPos(moduleDef.pos))
       }
     def newInnerObject(site: Symbol, module: Symbol): List[Tree] = {

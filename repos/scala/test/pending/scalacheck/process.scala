@@ -75,7 +75,9 @@ object IO {
     classLocationFile(mf.erasure)
 
   def toFile(url: URL) =
-    try { new File(url.toURI) } catch {
+    try {
+      new File(url.toURI)
+    } catch {
       case _: URISyntaxException => new File(url.getPath)
     }
 }

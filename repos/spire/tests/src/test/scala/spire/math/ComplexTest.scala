@@ -112,8 +112,8 @@ class ComplexTest extends FunSuite {
     val e_ipi = fc.pow(e, ipi)
     val z = fc.add(e_ipi, fc.one)
 
-    assert(fc.real(z) == 0.0F)
-    assert(fc.imag(z) < 0.000000001F)
+    assert(fc.real(z) == 0.0f)
+    assert(fc.imag(z) < 0.000000001f)
 
     assert(fc.multiply(fc.i, fc.i) === fc(-1f, 0f))
     assert(fc.imag(fc(-1f, 0f)) === 0f)
@@ -136,8 +136,8 @@ class ComplexTest extends FunSuite {
 
     val z = e.pow(i * pi) + one
 
-    assert(z.real == 0.0F)
-    assert(z.imag < 0.000000001F)
+    assert(z.real == 0.0f)
+    assert(z.imag < 0.000000001f)
   }
 
   test("complex trigonometry") {

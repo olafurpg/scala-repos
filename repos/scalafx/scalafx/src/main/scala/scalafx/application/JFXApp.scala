@@ -129,7 +129,7 @@ object JFXApp {
             case None => unnamedArguments += arg
             case Some(matcher) =>
               namedArguments(matcher.group(1)) = matcher.group(2)
-        })
+          })
         filled = true
       }
     }

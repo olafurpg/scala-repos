@@ -119,7 +119,9 @@ object Writer {
         @annotation.tailrec
         def go(p: Int): Unit =
           if (p == size) ()
-          else { writerT.write(os, a(p)); go(p + 1) }
+          else {
+            writerT.write(os, a(p)); go(p + 1)
+          }
 
         go(0)
       }

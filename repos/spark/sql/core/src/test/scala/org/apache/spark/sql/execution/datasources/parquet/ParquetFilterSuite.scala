@@ -652,7 +652,7 @@ class ParquetFilterSuite
           gt(doubleColumn("c"), 1.5: java.lang.Double)))) {
       ParquetFilters.createFilter(
         schema,
-        sources.And(sources.LessThan("a", 10), sources.GreaterThan("c", 1.5D)))
+        sources.And(sources.LessThan("a", 10), sources.GreaterThan("c", 1.5d)))
     }
 
     assertResult(None) {

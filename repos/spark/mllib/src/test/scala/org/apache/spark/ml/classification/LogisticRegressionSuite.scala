@@ -144,7 +144,7 @@ class LogisticRegressionSuite
     val lr2 = new LogisticRegression
     lr2.setThresholds(Array(0.3, 0.7))
     val expectedThreshold = 1.0 / (1.0 + 0.3 / 0.7)
-    assert(lr2.getThreshold ~== expectedThreshold relTol 1E-7)
+    assert(lr2.getThreshold ~== expectedThreshold relTol 1e-7)
     // thresholds and threshold must be consistent
     lr2.setThresholds(Array(0.1, 0.2, 0.3))
     withClue("getThreshold should throw error if thresholds has length != 2.") {
@@ -319,7 +319,7 @@ class LogisticRegressionSuite
       .add(6.0, 3.1)
     assert(
       Vectors.dense(summarizer1.histogram) ~==
-        Vectors.dense(Array(0.2, 0, 0, 2.1, 3.2, 0, 3.1)) absTol 1E-10)
+        Vectors.dense(Array(0.2, 0, 0, 2.1, 3.2, 0, 3.1)) absTol 1e-10)
     assert(summarizer1.countInvalid === 0)
     assert(summarizer1.numClasses === 7)
 
@@ -333,14 +333,14 @@ class LogisticRegressionSuite
       .add(2, 0.0)
     assert(
       Vectors.dense(summarizer2.histogram) ~==
-        Vectors.dense(Array[Double](1.0, 2.1, 0.0, 1, 1, 2.3)) absTol 1E-10)
+        Vectors.dense(Array[Double](1.0, 2.1, 0.0, 1, 1, 2.3)) absTol 1e-10)
     assert(summarizer2.countInvalid === 0)
     assert(summarizer2.numClasses === 6)
 
     val summarizer = summarizer1.merge(summarizer2)
     assert(
       Vectors.dense(summarizer.histogram) ~==
-        Vectors.dense(Array(1.2, 2.1, 0.0, 3.1, 4.2, 2.3, 3.1)) absTol 1E-10)
+        Vectors.dense(Array(1.2, 2.1, 0.0, 3.1, 4.2, 2.3, 3.1)) absTol 1e-10)
     assert(summarizer.countInvalid === 0)
     assert(summarizer.numClasses === 7)
   }
@@ -376,12 +376,12 @@ class LogisticRegressionSuite
     val coefficientsR =
       Vectors.dense(-0.5895848, 0.8931147, -0.3925051, -0.7996864)
 
-    assert(model1.intercept ~== interceptR relTol 1E-3)
-    assert(model1.coefficients ~= coefficientsR relTol 1E-3)
+    assert(model1.intercept ~== interceptR relTol 1e-3)
+    assert(model1.coefficients ~= coefficientsR relTol 1e-3)
 
     // Without regularization, with or without standardization will converge to the same solution.
-    assert(model2.intercept ~== interceptR relTol 1E-3)
-    assert(model2.coefficients ~= coefficientsR relTol 1E-3)
+    assert(model2.intercept ~== interceptR relTol 1e-3)
+    assert(model2.coefficients ~= coefficientsR relTol 1e-3)
   }
 
   test("binary logistic regression without intercept without regularization") {
@@ -416,12 +416,12 @@ class LogisticRegressionSuite
     val coefficientsR =
       Vectors.dense(-0.3534996, 1.2964482, -0.3571741, -0.7407946)
 
-    assert(model1.intercept ~== interceptR relTol 1E-3)
-    assert(model1.coefficients ~= coefficientsR relTol 1E-2)
+    assert(model1.intercept ~== interceptR relTol 1e-3)
+    assert(model1.coefficients ~= coefficientsR relTol 1e-2)
 
     // Without regularization, with or without standardization should converge to the same solution.
-    assert(model2.intercept ~== interceptR relTol 1E-3)
-    assert(model2.coefficients ~= coefficientsR relTol 1E-2)
+    assert(model2.intercept ~== interceptR relTol 1e-3)
+    assert(model2.coefficients ~= coefficientsR relTol 1e-2)
   }
 
   test("binary logistic regression with intercept with L1 regularization") {
@@ -460,8 +460,8 @@ class LogisticRegressionSuite
     val interceptR1 = -0.05627428
     val coefficientsR1 = Vectors.dense(0.0, 0.0, -0.04325749, -0.02481551)
 
-    assert(model1.intercept ~== interceptR1 relTol 1E-2)
-    assert(model1.coefficients ~= coefficientsR1 absTol 2E-2)
+    assert(model1.intercept ~== interceptR1 relTol 1e-2)
+    assert(model1.coefficients ~= coefficientsR1 absTol 2e-2)
 
     /*
        Using the following R code to load the data and train the model using glmnet package.
@@ -485,8 +485,8 @@ class LogisticRegressionSuite
     val interceptR2 = 0.3722152
     val coefficientsR2 = Vectors.dense(0.0, 0.0, -0.1665453, 0.0)
 
-    assert(model2.intercept ~== interceptR2 relTol 1E-2)
-    assert(model2.coefficients ~= coefficientsR2 absTol 1E-3)
+    assert(model2.intercept ~== interceptR2 relTol 1e-2)
+    assert(model2.coefficients ~= coefficientsR2 absTol 1e-3)
   }
 
   test("binary logistic regression without intercept with L1 regularization") {
@@ -526,8 +526,8 @@ class LogisticRegressionSuite
     val interceptR1 = 0.0
     val coefficientsR1 = Vectors.dense(0.0, 0.0, -0.05189203, -0.03891782)
 
-    assert(model1.intercept ~== interceptR1 relTol 1E-3)
-    assert(model1.coefficients ~= coefficientsR1 absTol 1E-3)
+    assert(model1.intercept ~== interceptR1 relTol 1e-3)
+    assert(model1.coefficients ~= coefficientsR1 absTol 1e-3)
 
     /*
        Using the following R code to load the data and train the model using glmnet package.
@@ -551,8 +551,8 @@ class LogisticRegressionSuite
     val interceptR2 = 0.0
     val coefficientsR2 = Vectors.dense(0.0, 0.0, -0.08420782, 0.0)
 
-    assert(model2.intercept ~== interceptR2 absTol 1E-3)
-    assert(model2.coefficients ~= coefficientsR2 absTol 1E-3)
+    assert(model2.intercept ~== interceptR2 absTol 1e-3)
+    assert(model2.coefficients ~= coefficientsR2 absTol 1e-3)
   }
 
   test("binary logistic regression with intercept with L2 regularization") {
@@ -592,8 +592,8 @@ class LogisticRegressionSuite
     val coefficientsR1 =
       Vectors.dense(-0.07251837, 0.10724191, -0.04865309, -0.10062872)
 
-    assert(model1.intercept ~== interceptR1 relTol 1E-3)
-    assert(model1.coefficients ~= coefficientsR1 relTol 1E-3)
+    assert(model1.intercept ~== interceptR1 relTol 1e-3)
+    assert(model1.coefficients ~= coefficientsR1 relTol 1e-3)
 
     /*
        Using the following R code to load the data and train the model using glmnet package.
@@ -618,8 +618,8 @@ class LogisticRegressionSuite
     val coefficientsR2 =
       Vectors.dense(-0.05155371, 0.02301057, -0.11482896, -0.06266838)
 
-    assert(model2.intercept ~== interceptR2 relTol 1E-3)
-    assert(model2.coefficients ~= coefficientsR2 relTol 1E-3)
+    assert(model2.intercept ~== interceptR2 relTol 1e-3)
+    assert(model2.coefficients ~= coefficientsR2 relTol 1e-3)
   }
 
   test("binary logistic regression without intercept with L2 regularization") {
@@ -660,8 +660,8 @@ class LogisticRegressionSuite
     val coefficientsR1 =
       Vectors.dense(-0.06099165, 0.12857058, -0.04708770, -0.09799775)
 
-    assert(model1.intercept ~== interceptR1 absTol 1E-3)
-    assert(model1.coefficients ~= coefficientsR1 relTol 1E-2)
+    assert(model1.intercept ~== interceptR1 absTol 1e-3)
+    assert(model1.coefficients ~= coefficientsR1 relTol 1e-2)
 
     /*
        Using the following R code to load the data and train the model using glmnet package.
@@ -686,8 +686,8 @@ class LogisticRegressionSuite
     val coefficientsR2 =
       Vectors.dense(-0.005679651, 0.048967094, -0.093714016, -0.053314311)
 
-    assert(model2.intercept ~== interceptR2 absTol 1E-3)
-    assert(model2.coefficients ~= coefficientsR2 relTol 1E-2)
+    assert(model2.intercept ~== interceptR2 absTol 1e-3)
+    assert(model2.coefficients ~= coefficientsR2 relTol 1e-2)
   }
 
   test(
@@ -728,8 +728,8 @@ class LogisticRegressionSuite
     val coefficientsR1 =
       Vectors.dense(-0.05310287, 0.0, -0.08849250, -0.15458796)
 
-    assert(model1.intercept ~== interceptR1 relTol 6E-3)
-    assert(model1.coefficients ~== coefficientsR1 absTol 5E-3)
+    assert(model1.intercept ~== interceptR1 relTol 6e-3)
+    assert(model1.coefficients ~== coefficientsR1 absTol 5e-3)
 
     /*
        Using the following R code to load the data and train the model using glmnet package.
@@ -753,8 +753,8 @@ class LogisticRegressionSuite
     val interceptR2 = 0.51555993
     val coefficientsR2 = Vectors.dense(0.0, 0.0, -0.18807395, -0.05350074)
 
-    assert(model2.intercept ~== interceptR2 relTol 6E-3)
-    assert(model2.coefficients ~= coefficientsR2 absTol 1E-3)
+    assert(model2.intercept ~== interceptR2 relTol 6e-3)
+    assert(model2.coefficients ~= coefficientsR2 absTol 1e-3)
   }
 
   test(
@@ -796,8 +796,8 @@ class LogisticRegressionSuite
     val coefficientsR1 =
       Vectors.dense(-0.001005743, 0.072577857, -0.081203769, -0.142534158)
 
-    assert(model1.intercept ~== interceptR1 relTol 1E-3)
-    assert(model1.coefficients ~= coefficientsR1 absTol 1E-2)
+    assert(model1.intercept ~== interceptR1 relTol 1e-3)
+    assert(model1.coefficients ~= coefficientsR1 absTol 1e-2)
 
     /*
        Using the following R code to load the data and train the model using glmnet package.
@@ -821,8 +821,8 @@ class LogisticRegressionSuite
     val interceptR2 = 0.0
     val coefficientsR2 = Vectors.dense(0.0, 0.03345223, -0.11304532, 0.0)
 
-    assert(model2.intercept ~== interceptR2 absTol 1E-3)
-    assert(model2.coefficients ~= coefficientsR2 absTol 1E-3)
+    assert(model2.intercept ~== interceptR2 absTol 1e-3)
+    assert(model2.coefficients ~= coefficientsR2 absTol 1e-3)
   }
 
   test(
@@ -850,14 +850,14 @@ class LogisticRegressionSuite
           (c, v) match {
             case (classSummarizer: MultiClassSummarizer, label: Double) =>
               classSummarizer.add(label)
-        },
+          },
         combOp = (c1, c2) =>
           (c1, c2) match {
             case (
                 classSummarizer1: MultiClassSummarizer,
                 classSummarizer2: MultiClassSummarizer) =>
               classSummarizer1.merge(classSummarizer2)
-        }
+          }
       )
       .histogram
 
@@ -875,11 +875,11 @@ class LogisticRegressionSuite
     val interceptTheory = math.log(histogram(1) / histogram(0))
     val coefficientsTheory = Vectors.dense(0.0, 0.0, 0.0, 0.0)
 
-    assert(model1.intercept ~== interceptTheory relTol 1E-5)
-    assert(model1.coefficients ~= coefficientsTheory absTol 1E-6)
+    assert(model1.intercept ~== interceptTheory relTol 1e-5)
+    assert(model1.coefficients ~= coefficientsTheory absTol 1e-6)
 
-    assert(model2.intercept ~== interceptTheory relTol 1E-5)
-    assert(model2.coefficients ~= coefficientsTheory absTol 1E-6)
+    assert(model2.intercept ~== interceptTheory relTol 1e-5)
+    assert(model2.coefficients ~= coefficientsTheory absTol 1e-6)
 
     /*
        Using the following R code to load the data and train the model using glmnet package.
@@ -902,8 +902,8 @@ class LogisticRegressionSuite
     val interceptR = -0.248065
     val coefficientsR = Vectors.dense(0.0, 0.0, 0.0, 0.0)
 
-    assert(model1.intercept ~== interceptR relTol 1E-5)
-    assert(model1.coefficients ~== coefficientsR absTol 1E-6)
+    assert(model1.intercept ~== interceptR relTol 1e-5)
+    assert(model1.coefficients ~== coefficientsR absTol 1e-6)
   }
 
   test("evaluate on test set") {
@@ -1009,10 +1009,10 @@ class LogisticRegressionSuite
     val model1a0 = trainer1a.fit(dataset)
     val model1a1 = trainer1a.fit(weightedDataset)
     val model1b = trainer1b.fit(weightedDataset)
-    assert(model1a0.coefficients !~= model1a1.coefficients absTol 1E-3)
-    assert(model1a0.intercept !~= model1a1.intercept absTol 1E-3)
-    assert(model1a0.coefficients ~== model1b.coefficients absTol 1E-3)
-    assert(model1a0.intercept ~== model1b.intercept absTol 1E-3)
+    assert(model1a0.coefficients !~= model1a1.coefficients absTol 1e-3)
+    assert(model1a0.intercept !~= model1a1.intercept absTol 1e-3)
+    assert(model1a0.coefficients ~== model1b.coefficients absTol 1e-3)
+    assert(model1a0.intercept ~== model1b.intercept absTol 1e-3)
   }
 
   test("logistic regression with all labels the same") {
@@ -1027,13 +1027,13 @@ class LogisticRegressionSuite
     val allZeroInterceptModel =
       lrIntercept.setLabelCol("zeroLabel").fit(sameLabels)
     assert(
-      allZeroInterceptModel.coefficients ~== Vectors.dense(0.0) absTol 1E-3)
+      allZeroInterceptModel.coefficients ~== Vectors.dense(0.0) absTol 1e-3)
     assert(allZeroInterceptModel.intercept === Double.NegativeInfinity)
     assert(allZeroInterceptModel.summary.totalIterations === 0)
 
     val allOneInterceptModel =
       lrIntercept.setLabelCol("oneLabel").fit(sameLabels)
-    assert(allOneInterceptModel.coefficients ~== Vectors.dense(0.0) absTol 1E-3)
+    assert(allOneInterceptModel.coefficients ~== Vectors.dense(0.0) absTol 1e-3)
     assert(allOneInterceptModel.intercept === Double.PositiveInfinity)
     assert(allOneInterceptModel.summary.totalIterations === 0)
 

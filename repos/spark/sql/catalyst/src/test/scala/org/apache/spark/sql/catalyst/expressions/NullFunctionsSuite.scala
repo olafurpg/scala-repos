@@ -28,7 +28,7 @@ class NullFunctionsSuite extends SparkFunSuite with ExpressionEvalHelper {
     testFunc(1.toShort, ShortType)
     testFunc(1, IntegerType)
     testFunc(1L, LongType)
-    testFunc(1.0F, FloatType)
+    testFunc(1.0f, FloatType)
     testFunc(1.0, DoubleType)
     testFunc(Decimal(1.5), DecimalType(2, 1))
     testFunc(new java.sql.Date(10), DateType)

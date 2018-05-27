@@ -65,7 +65,7 @@ class StreamingKMeansSuite extends SparkFunSuite with TestSuiteBase {
     runStreams(ssc, numBatches, numBatches)
 
     // estimated center should be close to true center
-    assert(centers(0) ~== model.latestModel().clusterCenters(0) absTol 1E-1)
+    assert(centers(0) ~== model.latestModel().clusterCenters(0) absTol 1e-1)
 
     // estimated center from streaming should exactly match the arithmetic mean of all data points
     // because the decay factor is set to 1.0
@@ -74,7 +74,7 @@ class StreamingKMeansSuite extends SparkFunSuite with TestSuiteBase {
         (numBatches * numPoints).toDouble
     assert(
       model.latestModel().clusterCenters(0) ~==
-        Vectors.dense(grandMean.toArray) absTol 1E-5)
+        Vectors.dense(grandMean.toArray) absTol 1e-5)
   }
 
   test("accuracy for two centers") {
@@ -115,8 +115,8 @@ class StreamingKMeansSuite extends SparkFunSuite with TestSuiteBase {
       } else {
         (centers(1), centers(0))
       }
-    assert(c0 ~== kMeans.latestModel().clusterCenters(0) absTol 1E-1)
-    assert(c1 ~== kMeans.latestModel().clusterCenters(1) absTol 1E-1)
+    assert(c0 ~== kMeans.latestModel().clusterCenters(0) absTol 1e-1)
+    assert(c1 ~== kMeans.latestModel().clusterCenters(1) absTol 1e-1)
   }
 
   test("detecting dying clusters") {

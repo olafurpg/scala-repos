@@ -203,7 +203,7 @@ private trait MaybeTBindRec[F[_]]
       B.tailrecM[A, Maybe[B]](a =>
         F.map(f(a).run) {
           _.cata(_.map(Maybe.just), \/.right(Maybe.empty))
-      })(a)
+        })(a)
     )
 }
 

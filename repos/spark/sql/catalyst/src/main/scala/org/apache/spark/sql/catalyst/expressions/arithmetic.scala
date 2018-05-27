@@ -550,37 +550,51 @@ case class Pmod(left: Expression, right: Expression) extends BinaryArithmetic {
 
   private def pmod(a: Int, n: Int): Int = {
     val r = a % n
-    if (r < 0) { (r + n) % n } else r
+    if (r < 0) {
+      (r + n) % n
+    } else r
   }
 
   private def pmod(a: Long, n: Long): Long = {
     val r = a % n
-    if (r < 0) { (r + n) % n } else r
+    if (r < 0) {
+      (r + n) % n
+    } else r
   }
 
   private def pmod(a: Byte, n: Byte): Byte = {
     val r = a % n
-    if (r < 0) { ((r + n) % n).toByte } else r.toByte
+    if (r < 0) {
+      ((r + n) % n).toByte
+    } else r.toByte
   }
 
   private def pmod(a: Double, n: Double): Double = {
     val r = a % n
-    if (r < 0) { (r + n) % n } else r
+    if (r < 0) {
+      (r + n) % n
+    } else r
   }
 
   private def pmod(a: Short, n: Short): Short = {
     val r = a % n
-    if (r < 0) { ((r + n) % n).toShort } else r.toShort
+    if (r < 0) {
+      ((r + n) % n).toShort
+    } else r.toShort
   }
 
   private def pmod(a: Float, n: Float): Float = {
     val r = a % n
-    if (r < 0) { (r + n) % n } else r
+    if (r < 0) {
+      (r + n) % n
+    } else r
   }
 
   private def pmod(a: Decimal, n: Decimal): Decimal = {
     val r = a % n
-    if (r.compare(Decimal.ZERO) < 0) { (r + n) % n } else r
+    if (r.compare(Decimal.ZERO) < 0) {
+      (r + n) % n
+    } else r
   }
 
   override def sql: String = s"$prettyName(${left.sql}, ${right.sql})"

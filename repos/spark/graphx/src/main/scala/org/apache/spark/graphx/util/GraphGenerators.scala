@@ -279,10 +279,14 @@ object GraphGenerators extends Logging {
     val edges: RDD[Edge[Double]] = vertices
       .flatMap {
         case (vid, (r, c)) =>
-          (if (r + 1 < rows) { Seq((sub2ind(r, c), sub2ind(r + 1, c))) } else {
+          (if (r + 1 < rows) {
+             Seq((sub2ind(r, c), sub2ind(r + 1, c)))
+           } else {
              Seq.empty
            }) ++
-            (if (c + 1 < cols) { Seq((sub2ind(r, c), sub2ind(r, c + 1))) } else {
+            (if (c + 1 < cols) {
+               Seq((sub2ind(r, c), sub2ind(r, c + 1)))
+             } else {
                Seq.empty
              })
       }

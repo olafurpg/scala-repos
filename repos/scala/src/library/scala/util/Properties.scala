@@ -40,8 +40,12 @@ private[scala] trait PropertiesTrait {
   }
 
   private def quietlyDispose(action: => Unit, disposal: => Unit) =
-    try { action } finally {
-      try { disposal } catch { case _: IOException => }
+    try {
+      action
+    } finally {
+      try {
+        disposal
+      } catch { case _: IOException => }
     }
 
   def propIsSet(name: String) = System.getProperty(name) != null

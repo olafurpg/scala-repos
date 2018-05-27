@@ -72,7 +72,7 @@ trait EnumeratorT[E, F[_]] { self =>
             cont = k =>
               k(eofInput) >>== { s =>
                 s.mapContOr(_ => sys.error("diverging iteratee"), check(s))
-            },
+              },
             done = (a, _) => step.mapCont(f => f(elInput(a)))
           )
 
@@ -166,7 +166,7 @@ trait EnumeratorTFunctions {
             case h #:: t =>
               s.mapCont(k => k(elInput(h)) >>== enumStream[E, F](t).apply[A])
             case _ => s.pointI
-        }
+          }
     }
 
   def enumList[E, F[_]: Monad](xs: List[E]): EnumeratorT[E, F] =
@@ -177,7 +177,7 @@ trait EnumeratorTFunctions {
             case h :: t =>
               s.mapCont(k => k(elInput(h)) >>== enumList[E, F](t).apply[A])
             case Nil => s.pointI
-        }
+          }
     }
 
   def enumIterator[E, F[_]](x: => Iterator[E])(
@@ -212,7 +212,7 @@ trait EnumeratorTFunctions {
               if (gotdata(i)) k(elInput(i.map(render))) >>== apply[A]
               else s.pointI
             }
-        )
+          )
     }
 
   def enumReader[F[_]](r: => java.io.Reader)(

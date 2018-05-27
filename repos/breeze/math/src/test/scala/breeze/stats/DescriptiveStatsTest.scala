@@ -166,10 +166,10 @@ class DescriptiveStatsTest2 extends FunSuite {
     val mav = meanAndVariance(data)
     val mav2 = meanAndVariance(data.iterator)
     assert(
-      breeze.numerics.closeTo(mav.mean, 0.0, 1E-2),
+      breeze.numerics.closeTo(mav.mean, 0.0, 1e-2),
       mav.mean + " should be 0")
     assert(
-      breeze.numerics.closeTo(mav.variance, 1.0, 1E-2),
+      breeze.numerics.closeTo(mav.variance, 1.0, 1e-2),
       mav.variance + " should be 1")
     assert(mav == mav2)
   }
@@ -182,8 +182,8 @@ class DescriptiveStatsTest2 extends FunSuite {
     val mav2 = meanAndVariance(data2)
     val mavTotal = meanAndVariance(data ++ data2)
     val mavSum = mav + mav2
-    assert(breeze.numerics.closeTo(mavTotal.mean, mavSum.mean, 1E-5))
-    assert(breeze.numerics.closeTo(mavTotal.variance, mavSum.variance, 1E-5))
+    assert(breeze.numerics.closeTo(mavTotal.mean, mavSum.mean, 1e-5))
+    assert(breeze.numerics.closeTo(mavTotal.variance, mavSum.variance, 1e-5))
     assert(mavSum.count == mavTotal.count)
   }
 

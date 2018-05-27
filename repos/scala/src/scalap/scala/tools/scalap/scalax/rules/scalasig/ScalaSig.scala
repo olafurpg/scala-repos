@@ -96,8 +96,7 @@ object ScalaSigAttributeParsers extends ByteCodeReader {
         }
         case _ => Failure
       }
-    in =>
-      natN(in, 0)
+    in => natN(in, 0)
   }
 
   val rawBytes = nat >> bytes

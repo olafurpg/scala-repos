@@ -38,7 +38,7 @@ class Kalman(N: Int) {
     est += weight * (m - est)
     val mv = mvar
     val ev = evar
-    if (mv + ev == 0) weight = 1D
+    if (mv + ev == 0) weight = 1d
     else weight = mv / (mv + ev)
     n += 1
   }
@@ -56,7 +56,7 @@ class Kalman(N: Int) {
   def estimate = est
 
   private[this] def variance(samples: Array[Double]): Double = {
-    if (samples.length == 1) return 0D
+    if (samples.length == 1) return 0d
 
     val sum = samples.sum
     val mean = sum / samples.length
@@ -82,7 +82,7 @@ class Kalman(N: Int) {
 class KalmanGaussianError(N: Int, range: Double)
     extends Kalman(N)
     with Estimator[Double] {
-  require(range >= 0D && range < 1D)
+  require(range >= 0d && range < 1d)
   private[this] val rng = new Random
 
   def measure(m: Double) {
@@ -138,7 +138,7 @@ class WindowedMeans(N: Int, windows: Seq[(Int, Int)])
   * See: http://web.mit.edu/saltzer/www/publications/instrumentation.html
   */
 class LoadAverage(interval: Double) extends Estimator[Double] {
-  private[this] val a = math.exp(-1D / interval)
+  private[this] val a = math.exp(-1d / interval)
   private[this] var load = Double.NaN
 
   def measure(m: Double) {

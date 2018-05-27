@@ -93,8 +93,7 @@ private[util] class BatchExecutor[In, Out](
       if (buf.size >= currentBufThreshold) flushBatch()
       else {
         scheduleFlushIfNecessary()
-        () =>
-          ()
+        () => ()
       }
     }
 

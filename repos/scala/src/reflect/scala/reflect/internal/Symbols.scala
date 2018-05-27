@@ -494,8 +494,7 @@ trait Symbols extends api.Symbols { self: SymbolTable =>
 
     private def freshNamer: () => TermName = {
       var cnt = 0
-      () =>
-        { cnt += 1; nme.syntheticParamName(cnt) }
+      () => { cnt += 1; nme.syntheticParamName(cnt) }
     }
 
     /** Synthetic value parameters when parameter symbols are not available.
@@ -690,7 +689,9 @@ trait Symbols extends api.Symbols { self: SymbolTable =>
               recursionTable += (this -> 1)
               true
           }
-        } else { handler; false }
+        } else {
+          handler; false
+        }
       } else {
         _rawflags |= LOCKED
         true
@@ -1895,7 +1896,9 @@ trait Symbols extends api.Symbols { self: SymbolTable =>
       this
     }
     def maybeInitialize = {
-      try { initialize; true } catch {
+      try {
+        initialize; true
+      } catch {
         case _: CyclicReference =>
           debuglog("Hit cycle in maybeInitialize of $this"); false
       }

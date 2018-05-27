@@ -342,7 +342,7 @@ package scalaguide.forms.scalaforms {
             fields match {
               case userData =>
                 validate(userData.name, userData.age).isDefined
-          })
+            })
       )
       //#userForm-constraints-ad-hoc
 

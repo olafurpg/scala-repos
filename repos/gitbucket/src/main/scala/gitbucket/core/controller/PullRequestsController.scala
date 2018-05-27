@@ -136,7 +136,7 @@ trait PullRequestsControllerBase extends ControllerBase {
                     getIssueLabels(owner, name, issueId),
                     (getCollaborators(owner, name) :::
                       (if (getAccountByUserName(owner).get.isGroupAccount) Nil
-                     else List(owner))).sorted,
+                       else List(owner))).sorted,
                     getMilestonesWithIssueCount(owner, name),
                     getLabels(owner, name),
                     commits,
@@ -625,8 +625,8 @@ trait PullRequestsControllerBase extends ControllerBase {
                     originRepository.owner,
                     originRepository.name) :::
                     (if (getAccountByUserName(originRepository.owner).get.isGroupAccount)
-                     Nil
-                   else List(originRepository.owner))).sorted,
+                       Nil
+                     else List(originRepository.owner))).sorted,
                   getMilestones(originRepository.owner, originRepository.name),
                   getLabels(originRepository.owner, originRepository.name)
                 )

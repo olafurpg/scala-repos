@@ -76,7 +76,7 @@ package object util {
           println(s"$marker: Cancel")
           super.onDownstreamFinish(ctx)
         }
-    })
+      })
 
   private[this] var eventStreamLogger: ActorRef = _
   private[http] def installEventStreamLoggerFor(channel: Class[_])(

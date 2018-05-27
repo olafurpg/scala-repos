@@ -58,7 +58,7 @@ object Message extends LilaController {
                 blocked,
                 answerable = !Env.message.LichessSenders
                   .contains(thread.creatorId)))
-        },
+          },
         text =>
           api.makePost(thread, text, me) inject Redirect(
             routes.Message.thread(thread.id) + "#bottom")
@@ -83,7 +83,7 @@ object Message extends LilaController {
           data =>
             api.makeThread(data, me) map { thread =>
               Redirect(routes.Message.thread(thread.id))
-          })
+            })
     }
   }
 

@@ -235,7 +235,6 @@ trait SimpleStatelessBehavior extends StatelessBehavior {
 trait BlankStatelessBehavior extends StatelessBehavior {
   def statelessDispatch: PartialFunction[String, NodeSeq => NodeSeq] = {
     case _ =>
-      _ =>
-        NodeSeq.Empty
+      _ => NodeSeq.Empty
   }
 }

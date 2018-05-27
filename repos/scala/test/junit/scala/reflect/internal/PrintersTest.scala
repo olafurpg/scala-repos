@@ -106,7 +106,7 @@ trait BasePrintTests {
 
   @Test def testConstantDouble = assertTreeCode(Literal(Constant(42d)))("42.0")
 
-  @Test def testConstantLong = assertTreeCode(Literal(Constant(42l)))("42L")
+  @Test def testConstantLong = assertTreeCode(Literal(Constant(42L)))("42L")
 
   @Test def testOpExpr = assertPrintedCode("(5).+(4)", checkTypedTree = false)
 

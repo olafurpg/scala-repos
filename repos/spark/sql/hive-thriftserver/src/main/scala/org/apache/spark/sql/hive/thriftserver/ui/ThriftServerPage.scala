@@ -62,7 +62,9 @@ private[ui] class ThriftServerPage(parent: ThriftServerTab)
         <strong>Started at: </strong> {formatDate(startTime)}
       </li>
       <li>
-        <strong>Time since start: </strong>{formatDurationVerbose(timeSinceStart)}
+        <strong>Time since start: </strong>{
+      formatDurationVerbose(timeSinceStart)
+    }
       </li>
     </ul>
   }
@@ -86,7 +88,11 @@ private[ui] class ThriftServerPage(parent: ThriftServerTab)
 
         def generateDataRow(info: ExecutionInfo): Seq[Node] = {
           val jobLink = info.jobId.map { id: String =>
-            <a href={"%s/jobs/job?id=%s".format(UIUtils.prependBaseUri(parent.basePath), id)}>
+            <a href={
+              "%s/jobs/job?id=%s".format(
+                UIUtils.prependBaseUri(parent.basePath),
+                id)
+            }>
             [{id}]
           </a>
           }
@@ -178,7 +184,9 @@ private[ui] class ThriftServerPage(parent: ThriftServerTab)
           <td> {session.ip} </td>
           <td> <a href={sessionLink}> {session.sessionId} </a> </td>
           <td> {formatDate(session.startTimestamp)} </td>
-          <td> {if (session.finishTimestamp > 0) formatDate(session.finishTimestamp)} </td>
+          <td> {
+            if (session.finishTimestamp > 0) formatDate(session.finishTimestamp)
+          } </td>
           <td> {formatDurationOption(Some(session.totalTime))} </td>
           <td> {session.totalExecution.toString} </td>
         </tr>

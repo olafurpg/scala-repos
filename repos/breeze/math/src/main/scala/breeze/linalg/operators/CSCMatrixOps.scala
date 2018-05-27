@@ -156,7 +156,7 @@ trait CSCMatrixOps extends CSCMatrixOps_Ring {
         T,
         T,
         T],
-      @expand.sequence[T](0, 0.0, 0.0f, 0l) zero: T)
+      @expand.sequence[T](0, 0.0, 0.0f, 0L) zero: T)
     : Op.Impl2[CSCMatrix[T], CSCMatrix[T], CSCMatrix[T]] = {
     val mZero = implicitly[T](zero)
     def computeZeroOpOnRange(arr: Array[T], start: Int, end: Int) {
@@ -225,7 +225,7 @@ trait CSCMatrixOps extends CSCMatrixOps_Ring {
   @expand
   @expand.valify
   implicit def csc_csc_OpAdd[@expand.args(Int, Double, Float, Long) T](
-      implicit @expand.sequence[T](0, 0.0, 0.0f, 0l) zero: T)
+      implicit @expand.sequence[T](0, 0.0, 0.0f, 0L) zero: T)
     : OpAdd.Impl2[CSCMatrix[T], CSCMatrix[T], CSCMatrix[T]] = {
     new OpAdd.Impl2[CSCMatrix[T], CSCMatrix[T], CSCMatrix[T]] {
       def apply(a: CSCMatrix[T], b: CSCMatrix[T]): CSCMatrix[T] = {
@@ -467,7 +467,7 @@ trait CSCMatrixOps extends CSCMatrixOps_Ring {
   @expand
   @expand.valify
   implicit def csc_csc_OpMulScalar[@expand.args(Int, Double, Float, Long) T](
-      implicit @expand.sequence[T](0, 0.0, 0.0f, 0l) zero: T)
+      implicit @expand.sequence[T](0, 0.0, 0.0f, 0L) zero: T)
     : OpMulScalar.Impl2[CSCMatrix[T], CSCMatrix[T], CSCMatrix[T]] = {
     new OpMulScalar.Impl2[CSCMatrix[T], CSCMatrix[T], CSCMatrix[T]] {
       def apply(a: CSCMatrix[T], b: CSCMatrix[T]): CSCMatrix[T] = {
@@ -523,7 +523,7 @@ trait CSCMatrixOps extends CSCMatrixOps_Ring {
   @expand
   @expand.valify
   implicit def csc_csc_OpSub[@expand.args(Int, Double, Float, Long) T](
-      implicit @expand.sequence[T](0, 0.0, 0.0f, 0l) zero: T)
+      implicit @expand.sequence[T](0, 0.0, 0.0f, 0L) zero: T)
     : OpSub.Impl2[CSCMatrix[T], CSCMatrix[T], CSCMatrix[T]] = {
     new OpSub.Impl2[CSCMatrix[T], CSCMatrix[T], CSCMatrix[T]] {
       def apply(a: CSCMatrix[T], b: CSCMatrix[T]): CSCMatrix[T] = {
@@ -583,7 +583,7 @@ trait CSCMatrixOps extends CSCMatrixOps_Ring {
   implicit def implOps_CSCT_T_eq_CSCT[
       @expand.args(Int, Double, Float, Long) T,
       @expand.args(OpMulScalar, OpMulMatrix) Op <: OpType](
-      implicit @expand.sequence[T](0, 0.0, 0.0f, 0l) zero: T)
+      implicit @expand.sequence[T](0, 0.0, 0.0f, 0L) zero: T)
     : Op.Impl2[CSCMatrix[T], T, CSCMatrix[T]] = {
     new Op.Impl2[CSCMatrix[T], T, CSCMatrix[T]] {
       def apply(a: CSCMatrix[T], b: T): CSCMatrix[T] = {

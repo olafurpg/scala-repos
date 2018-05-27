@@ -56,7 +56,7 @@ object DevModeBuild {
   )
 
   val ServerMaxAttempts = 3 * 60
-  val ServerWaitTime = 1000l
+  val ServerWaitTime = 1000L
 
   @tailrec
   def waitForServer(attempts: Int = 0): Unit = {
@@ -90,7 +90,7 @@ object DevModeBuild {
   }
 
   val MaxAttempts = 10
-  val WaitTime = 500l
+  val WaitTime = 500L
   val ConnectTimeout = 10000
   val ReadTimeout = 10000
 

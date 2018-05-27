@@ -123,7 +123,7 @@ trait RandomCompanion[G <: Generator] { self =>
             f(b, a) match {
               case Some(b2) => More(() => loop(Const(b2), ma))
               case None     => Const(b)
-          }))
+            }))
       spawn(loop(Const(init), More(() => lhs.op)))
     }
   }

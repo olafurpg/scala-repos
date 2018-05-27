@@ -236,7 +236,7 @@ package object plot {
                 binner.splits(i - 1) + width / 2.0
               } else {
                 binner.splits(i) - width / 2.0
-            },
+              },
             y = (i: Int) => counts(i),
             label = (i: Int) => null,
             tip = (i: Int) => null

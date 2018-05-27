@@ -78,7 +78,7 @@ class NNLSSuite extends SparkFunSuite {
     val ws = NNLS.createWorkspace(n)
     val x = NNLS.solve(ata, atb, ws)
     for (i <- 0 until n) {
-      assert(x(i) ~== goodx(i) absTol 1E-3)
+      assert(x(i) ~== goodx(i) absTol 1e-3)
       assert(x(i) >= 0)
     }
   }
@@ -106,6 +106,6 @@ class NNLSSuite extends SparkFunSuite {
     val x = new BDV(NNLS.solve(ata.data, atb.data, ws))
     val obj = computeObjectiveValue(ata, atb, x)
 
-    assert(obj < refObj + 1E-5)
+    assert(obj < refObj + 1e-5)
   }
 }

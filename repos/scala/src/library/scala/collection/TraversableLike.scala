@@ -340,7 +340,9 @@ trait TraversableLike[+A, +Repr]
   def forall(p: A => Boolean): Boolean = {
     var result = true
     breakable {
-      for (x <- this) if (!p(x)) { result = false; break }
+      for (x <- this) if (!p(x)) {
+        result = false; break
+      }
     }
     result
   }
@@ -356,7 +358,9 @@ trait TraversableLike[+A, +Repr]
   def exists(p: A => Boolean): Boolean = {
     var result = false
     breakable {
-      for (x <- this) if (p(x)) { result = true; break }
+      for (x <- this) if (p(x)) {
+        result = true; break
+      }
     }
     result
   }
@@ -364,7 +368,9 @@ trait TraversableLike[+A, +Repr]
   def find(p: A => Boolean): Option[A] = {
     var result: Option[A] = None
     breakable {
-      for (x <- this) if (p(x)) { result = Some(x); break }
+      for (x <- this) if (p(x)) {
+        result = Some(x); break
+      }
     }
     result
   }

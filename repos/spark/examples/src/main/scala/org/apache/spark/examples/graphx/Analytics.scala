@@ -75,7 +75,7 @@ object Analytics extends Logging {
 
     taskType match {
       case "pagerank" =>
-        val tol = options.remove("tol").map(_.toFloat).getOrElse(0.001F)
+        val tol = options.remove("tol").map(_.toFloat).getOrElse(0.001f)
         val outFname = options.remove("output").getOrElse("")
         val numIterOpt = options.remove("numIter").map(_.toInt)
 

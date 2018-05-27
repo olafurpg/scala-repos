@@ -92,8 +92,8 @@ trait DiagramDirectiveParser {
     else defaultFilter
   }
 
-  protected var tFilter = 0l
-  protected var tModel = 0l
+  protected var tFilter = 0L
+  protected var tModel = 0L
 
   /** Show the entire diagram, no filtering */
   case object FullDiagram extends DiagramFilter {

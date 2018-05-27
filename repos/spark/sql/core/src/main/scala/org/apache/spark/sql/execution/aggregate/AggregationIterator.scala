@@ -177,11 +177,9 @@ abstract class AggregationIterator(
         case (ae: ImperativeAggregate, i) =>
           expressions(i).mode match {
             case Partial | Complete =>
-              (buffer: MutableRow, row: InternalRow) =>
-                ae.update(buffer, row)
+              (buffer: MutableRow, row: InternalRow) => ae.update(buffer, row)
             case PartialMerge | Final =>
-              (buffer: MutableRow, row: InternalRow) =>
-                ae.merge(buffer, row)
+              (buffer: MutableRow, row: InternalRow) => ae.merge(buffer, row)
           }
       }
       // This projection is used to merge buffer values for all expression-based aggregates.
@@ -190,17 +188,16 @@ abstract class AggregationIterator(
         mergeExpressions,
         aggregationBufferSchema ++ inputAttributes)()
 
-      (currentBuffer: MutableRow, row: InternalRow) =>
-        {
-          // Process all expression-based aggregate functions.
-          updateProjection.target(currentBuffer)(joinedRow(currentBuffer, row))
-          // Process all imperative aggregate functions.
-          var i = 0
-          while (i < updateFunctions.length) {
-            updateFunctions(i)(currentBuffer, row)
-            i += 1
-          }
+      (currentBuffer: MutableRow, row: InternalRow) => {
+        // Process all expression-based aggregate functions.
+        updateProjection.target(currentBuffer)(joinedRow(currentBuffer, row))
+        // Process all imperative aggregate functions.
+        var i = 0
+        while (i < updateFunctions.length) {
+          updateFunctions(i)(currentBuffer, row)
+          i += 1
         }
+      }
     } else {
       // Grouping only.
       (currentBuffer: MutableRow, row: InternalRow) =>
@@ -239,36 +236,33 @@ abstract class AggregationIterator(
         resultExpressions,
         groupingAttributes ++ aggregateAttributes)
 
-      (currentGroupingKey: UnsafeRow, currentBuffer: MutableRow) =>
-        {
-          // Generate results for all expression-based aggregate functions.
-          expressionAggEvalProjection(currentBuffer)
-          // Generate results for all imperative aggregate functions.
-          var i = 0
-          while (i < allImperativeAggregateFunctions.length) {
-            aggregateResult.update(
-              allImperativeAggregateFunctionPositions(i),
-              allImperativeAggregateFunctions(i).eval(currentBuffer))
-            i += 1
-          }
-          resultProjection(joinedRow(currentGroupingKey, aggregateResult))
+      (currentGroupingKey: UnsafeRow, currentBuffer: MutableRow) => {
+        // Generate results for all expression-based aggregate functions.
+        expressionAggEvalProjection(currentBuffer)
+        // Generate results for all imperative aggregate functions.
+        var i = 0
+        while (i < allImperativeAggregateFunctions.length) {
+          aggregateResult.update(
+            allImperativeAggregateFunctionPositions(i),
+            allImperativeAggregateFunctions(i).eval(currentBuffer))
+          i += 1
         }
+        resultProjection(joinedRow(currentGroupingKey, aggregateResult))
+      }
     } else if (modes.contains(Partial) || modes.contains(PartialMerge)) {
       val resultProjection = UnsafeProjection.create(
         groupingAttributes ++ bufferAttributes,
         groupingAttributes ++ bufferAttributes)
-      (currentGroupingKey: UnsafeRow, currentBuffer: MutableRow) =>
-        {
-          resultProjection(joinedRow(currentGroupingKey, currentBuffer))
-        }
+      (currentGroupingKey: UnsafeRow, currentBuffer: MutableRow) => {
+        resultProjection(joinedRow(currentGroupingKey, currentBuffer))
+      }
     } else {
       // Grouping-only: we only output values based on grouping expressions.
       val resultProjection =
         UnsafeProjection.create(resultExpressions, groupingAttributes)
-      (currentGroupingKey: UnsafeRow, currentBuffer: MutableRow) =>
-        {
-          resultProjection(currentGroupingKey)
-        }
+      (currentGroupingKey: UnsafeRow, currentBuffer: MutableRow) => {
+        resultProjection(currentGroupingKey)
+      }
     }
   }
 

@@ -30,7 +30,7 @@ trait HeaderDirectives {
                 header.name,
                 e.getMessage.nullAsEmpty,
                 Some(e))))
-    }
+      }
 
     extract(_.request.headers.collectFirst(Function.unlift(protectedF)))
       .flatMap {

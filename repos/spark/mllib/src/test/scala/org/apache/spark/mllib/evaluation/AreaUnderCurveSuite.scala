@@ -25,22 +25,22 @@ class AreaUnderCurveSuite extends SparkFunSuite with MLlibTestSparkContext {
   test("auc computation") {
     val curve = Seq((0.0, 0.0), (1.0, 1.0), (2.0, 3.0), (3.0, 0.0))
     val auc = 4.0
-    assert(AreaUnderCurve.of(curve) ~== auc absTol 1E-5)
+    assert(AreaUnderCurve.of(curve) ~== auc absTol 1e-5)
     val rddCurve = sc.parallelize(curve, 2)
-    assert(AreaUnderCurve.of(rddCurve) ~== auc absTol 1E-5)
+    assert(AreaUnderCurve.of(rddCurve) ~== auc absTol 1e-5)
   }
 
   test("auc of an empty curve") {
     val curve = Seq.empty[(Double, Double)]
-    assert(AreaUnderCurve.of(curve) ~== 0.0 absTol 1E-5)
+    assert(AreaUnderCurve.of(curve) ~== 0.0 absTol 1e-5)
     val rddCurve = sc.parallelize(curve, 2)
-    assert(AreaUnderCurve.of(rddCurve) ~== 0.0 absTol 1E-5)
+    assert(AreaUnderCurve.of(rddCurve) ~== 0.0 absTol 1e-5)
   }
 
   test("auc of a curve with a single point") {
     val curve = Seq((1.0, 1.0))
-    assert(AreaUnderCurve.of(curve) ~== 0.0 absTol 1E-5)
+    assert(AreaUnderCurve.of(curve) ~== 0.0 absTol 1e-5)
     val rddCurve = sc.parallelize(curve, 2)
-    assert(AreaUnderCurve.of(rddCurve) ~== 0.0 absTol 1E-5)
+    assert(AreaUnderCurve.of(rddCurve) ~== 0.0 absTol 1e-5)
   }
 }

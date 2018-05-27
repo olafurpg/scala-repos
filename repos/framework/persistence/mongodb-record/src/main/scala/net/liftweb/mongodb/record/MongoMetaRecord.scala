@@ -91,7 +91,7 @@ trait MongoMetaRecord[BaseRecord <: MongoRecord[BaseRecord]]
       coll.findOne(qry) match {
         case null => Empty
         case dbo  => Full(fromDBObject(dbo))
-    })
+      })
   }
 
   /**
@@ -385,7 +385,7 @@ trait MongoMetaRecord[BaseRecord <: MongoRecord[BaseRecord]]
             pair._2 match {
               case Empty => true
               case _     => false
-          }
+            }
         )
         .map(_._1)
 

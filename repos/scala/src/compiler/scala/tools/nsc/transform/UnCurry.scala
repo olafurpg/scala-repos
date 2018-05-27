@@ -296,7 +296,7 @@ abstract class UnCurry
                   gen.mkForwarder(
                     gen.mkAttributedRef(liftedMethod.symbol),
                     funParams :: Nil)
-              ))
+                ))
             typedFunPos(Block(liftedMethod, super.transform(newFun)))
           }
       }

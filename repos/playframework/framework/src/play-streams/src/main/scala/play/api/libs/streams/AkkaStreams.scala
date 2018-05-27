@@ -102,7 +102,7 @@ object AkkaStreams {
             null
           }
         }
-    })
+      })
 
   /**
     * A flow that will ignore downstream cancellation, and instead will continue receiving and ignoring the stream.

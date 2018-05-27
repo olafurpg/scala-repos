@@ -343,7 +343,7 @@ class P2CBalancerEwmaTest extends FunSuite with App with P2CSuite {
 
   case class LatentFactory(which: Int, latency: Any => Int)
       extends P2CServiceFactory {
-    val weight = 1D
+    val weight = 1d
     var load = 0
     var sum = 0
     def meanLoad = if (load == 0) 0.0 else sum.toDouble / load.toDouble

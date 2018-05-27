@@ -94,7 +94,7 @@ object Math {
       var xi = pow(value, 0.3333333333333333)
 
       //Halley's Method (http://metamerist.com/cbrt/cbrt.htm)
-      while (abs(x - xi) >= 1E-16) {
+      while (abs(x - xi) >= 1e-16) {
         x = xi
         val x3 = js.Math.pow(x, 3)
         val x3Plusa = x3 + value
@@ -116,7 +116,7 @@ object Math {
           x: scala.Double,
           xi: scala.Double,
           n: scala.Double): scala.Double = {
-        if (Math.abs(xi - x) >= 1E-16) {
+        if (Math.abs(xi - x) >= 1e-16) {
           val c0 = (xi + x) / 2
           val c =
             if (c0 == NegativeInfinity || c0 == PositiveInfinity)
@@ -127,7 +127,7 @@ object Math {
           else iter(x = c, xi = xi, n = c)
         } else xi
       }
-      val d = Math.max(Math.abs(a) * 2E-16, MinPositiveValue)
+      val d = Math.max(Math.abs(a) * 2e-16, MinPositiveValue)
       val ad = a + d
       val xi0 =
         if (ad == PositiveInfinity) MaxValue
@@ -171,7 +171,7 @@ object Math {
     if (a == 0 || a.isNaN) a
     // Power Series http://en.wikipedia.org/wiki/Power_series
     // for small values of a, exp(a) = 1 + a + (a*a)/2
-    else if (abs(a) < 1E-5) a + 0.5 * a * a
+    else if (abs(a) < 1e-5) a + 0.5 * a * a
     else exp(a) - 1.0
   }
 

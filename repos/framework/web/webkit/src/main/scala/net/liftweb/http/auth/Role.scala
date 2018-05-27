@@ -29,7 +29,7 @@ object AuthRole {
     roleNames.toList.map(n =>
       new Role {
         def name = n
-    })
+      })
 
   def apply(roleName: String, roles: Role*): Role =
     new Role {
@@ -87,7 +87,7 @@ trait Role {
           role.getRoleByName(roleName) match {
             case Empty       => false
             case theRole @ _ => return theRole
-        })
+          })
         Empty
       case _ => Full(this)
     }

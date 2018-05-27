@@ -92,7 +92,7 @@ class SbtBuilder extends ModuleLevelBuilder(BuilderCategory.TRANSLATOR) {
         if (client.hasReportedErrors || client.isCanceled) {
           ExitCode.ABORT
         } else {
-          client.progress("Compilation completed", Some(1.0F))
+          client.progress("Compilation completed", Some(1.0f))
           code
         }
     }

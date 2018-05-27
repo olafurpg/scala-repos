@@ -41,7 +41,7 @@ class LBFGS(private var gradient: Gradient, private var updater: Updater)
     with Logging {
 
   private var numCorrections = 10
-  private var convergenceTol = 1E-6
+  private var convergenceTol = 1e-6
   private var maxNumIterations = 100
   private var regParam = 0.0
 
@@ -256,13 +256,13 @@ object LBFGS extends Logging {
             case ((grad, loss), (label, features)) =>
               val l = localGradient.compute(features, label, bcW.value, grad)
               (grad, loss + l)
-        },
+          },
         combOp = (c1, c2) =>
           (c1, c2) match {
             case ((grad1, loss1), (grad2, loss2)) =>
               axpy(1.0, grad2, grad1)
               (grad1, loss1 + loss2)
-        }
+          }
       )
 
       /**

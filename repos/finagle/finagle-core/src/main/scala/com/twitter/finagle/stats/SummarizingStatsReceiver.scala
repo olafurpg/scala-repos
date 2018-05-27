@@ -85,11 +85,11 @@ class SummarizingStatsReceiver extends StatsReceiverWithCumulativeGauges {
               n,
               xs(0),
               xs(n / 2),
-              xs(idx(.9D)),
-              xs(idx(.95D)),
-              xs(idx(.99D)),
-              xs(idx(.999D)),
-              xs(idx(.9999D)),
+              xs(idx(.9d)),
+              xs(idx(.95d)),
+              xs(idx(.99d)),
+              xs(idx(.999d)),
+              xs(idx(.9999d)),
               xs(n - 1)))
     }).toSeq
 
@@ -103,7 +103,7 @@ class SummarizingStatsReceiver extends StatsReceiverWithCumulativeGauges {
         }
         (
           variableName(k),
-          "p999=%s, p9999=%s".format(slice(.999D), slice(.9999D)))
+          "p999=%s, p9999=%s".format(slice(.999d), slice(.9999d)))
     }).toSeq
 
     val sortedCounters = counterLines.sortBy { case (k, _) => k }

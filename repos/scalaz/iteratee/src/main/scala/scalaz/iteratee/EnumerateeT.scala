@@ -53,7 +53,7 @@ trait EnumerateeTFunctions {
                     empty = contf(emptyInput) >>== loop,
                     eof = done(step, emptyInput)
                   )
-            },
+              },
             done = (a, _) => done(sdone(a, emptyInput), emptyInput)
           )
         }
@@ -117,8 +117,7 @@ trait EnumerateeTFunctions {
             }
           }
 
-        s =>
-          step(s, emptyInput).map(sdone(_, emptyInput))
+        s => step(s, emptyInput).map(sdone(_, emptyInput))
       }
     }
 

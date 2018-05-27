@@ -24,7 +24,7 @@ trait DoubleIsField extends Field[Double] {
 
   final def gcd(a: Double, b: Double): Double = {
     def value(bits: Long): Long =
-      bits & 0x000FFFFFFFFFFFFFL | 0x0010000000000000L
+      bits & 0X000FFFFFFFFFFFFFL | 0X0010000000000000L
 
     def exp(bits: Long): Int = ((bits >> 52) & 0x7FF).toInt
 
@@ -42,14 +42,14 @@ trait DoubleIsField extends Field[Double] {
       // If exp is 0, then the value is actually just the mantissa * 2^−126,
       // so we need to adjust the *shift* accordingly.
       val shift0 = if (exp == 0) shift - 1 else shift
-      val mantissa = (n << shift0) & 0x000FFFFFFFFFFFFFL
+      val mantissa = (n << shift0) & 0X000FFFFFFFFFFFFFL
       // If exp < 0, then we have underflowed; not much we can do but return 0.
       if (exp < 0) 0.0
       else longBitsToDouble((exp << 52) | mantissa)
     }
 
-    if (a == 0D) b
-    else if (b == 0D) a
+    if (a == 0d) b
+    else if (b == 0d) a
     else {
       val aBits = doubleToLongBits(a)
       val aVal = value(aBits)
@@ -142,7 +142,7 @@ trait DoubleInstances {
   import Double._
   import spire.math.NumberTag._
   implicit final val DoubleTag = new BuiltinFloatTag(
-    0D,
+    0d,
     MinValue,
     MaxValue,
     NaN,

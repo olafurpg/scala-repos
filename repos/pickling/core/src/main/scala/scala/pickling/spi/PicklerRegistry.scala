@@ -68,8 +68,8 @@ trait PicklerRegistry {
     */
   def registerPicklerUnpickler[T](
       key: String,
-      p: (Pickler[T] with Unpickler[T]))
-    : Unit // TODO - Return old pickler if one existed?
+      p: (Pickler[T]
+        with Unpickler[T])): Unit // TODO - Return old pickler if one existed?
 
   /** Registers a function which can generate picklers for a given type constructor.
     *

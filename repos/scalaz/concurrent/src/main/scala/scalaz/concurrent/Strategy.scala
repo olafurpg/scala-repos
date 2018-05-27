@@ -66,8 +66,7 @@ trait StrategysLow {
   implicit val Sequential: Strategy = new Strategy {
     def apply[A](a: => A) = {
       val v = a
-      () =>
-        v
+      () => v
     }
   }
 
@@ -84,8 +83,7 @@ trait StrategysLow {
       val fut = s.submit(new Callable[A] {
         def call = a
       })
-      () =>
-        fut.get
+      () => fut.get
     }
   }
 
@@ -107,8 +105,7 @@ trait StrategysLow {
         def call = a
       })
       thread.shutdown()
-      () =>
-        fut.get
+      () => fut.get
     }
   }
 
@@ -124,8 +121,7 @@ trait StrategysLow {
         def doInBackground = a
       }
       worker.execute
-      () =>
-        worker.get
+      () => worker.get
     }
   }
 
@@ -142,8 +138,7 @@ trait StrategysLow {
         def call = a
       })
       invokeLater(task)
-      () =>
-        task.get
+      () => task.get
     }
   }
 }

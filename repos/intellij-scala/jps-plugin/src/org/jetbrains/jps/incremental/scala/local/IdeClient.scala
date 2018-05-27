@@ -81,7 +81,7 @@ abstract class IdeClient(
           modules.mkString(", "))
       }
     context.processMessage(
-      new ProgressMessage(formattedText, done.getOrElse(-1.0F)))
+      new ProgressMessage(formattedText, done.getOrElse(-1.0f)))
   }
 
   def debug(text: String) {

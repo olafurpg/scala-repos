@@ -147,7 +147,9 @@ private[ui] class DriverPage(parent: MesosClusterUI)
       <td>Java options</td><td>{command.javaOpts.mkString((" "))}</td>
     </tr>
     <tr>
-      <td>Library path entries</td><td>{command.libraryPathEntries.mkString((" "))}</td>
+      <td>Library path entries</td><td>{
+      command.libraryPathEntries.mkString((" "))
+    }</td>
     </tr>
   }
 

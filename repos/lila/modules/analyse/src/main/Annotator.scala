@@ -65,7 +65,7 @@ private[analyse] final class Annotator(netDomain: String) {
                   nag = advice.nag.code.some,
                   comment = advice.makeComment(true, true).some,
                   variation = makeVariation(turn, advice)
-              ))
+                ))
         )
     }
 

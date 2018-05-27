@@ -385,11 +385,11 @@ class SparseVectorOps_DoubleTest
     (SparseVector[Double], SparseVector[Double], SparseVector[Double])] = {
     Arbitrary {
       for {
-        x <- Arbitrary.arbitrary[Double].map { _ % 1E100 }
+        x <- Arbitrary.arbitrary[Double].map { _ % 1e100 }
         xl <- Arbitrary.arbitrary[List[Int]]
-        y <- Arbitrary.arbitrary[Double].map { _ % 1E100 }
+        y <- Arbitrary.arbitrary[Double].map { _ % 1e100 }
         yl <- Arbitrary.arbitrary[List[Int]]
-        z <- Arbitrary.arbitrary[Double].map { _ % 1E100 }
+        z <- Arbitrary.arbitrary[Double].map { _ % 1e100 }
         zl <- Arbitrary.arbitrary[List[Int]]
       } yield {
         (
@@ -401,7 +401,7 @@ class SparseVectorOps_DoubleTest
   }
 
   def genScalar: Arbitrary[Double] =
-    Arbitrary(Arbitrary.arbitrary[Double].map { _ % 1E10 })
+    Arbitrary(Arbitrary.arbitrary[Double].map { _ % 1e10 })
 }
 
 /**
@@ -413,7 +413,7 @@ class SparseVectorOps_FloatTest
     extends TensorSpaceTestBase[SparseVector[Float], Int, Float] {
   val space = SparseVector.space[Float]
 
-  override val TOL: Double = 1E-2
+  override val TOL: Double = 1e-2
   val N = 30
   implicit def genTriple: Arbitrary[
     (SparseVector[Float], SparseVector[Float], SparseVector[Float])] = {

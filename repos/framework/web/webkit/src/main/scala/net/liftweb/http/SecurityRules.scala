@@ -376,24 +376,23 @@ object ContentSecurityPolicyViolation extends LazyLoggable {
         extractedViolation
       }
 
-      () =>
-        {
-          violation match {
-            case Full(violation) =>
-              LiftRules.contentSecurityPolicyViolationReport(violation) or Full(
-                OkResponse())
+      () => {
+        violation match {
+          case Full(violation) =>
+            LiftRules.contentSecurityPolicyViolationReport(violation) or Full(
+              OkResponse())
 
-            case _ =>
-              logger.warn(
-                s"Got a content security violation report we couldn't interpret: '${request.body
-                  .map(new String(_, "UTF-8"))}'."
-              )
+          case _ =>
+            logger.warn(
+              s"Got a content security violation report we couldn't interpret: '${request.body
+                .map(new String(_, "UTF-8"))}'."
+            )
 
-              Full(
-                BadRequestResponse(
-                  "Unrecognized format for content security policy report."))
-          }
+            Full(
+              BadRequestResponse(
+                "Unrecognized format for content security policy report."))
         }
+      }
   }
 }
 

@@ -68,7 +68,11 @@ private[sql] object JDBCRDD extends Logging {
       // scalastyle:off
       case java.sql.Types.ARRAY => null
       case java.sql.Types.BIGINT =>
-        if (signed) { LongType } else { DecimalType(20, 0) }
+        if (signed) {
+          LongType
+        } else {
+          DecimalType(20, 0)
+        }
       case java.sql.Types.BINARY   => BinaryType
       case java.sql.Types.BIT      => BooleanType // @see JdbcDialect for quirks
       case java.sql.Types.BLOB     => BinaryType
@@ -84,7 +88,11 @@ private[sql] object JDBCRDD extends Logging {
       case java.sql.Types.DOUBLE   => DoubleType
       case java.sql.Types.FLOAT    => FloatType
       case java.sql.Types.INTEGER =>
-        if (signed) { IntegerType } else { LongType }
+        if (signed) {
+          IntegerType
+        } else {
+          LongType
+        }
       case java.sql.Types.JAVA_OBJECT   => null
       case java.sql.Types.LONGNVARCHAR  => StringType
       case java.sql.Types.LONGVARBINARY => BinaryType

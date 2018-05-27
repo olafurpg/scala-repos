@@ -247,7 +247,8 @@ abstract class HiveComparisonTest
     skipDirectories
       .map(new File(_, testCaseName))
       .filter(_.exists)
-      .foreach(_ => return )
+      .foreach(_ => return
+      )
 
     // If runonlytests is set, skip this test unless we find a file in one of the specified
     // directories.
@@ -401,7 +402,9 @@ abstract class HiveComparisonTest
                       fail(errorMessage)
                   }
               }.toSeq
-            if (reset) { TestHive.reset() }
+            if (reset) {
+              TestHive.reset()
+            }
 
             computedResults
           }

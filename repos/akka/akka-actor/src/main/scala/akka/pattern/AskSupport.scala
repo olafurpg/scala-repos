@@ -631,7 +631,9 @@ private[akka] final class PromiseActorRef private (
           p = provider.tempPath()
           provider.registerTempActor(this, p)
           p
-        } finally { setState(p) }
+        } finally {
+          setState(p)
+        }
       } else path
     case p: ActorPath ⇒ p
     case StoppedWithPath(p) ⇒ p

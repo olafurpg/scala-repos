@@ -249,12 +249,12 @@ object CacheIvy {
     i match {
       case BinaryValue => new Binary(idFun); case FullValue => new Full(idFun);
       case _           => Disabled
-  }
+    }
   private[this] val crossToInt = (c: CrossVersion) =>
     c match {
       case Disabled => 0; case b: Binary => BinaryValue;
       case f: Full  => FullValue
-  }
+    }
 
   implicit def moduleIDFormat(
       implicit sf: Format[String],

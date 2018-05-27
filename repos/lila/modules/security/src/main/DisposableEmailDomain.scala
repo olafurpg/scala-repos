@@ -51,8 +51,7 @@ final class DisposableEmailDomain(
 
   private def makeMatcher(regex: String): Matcher = {
     val matcher = regex.r.pattern matcher _
-    (s: String) =>
-      matcher(s).matches
+    (s: String) => matcher(s).matches
   }
 
   def apply(domain: String) = matchers exists { _(domain) }

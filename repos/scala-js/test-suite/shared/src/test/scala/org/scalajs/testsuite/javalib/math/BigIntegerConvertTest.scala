@@ -19,14 +19,14 @@ class BigIntegerConvertTest {
 
   @Test def testDoubleValueNegative1(): Unit = {
     val a = "-27467238945"
-    val result = -2.7467238945E10
+    val result = -2.7467238945e10
     val aNumber = new BigInteger(a).doubleValue()
     assertEquals(result, aNumber, 0.0)
   }
 
   @Test def testDoubleValueNegative2(): Unit = {
     val a = "-2746723894572364578265426346273456972"
-    val result = -2.7467238945723645E36
+    val result = -2.7467238945723645e36
     val aNumber = new BigInteger(a).doubleValue()
     assertEquals(result, aNumber, 0.0)
   }
@@ -63,7 +63,7 @@ class BigIntegerConvertTest {
       0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
     val aSign = -1
     val aNumber = new BigInteger(aSign, a).doubleValue()
-    assertEquals(-8.98846567431158E307, aNumber, 0.0)
+    assertEquals(-8.98846567431158e307, aNumber, 0.0)
   }
 
   @Test def testDoubleValueNegMaxValue(): Unit = {
@@ -83,7 +83,7 @@ class BigIntegerConvertTest {
   @Test def testDoubleValueNegNotRounded(): Unit = {
     val a = Array[Byte](-128, 1, 2, 3, 4, 5, -128, 23, 1, -3, -5)
     val aSign = -1
-    val result = -1.5474726438794828E26
+    val result = -1.5474726438794828e26
     val aNumber = new BigInteger(aSign, a).doubleValue()
     assertEquals(result, aNumber, 0.0)
   }
@@ -91,7 +91,7 @@ class BigIntegerConvertTest {
   @Test def testDoubleValueNegRounded1(): Unit = {
     val a = Array[Byte](-128, 1, 2, 3, 4, 5, 60, 23, 1, -3, -5)
     val aSign = -1
-    val result = -1.54747264387948E26
+    val result = -1.54747264387948e26
     val aNumber = new BigInteger(aSign, a).doubleValue()
     assertEquals(result, aNumber, 0.0)
   }
@@ -99,21 +99,21 @@ class BigIntegerConvertTest {
   @Test def testDoubleValueNegRounded2(): Unit = {
     val a = Array[Byte](-128, 1, 2, 3, 4, 5, 36, 23, 1, -3, -5)
     val aSign = -1
-    val result = -1.547472643879479E26
+    val result = -1.547472643879479e26
     val aNumber = new BigInteger(aSign, a).doubleValue()
     assertEquals(result, aNumber, 0.0)
   }
 
   @Test def testDoubleValuePositive1(): Unit = {
     val a = "27467238945"
-    val result = 2.7467238945E10
+    val result = 2.7467238945e10
     val aNumber = new BigInteger(a).doubleValue()
     assertEquals(result, aNumber, 0.0)
   }
 
   @Test def testDoubleValuePositive2(): Unit = {
     val a = "2746723894572364578265426346273456972"
-    val result = 2.7467238945723645E36
+    val result = 2.7467238945723645e36
     val aNumber = new BigInteger(a).doubleValue()
     assertEquals(result, aNumber, 0.0)
   }
@@ -149,7 +149,7 @@ class BigIntegerConvertTest {
       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
       0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
     val aSign = 1
-    val result = 8.98846567431158E307
+    val result = 8.98846567431158e307
     val aNumber = new BigInteger(aSign, a).doubleValue()
     assertEquals(result, aNumber, 0.0)
   }
@@ -171,7 +171,7 @@ class BigIntegerConvertTest {
   @Test def testDoubleValuePosNotRounded(): Unit = {
     val a = Array[Byte](-128, 1, 2, 3, 4, 5, -128, 23, 1, -3, -5)
     val aSign = 1
-    val result = 1.5474726438794828E26
+    val result = 1.5474726438794828e26
     val aNumber = new BigInteger(aSign, a).doubleValue()
     assertEquals(result, aNumber, 0.0)
   }
@@ -179,7 +179,7 @@ class BigIntegerConvertTest {
   @Test def testDoubleValuePosRounded1(): Unit = {
     val a = Array[Byte](-128, 1, 2, 3, 4, 5, 60, 23, 1, -3, -5)
     val aSign = 1
-    val result = 1.54747264387948E26
+    val result = 1.54747264387948e26
     val aNumber = new BigInteger(aSign, a).doubleValue()
     assertEquals(result, aNumber, 0.0)
   }
@@ -187,7 +187,7 @@ class BigIntegerConvertTest {
   @Test def testDoubleValuePosRounded2(): Unit = {
     val a = Array[Byte](-128, 1, 2, 3, 4, 5, 36, 23, 1, -3, -5)
     val aSign = 1
-    val result = 1.547472643879479E26
+    val result = 1.547472643879479e26
     val aNumber = new BigInteger(aSign, a).doubleValue()
     assertEquals(result, aNumber, 0.0)
   }
@@ -219,7 +219,7 @@ class BigIntegerConvertTest {
 
   @Test def testFloatValueNegative1(): Unit = {
     val a = "-27467238"
-    val result = -2.7467238E7f
+    val result = -2.7467238e7f
     val aNumber = new BigInteger(a).floatValue()
     val delta = 1
     assertTrue(Math.abs(aNumber - result) < delta)
@@ -227,7 +227,7 @@ class BigIntegerConvertTest {
 
   @Test def testFloatValueNegative2(): Unit = {
     val a = "-27467238945723645782"
-    val result = -2.7467239E19f
+    val result = -2.7467239e19f
     val aNumber = new BigInteger(a).floatValue()
     val delta = 1e12
     assertTrue(aNumber - result < delta)
@@ -264,7 +264,7 @@ class BigIntegerConvertTest {
   @Test def testFloatValueNegNotRounded(): Unit = {
     val a = Array[Byte](-128, 1, 2, 3, 4, 5, 60, 23, 1, -3, -5)
     val aSign = -1
-    val result = -1.5474726E26f
+    val result = -1.5474726e26f
     val aNumber = new BigInteger(aSign, a).floatValue()
     val delta = 1e19
     assertTrue(aNumber - result < delta)
@@ -273,7 +273,7 @@ class BigIntegerConvertTest {
   @Test def testFloatValueNegRounded1(): Unit = {
     val a = Array[Byte](-128, 1, -1, -4, 4, 5, 60, 23, 1, -3, -5)
     val aSign = -1
-    val result = -1.5475195E26f
+    val result = -1.5475195e26f
     val aNumber = new BigInteger(aSign, a).floatValue()
     val delta = 1e19
     assertTrue(aNumber - result < delta)
@@ -282,7 +282,7 @@ class BigIntegerConvertTest {
   @Test def testFloatValueNegRounded2(): Unit = {
     val a = Array[Byte](-128, 1, 2, -128, 4, 5, 60, 23, 1, -3, -5)
     val aSign = -1
-    val result = -1.5474728E26f
+    val result = -1.5474728e26f
     val aNumber = new BigInteger(aSign, a).floatValue()
     val delta = 1e19
     assertTrue(aNumber - result < delta)
@@ -308,14 +308,14 @@ class BigIntegerConvertTest {
 
   @Test def testFloatValuePositive1(): Unit = {
     val a = "27467238"
-    val result = 2.7467238E7f
+    val result = 2.7467238e7f
     val aNumber = new BigInteger(a).floatValue()
     assertEquals(result, aNumber, 0.0f)
   }
 
   @Test def testFloatValuePositive2(): Unit = {
     val a = "27467238945723645782"
-    val result = 2.7467239E19f
+    val result = 2.7467239e19f
     val aNumber = new BigInteger(a).floatValue()
     val delta = 1e12
     assertTrue(aNumber - result < delta)
@@ -344,7 +344,7 @@ class BigIntegerConvertTest {
   @Test def testFloatValuePosMantissaIsZero(): Unit = {
     val a = Array[Byte](-128, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
     val aSign = 1
-    val result = 1.7014118E38f
+    val result = 1.7014118e38f
     val aNumber = new BigInteger(aSign, a).floatValue()
     val delta = 1e31
     assertTrue(aNumber - result < delta)
@@ -353,7 +353,7 @@ class BigIntegerConvertTest {
   @Test def testFloatValuePosNotRounded(): Unit = {
     val a = Array[Byte](-128, 1, 2, 3, 4, 5, 60, 23, 1, -3, -5)
     val aSign = 1
-    val result = 1.5474726E26f
+    val result = 1.5474726e26f
     val aNumber = new BigInteger(aSign, a).floatValue()
     val delta = 1e19
     assertTrue(aNumber - result < delta)
@@ -362,7 +362,7 @@ class BigIntegerConvertTest {
   @Test def testFloatValuePosRounded1(): Unit = {
     val a = Array[Byte](-128, 1, -1, -4, 4, 5, 60, 23, 1, -3, -5)
     val aSign = 1
-    val result = 1.5475195E26f
+    val result = 1.5475195e26f
     val aNumber = new BigInteger(aSign, a).floatValue()
     val delta = 1e19
     assertTrue(aNumber - result < delta)
@@ -371,7 +371,7 @@ class BigIntegerConvertTest {
   @Test def testFloatValuePosRounded2(): Unit = {
     val a = Array[Byte](-128, 1, 2, -128, 4, 5, 60, 23, 1, -3, -5)
     val aSign = 1
-    val result = 1.5474728E26f
+    val result = 1.5474728e26f
     val aNumber = new BigInteger(aSign, a).floatValue()
     val delta = 1e19
     assertTrue(aNumber - result < delta)
@@ -572,7 +572,7 @@ class BigIntegerConvertTest {
     assumeTrue("Needs strict floats.", hasStrictFloats)
 
     val a = "2147483649"
-    val result = 2.14748365E9f
+    val result = 2.14748365e9f
     val aNumber = new BigInteger(a).floatValue()
     val delta = 0.0f
     assertEquals(delta, Math.abs(aNumber - result), 0.0f)

@@ -555,7 +555,7 @@ class ScaldingLaws extends WordSpec {
       val valuesFlatMap = (e: ((Int, Option[Int]))) =>
         valuesFlatMap1(e).flatMap { x =>
           { valuesFlatMap2(x) }
-      }
+        }
 
       def toTime[T, U](fn: T => TraversableOnce[U])
         : ((Long, T)) => TraversableOnce[(Long, U)] =

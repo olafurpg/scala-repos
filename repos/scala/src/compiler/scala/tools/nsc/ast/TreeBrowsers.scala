@@ -150,7 +150,11 @@ abstract class TreeBrowsers {
           val childPath = path pathByAddingChild child
           _setExpansionState(root, childPath)
         }
-        if (expand) { jTree expandPath path } else { jTree collapsePath path }
+        if (expand) {
+          jTree expandPath path
+        } else {
+          jTree collapsePath path
+        }
       }
       _setExpansionState(root, new TreePath(root.getModel.getRoot))
     }

@@ -437,7 +437,10 @@ object ScalaPsiUtil {
         case _ => Seq.empty
       }
       val exprType =
-        ImplicitCollector.exprType(e, fromUnder = false).getOrElse(return )
+        ImplicitCollector
+          .exprType(e, fromUnder = false)
+          .getOrElse(return
+          )
       if (exprType.equiv(types.Nothing))
         return //do not proceed with nothing type, due to performance problems.
       val convertible = new ImplicitCollector(
@@ -916,7 +919,9 @@ object ScalaPsiUtil {
           }
         case j: JavaArrayType =>
           val parameterizedType = j.getParameterizedType(project, scope)
-          collectParts(parameterizedType.getOrElse(return ))
+          collectParts(
+            parameterizedType.getOrElse(return
+            ))
         case proj @ ScProjectionType(projected, _, _) =>
           collectParts(projected)
           proj.actualElement match {
@@ -1084,7 +1089,7 @@ object ScalaPsiUtil {
                 case _ => false
               }
             p.exactParamType(treatJavaObjectAsAny)
-    })
+        })
   }
 
   /**

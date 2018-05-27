@@ -155,7 +155,7 @@ trait ScTemplateDefinition extends ScNamedElement with PsiClass {
               case _ => 1
             }
           case _ => 1
-      })
+        })
   }
 
   override def getAllMethodsAndTheirSubstitutors
@@ -223,7 +223,7 @@ trait ScTemplateDefinition extends ScNamedElement with PsiClass {
       .flatMap(n =>
         n.map {
           case (_, x) => (x.info, x.substitutor)
-      }) ++ syntheticTypeDefinitions
+        }) ++ syntheticTypeDefinitions
       .filter(!_.isObject)
       .map((_, ScSubstitutor.empty))
 
@@ -261,7 +261,7 @@ trait ScTemplateDefinition extends ScNamedElement with PsiClass {
                     case _             => true
                   }
               })
-      })
+        })
       .map { case (_, n) => (n.info.namedElement, n.substitutor) }
 
   def allValsIncludingSelfType = {
@@ -285,7 +285,7 @@ trait ScTemplateDefinition extends ScNamedElement with PsiClass {
                             case _             => true
                           }
                       })
-              })
+                })
               .map { case (_, n) => (n.info.namedElement, n.substitutor) }
           case _ =>
             allVals

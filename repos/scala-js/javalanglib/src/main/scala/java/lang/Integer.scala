@@ -94,7 +94,7 @@ object Integer {
 
         @inline def isOutOfBounds: scala.Boolean = {
           if (signed) res > MAX_VALUE || res < MIN_VALUE
-          else res > 0xFFFFFFFFL || res < 0
+          else res > 0XFFFFFFFFL || res < 0
         }
 
         if (res.isNaN || isOutOfBounds) {
@@ -124,7 +124,7 @@ object Integer {
   }
 
   @inline def toUnsignedLong(x: Int): scala.Long =
-    x.toLong & 0xffffffffL
+    x.toLong & 0XFFFFFFFFL
 
   def bitCount(i: scala.Int): scala.Int = {
     /* See http://graphics.stanford.edu/~seander/bithacks.html#CountBitsSetParallel
@@ -189,10 +189,18 @@ object Integer {
       32
     } else {
       var r = 1
-      if ((x & 0xffff0000) == 0) { x <<= 16; r += 16 }
-      if ((x & 0xff000000) == 0) { x <<= 8; r += 8 }
-      if ((x & 0xf0000000) == 0) { x <<= 4; r += 4 }
-      if ((x & 0xc0000000) == 0) { x <<= 2; r += 2 }
+      if ((x & 0xffff0000) == 0) {
+        x <<= 16; r += 16
+      }
+      if ((x & 0xff000000) == 0) {
+        x <<= 8; r += 8
+      }
+      if ((x & 0xf0000000) == 0) {
+        x <<= 4; r += 4
+      }
+      if ((x & 0xc0000000) == 0) {
+        x <<= 2; r += 2
+      }
       r + (x >> 31)
     }
   }

@@ -27,22 +27,23 @@ case class ScalaCompilerSettings(
     when(compileOrder != DefaultComipileOrder)(
       <option name="compilerOrder" value={compileOrder}/>) ++ when(!warnings)(
       <option name="warnings" value={warnings.toString}/>) ++ when(
-      deprecationWarnings)(
-      <option name="deprecationWarnings" value={deprecationWarnings.toString}/>) ++ when(
-      uncheckedWarnings)(
-      <option name="uncheckedWarnings" value={uncheckedWarnings.toString}/>) ++ when(
-      optimiseBytecode)(
-      <option name="optimiseBytecode" value={optimiseBytecode.toString}/>) ++ when(
-      explainTypeErrors)(
-      <option name="explainTypeErrors" value={explainTypeErrors.toString}/>) ++ when(
-      continuations)(
-      <option name="continuations" value={continuations.toString}/>) ++ when(
-      debuggingInfoLevel != DefaultDebuggingLevel)(
+      deprecationWarnings)(<option name="deprecationWarnings" value={
+      deprecationWarnings.toString
+    }/>) ++ when(uncheckedWarnings)(<option name="uncheckedWarnings" value={
+      uncheckedWarnings.toString
+    }/>) ++ when(optimiseBytecode)(<option name="optimiseBytecode" value={
+      optimiseBytecode.toString
+    }/>) ++ when(explainTypeErrors)(<option name="explainTypeErrors" value={
+      explainTypeErrors.toString
+    }/>) ++ when(continuations)(<option name="continuations" value={
+      continuations.toString
+    }/>) ++ when(debuggingInfoLevel != DefaultDebuggingLevel)(
       <option name="debuggingInfoLevel" value={debuggingInfoLevel}/>) ++ when(
-      additionalCompilerOptions.nonEmpty)(
-      <parameters>{additionalCompilerOptions.map(option => <parameter value={option}/>)}</parameters>) ++ when(
-      compilerPlugins.nonEmpty)(
-      <plugins>{compilerPlugins.map(option => <plugin path={option}/>)}</plugins>)
+      additionalCompilerOptions.nonEmpty)(<parameters>{
+      additionalCompilerOptions.map(option => <parameter value={option}/>)
+    }</parameters>) ++ when(compilerPlugins.nonEmpty)(<plugins>{
+      compilerPlugins.map(option => <plugin path={option}/>)
+    }</plugins>)
   }
 
   private def when[T](b: Boolean)(value: => T): Seq[T] =

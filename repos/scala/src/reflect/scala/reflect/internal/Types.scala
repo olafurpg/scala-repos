@@ -254,7 +254,7 @@ trait Types
           tpe match {
             case tpe: PackageTypeRef => ThisType(tpe.sym)
             case _                   => tpe
-        })
+          })
         result
     }
     def substituteSymbols(from: List[Symbol], to: List[Symbol]): Type =
@@ -563,8 +563,8 @@ trait Types
     def dealiasWidenChain: List[Type] =
       this ::
         (if (this ne widen) widen.dealiasWidenChain
-       else if (this ne betaReduce) betaReduce.dealiasWidenChain
-       else Nil)
+         else if (this ne betaReduce) betaReduce.dealiasWidenChain
+         else Nil)
 
     /** Performs a single step of beta-reduction on types.
       *  Given:
@@ -4334,7 +4334,9 @@ trait Types
   final def sameLength(xs1: List[_], xs2: List[_]) =
     compareLengths(xs1, xs2) == 0
   @tailrec final def compareLengths(xs1: List[_], xs2: List[_]): Int =
-    if (xs1.isEmpty) { if (xs2.isEmpty) 0 else -1 } else if (xs2.isEmpty) 1
+    if (xs1.isEmpty) {
+      if (xs2.isEmpty) 0 else -1
+    } else if (xs2.isEmpty) 1
     else compareLengths(xs1.tail, xs2.tail)
 
   /** Again avoiding calling length, but the lengthCompare interface is clunky.
@@ -4961,7 +4963,11 @@ trait Types
   /** Execute `op` while printing a trace of the operations on types executed. */
   def withTypesExplained[A](op: => A): A = {
     val s = explainSwitch
-    try { explainSwitch = true; op } finally { explainSwitch = s }
+    try {
+      explainSwitch = true; op
+    } finally {
+      explainSwitch = s
+    }
   }
 
   def isUnboundedGeneric(tp: Type) = tp match {

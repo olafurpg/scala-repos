@@ -20,19 +20,19 @@ class OWLQN[K, T](maxIter: Int, m: Int, l1reg: K => Double, tolerance: Double)(
 
   def this(maxIter: Int, m: Int, l1reg: K => Double)(
       implicit space: MutableEnumeratedCoordinateField[T, K, Double]) =
-    this(maxIter, m, l1reg, 1E-8)
+    this(maxIter, m, l1reg, 1e-8)
 
-  def this(maxIter: Int, m: Int, l1reg: Double, tolerance: Double = 1E-8)(
+  def this(maxIter: Int, m: Int, l1reg: Double, tolerance: Double = 1e-8)(
       implicit space: MutableEnumeratedCoordinateField[T, K, Double]) =
     this(maxIter, m, (_: K) => l1reg, tolerance)
 
   def this(maxIter: Int, m: Int, l1reg: Double)(
       implicit space: MutableEnumeratedCoordinateField[T, K, Double]) =
-    this(maxIter, m, (_: K) => l1reg, 1E-8)
+    this(maxIter, m, (_: K) => l1reg, 1e-8)
 
   def this(maxIter: Int, m: Int)(
       implicit space: MutableEnumeratedCoordinateField[T, K, Double]) =
-    this(maxIter, m, (_: K) => 1.0, 1E-8)
+    this(maxIter, m, (_: K) => 1.0, 1e-8)
 
   require(m > 0)
 

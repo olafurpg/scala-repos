@@ -37,7 +37,7 @@ class LBFGSTest extends OptimizeTestBase {
       }
 
       val result = lbfgs.minimize(f, init)
-      norm(result - 3.0, 2) < 1E-10
+      norm(result - 3.0, 2) < 1e-10
     }
 
     check(Prop.forAll(optimizeThis _))
@@ -54,7 +54,7 @@ class LBFGSTest extends OptimizeTestBase {
       }
 
       val result = lbfgsString.minimize(f, init)
-      norm(result - 3.0, 2) < 1E-5
+      norm(result - 3.0, 2) < 1e-5
     }
 
     check(Prop.forAll(optimizeThis _))
@@ -74,7 +74,7 @@ class LBFGSTest extends OptimizeTestBase {
       val result =
         lbfgs.minimize(DiffFunction.withL2Regularization(f, 1.0), init)
       val ok =
-        norm(result :- (DenseVector.ones[Double](init.size) :* targetValue), 2) / result.size < 3E-3
+        norm(result :- (DenseVector.ones[Double](init.size) :* targetValue), 2) / result.size < 3e-3
       ok ||
       (throw new RuntimeException("Failed to find optimum for init " + init))
     }
@@ -108,7 +108,7 @@ class LBFGSTest extends OptimizeTestBase {
       val result = lbfgs.minimize(f, init)
 
       val ok =
-        norm(result :- DenseVector.ones[Double](init.size) * targetValue, 2) / result.size < 1E-5
+        norm(result :- DenseVector.ones[Double](init.size) * targetValue, 2) / result.size < 1e-5
       ok ||
       (throw new RuntimeException("Failed to find optimum for init " + init))
     }

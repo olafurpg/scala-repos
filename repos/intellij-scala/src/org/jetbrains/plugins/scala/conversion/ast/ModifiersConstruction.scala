@@ -15,7 +15,7 @@ trait Modifier {
 object ModifierType extends Enumeration {
   type ModifierType = Value
   val ABSTRACT, PUBLIC, PROTECTED, PRIVATE, PACKAGE_LOCAL, ANNOTATION, OVERRIDE,
-  INNER, VOLATILE, TRANSIENT, NATIVE, THROW, SerialVersionUID, FINAL = Value
+      INNER, VOLATILE, TRANSIENT, NATIVE, THROW, SerialVersionUID, FINAL = Value
 
   val accessModifiers = Seq(
     ModifierType.PUBLIC,

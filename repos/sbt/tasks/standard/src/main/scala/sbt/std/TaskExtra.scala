@@ -170,7 +170,7 @@ trait TaskExtra {
         flatMapR(x =>
           t.mapR { tx =>
             Result.tryValues[S](tx :: Nil, x)
-        })
+          })
       def ||[T >: S](alt: Task[T]): Task[T] = flatMapR {
         case Value(v) => task(v); case Inc(i) => alt
       }

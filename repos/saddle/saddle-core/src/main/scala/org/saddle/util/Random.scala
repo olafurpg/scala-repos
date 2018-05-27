@@ -98,7 +98,9 @@ class Random private (rng64: () => Long) {
 
       if (s >= 1) nextGaussian
       else {
-        val bm = if (s != 0) { math.sqrt(-2.0 * math.log(s) / s) } else s
+        val bm = if (s != 0) {
+          math.sqrt(-2.0 * math.log(s) / s)
+        } else s
         next = u1 * bm
         u2 * bm
       }
@@ -159,14 +161,13 @@ object LFib4 {
     for (i <- 0 until 256) state(i) = jrand.nextLong
     var c = 0
 
-    () =>
-      {
-        c += 1
-        c &= 0xFF
-        state(c) = state(c) + state((c + 58) & 0xFF) +
-          state((c + 119) & 0xFF) + state((c + 178) & 0xFF)
-        state(c)
-      }
+    () => {
+      c += 1
+      c &= 0xFF
+      state(c) = state(c) + state((c + 58) & 0xFF) +
+        state((c + 119) & 0xFF) + state((c + 178) & 0xFF)
+      state(c)
+    }
   }
 }
 
@@ -190,14 +191,13 @@ object Ziff98 {
     var nd = 0
     for (i <- 0 until m) state(i) = jrand.nextLong
 
-    () =>
-      {
-        nd += 1
-        val (a1, b1, c1, d1, e1) =
-          (nd & m, (nd - a) & m, (nd - b) & m, (nd - c) & m, (nd - d) & m)
-        state(a1) = state(b1) ^ state(c1) ^ state(d1) ^ state(e1)
-        state(a1)
-      }
+    () => {
+      nd += 1
+      val (a1, b1, c1, d1, e1) =
+        (nd & m, (nd - a) & m, (nd - b) & m, (nd - c) & m, (nd - d) & m)
+      state(a1) = state(b1) ^ state(c1) ^ state(d1) ^ state(e1)
+      state(a1)
+    }
   }
 }
 

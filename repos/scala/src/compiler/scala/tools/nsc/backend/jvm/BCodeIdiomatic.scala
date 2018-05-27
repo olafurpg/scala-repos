@@ -49,17 +49,23 @@ abstract class BCodeIdiomatic extends SubComponent {
 
   /* can-multi-thread */
   final def mkArray(xs: List[BType]): Array[BType] = {
-    if (xs.isEmpty) { return EMPTY_BTYPE_ARRAY }
+    if (xs.isEmpty) {
+      return EMPTY_BTYPE_ARRAY
+    }
     val a = new Array[BType](xs.size); xs.copyToArray(a); a
   }
   /* can-multi-thread */
   final def mkArray(xs: List[String]): Array[String] = {
-    if (xs.isEmpty) { return EMPTY_STRING_ARRAY }
+    if (xs.isEmpty) {
+      return EMPTY_STRING_ARRAY
+    }
     val a = new Array[String](xs.size); xs.copyToArray(a); a
   }
   /* can-multi-thread */
   final def mkArray(xs: List[asm.Label]): Array[asm.Label] = {
-    if (xs.isEmpty) { return EMPTY_LABEL_ARRAY }
+    if (xs.isEmpty) {
+      return EMPTY_LABEL_ARRAY
+    }
     val a = new Array[asm.Label](xs.size); xs.copyToArray(a); a
   }
 
@@ -68,7 +74,9 @@ abstract class BCodeIdiomatic extends SubComponent {
    */
   final def mkArrayReverse(xs: List[String]): Array[String] = {
     val len = xs.size
-    if (len == 0) { return EMPTY_STRING_ARRAY }
+    if (len == 0) {
+      return EMPTY_STRING_ARRAY
+    }
     val a = new Array[String](len)
     var i = len - 1
     var rest = xs
@@ -85,7 +93,9 @@ abstract class BCodeIdiomatic extends SubComponent {
    */
   final def mkArrayReverse(xs: List[Int]): Array[Int] = {
     val len = xs.size
-    if (len == 0) { return EMPTY_INT_ARRAY }
+    if (len == 0) {
+      return EMPTY_INT_ARRAY
+    }
     val a = new Array[Int](len)
     var i = len - 1
     var rest = xs
@@ -134,19 +144,25 @@ abstract class BCodeIdiomatic extends SubComponent {
         case (AND, INT)  => emit(Opcodes.IAND)
         case (AND, _) =>
           emit(Opcodes.IAND)
-          if (kind != BOOL) { emitT2T(INT, kind) }
+          if (kind != BOOL) {
+            emitT2T(INT, kind)
+          }
 
         case (OR, LONG) => emit(Opcodes.LOR)
         case (OR, INT)  => emit(Opcodes.IOR)
         case (OR, _) =>
           emit(Opcodes.IOR)
-          if (kind != BOOL) { emitT2T(INT, kind) }
+          if (kind != BOOL) {
+            emitT2T(INT, kind)
+          }
 
         case (XOR, LONG) => emit(Opcodes.LXOR)
         case (XOR, INT)  => emit(Opcodes.IXOR)
         case (XOR, _) =>
           emit(Opcodes.IXOR)
-          if (kind != BOOL) { emitT2T(INT, kind) }
+          if (kind != BOOL) {
+            emitT2T(INT, kind)
+          }
       }
     } // end of method genPrimitiveLogical()
 
@@ -250,10 +266,14 @@ abstract class BCodeIdiomatic extends SubComponent {
           case FLOAT  => opcs(5)
           case DOUBLE => opcs(6)
         }
-        if (chosen != -1) { emit(chosen) }
+        if (chosen != -1) {
+          emit(chosen)
+        }
       }
 
-      if (from == to) { return }
+      if (from == to) {
+        return
+      }
       // the only conversion involving BOOL that is allowed is (BOOL -> BOOL)
       assert(from != BOOL && to != BOOL, s"inconvertible types : $from -> $to")
 
@@ -334,7 +354,7 @@ abstract class BCodeIdiomatic extends SubComponent {
     // can-multi-thread
     final def dconst(cst: Double) {
       val bits: Long = java.lang.Double.doubleToLongBits(cst)
-      if (bits == 0L || bits == 0x3ff0000000000000L) {
+      if (bits == 0L || bits == 0X3FF0000000000000L) {
         // +0.0d and 1.0d
         emit(Opcodes.DCONST_0 + cst.asInstanceOf[Int])
       } else {
@@ -462,7 +482,9 @@ abstract class BCodeIdiomatic extends SubComponent {
 
     // can-multi-thread
     final def emitRETURN(tk: BType) {
-      if (tk == UNIT) { emit(Opcodes.RETURN) } else {
+      if (tk == UNIT) {
+        emit(Opcodes.RETURN)
+      } else {
         emitTypeBased(JCodeMethodN.returnOpcodes, tk)
       }
     }
@@ -568,7 +590,9 @@ abstract class BCodeIdiomatic extends SubComponent {
     final def emitTypeBased(opcs: Array[Int], tk: BType) {
       assert(tk != UNIT, tk)
       val opc = {
-        if (tk.isRef) { opcs(0) } else if (tk.isIntSizedType) {
+        if (tk.isRef) {
+          opcs(0)
+        } else if (tk.isIntSizedType) {
           (tk: @unchecked) match {
             case BOOL | BYTE => opcs(1)
             case SHORT       => opcs(2)

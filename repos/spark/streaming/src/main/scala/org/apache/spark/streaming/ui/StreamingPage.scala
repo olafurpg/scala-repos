@@ -171,8 +171,12 @@ private[ui] class StreamingPage(parent: StreamingTab)
   private def generateLoadResources(): Seq[Node] = {
     // scalastyle:off
     <script src={SparkUIUtils.prependBaseUri("/static/d3.min.js")}></script>
-      <link rel="stylesheet" href={SparkUIUtils.prependBaseUri("/static/streaming/streaming-page.css")} type="text/css"/>
-      <script src={SparkUIUtils.prependBaseUri("/static/streaming/streaming-page.js")}></script>
+      <link rel="stylesheet" href={
+      SparkUIUtils.prependBaseUri("/static/streaming/streaming-page.css")
+    } type="text/css"/>
+      <script src={
+      SparkUIUtils.prependBaseUri("/static/streaming/streaming-page.js")
+    }></script>
     // scalastyle:on
   }
 
@@ -326,7 +330,9 @@ private[ui] class StreamingPage(parent: StreamingTab)
       <thead>
         <tr>
           <th style="width: 160px;"></th>
-          <th style="width: 492px;">Timelines (Last {batchTimes.length} batches, {numActiveBatches} active, {numCompletedBatches} completed)</th>
+          <th style="width: 492px;">Timelines (Last {batchTimes.length} batches, {
+        numActiveBatches
+      } active, {numCompletedBatches} completed)</th>
           <th style="width: 350px;">Histograms</th></tr>
       </thead>
       <tbody>
@@ -335,65 +341,100 @@ private[ui] class StreamingPage(parent: StreamingTab)
             <div style="width: 160px;">
               <div>
               {
-                if (hasStream) {
-                  <span class="expand-input-rate">
+        if (hasStream) {
+          <span class="expand-input-rate">
                     <span class="expand-input-rate-arrow arrow-closed"></span>
                     <a data-toggle="tooltip" title="Show/hide details of each receiver" data-placement="right">
                       <strong>Input Rate</strong>
                     </a>
                   </span>
-                } else {
-                  <strong>Input Rate</strong>
-                }
-              }
+        } else {
+          <strong>Input Rate</strong>
+        }
+      }
               </div>
               {
-                if (numReceivers > 0) {
-                  <div>Receivers: {listener.numActiveReceivers} / {numReceivers} active</div>
-                }
-              }
+        if (numReceivers > 0) {
+          <div>Receivers: {listener.numActiveReceivers} / {numReceivers} active</div>
+        }
+      }
               <div>Avg: {eventRateForAllStreams.formattedAvg} events/sec</div>
             </div>
           </td>
-          <td class="timeline">{graphUIDataForEventRateOfAllStreams.generateTimelineHtml(jsCollector)}</td>
-          <td class="histogram">{graphUIDataForEventRateOfAllStreams.generateHistogramHtml(jsCollector)}</td>
+          <td class="timeline">{
+        graphUIDataForEventRateOfAllStreams.generateTimelineHtml(jsCollector)
+      }</td>
+          <td class="histogram">{
+        graphUIDataForEventRateOfAllStreams.generateHistogramHtml(jsCollector)
+      }</td>
         </tr>
-      {if (hasStream) {
-        <tr id="inputs-table" style="display: none;" >
+      {
+        if (hasStream) {
+          <tr id="inputs-table" style="display: none;" >
           <td colspan="3">
-            {generateInputDStreamsTable(jsCollector, minBatchTime, maxBatchTime, minEventRate, maxEventRate)}
+            {
+            generateInputDStreamsTable(
+              jsCollector,
+              minBatchTime,
+              maxBatchTime,
+              minEventRate,
+              maxEventRate)
+          }
           </td>
         </tr>
-      }}
+        }
+      }
         <tr>
           <td style="vertical-align: middle;">
             <div style="width: 160px;">
-              <div><strong>Scheduling Delay {SparkUIUtils.tooltip("Time taken by Streaming scheduler to submit jobs of a batch", "right")}</strong></div>
+              <div><strong>Scheduling Delay {
+        SparkUIUtils.tooltip(
+          "Time taken by Streaming scheduler to submit jobs of a batch",
+          "right")
+      }</strong></div>
               <div>Avg: {schedulingDelay.formattedAvg}</div>
             </div>
           </td>
-          <td class="timeline">{graphUIDataForSchedulingDelay.generateTimelineHtml(jsCollector)}</td>
-          <td class="histogram">{graphUIDataForSchedulingDelay.generateHistogramHtml(jsCollector)}</td>
+          <td class="timeline">{
+        graphUIDataForSchedulingDelay.generateTimelineHtml(jsCollector)
+      }</td>
+          <td class="histogram">{
+        graphUIDataForSchedulingDelay.generateHistogramHtml(jsCollector)
+      }</td>
         </tr>
         <tr>
           <td style="vertical-align: middle;">
             <div style="width: 160px;">
-              <div><strong>Processing Time {SparkUIUtils.tooltip("Time taken to process all jobs of a batch", "right")}</strong></div>
+              <div><strong>Processing Time {
+        SparkUIUtils.tooltip(
+          "Time taken to process all jobs of a batch",
+          "right")
+      }</strong></div>
               <div>Avg: {processingTime.formattedAvg}</div>
             </div>
           </td>
-          <td class="timeline">{graphUIDataForProcessingTime.generateTimelineHtml(jsCollector)}</td>
-          <td class="histogram">{graphUIDataForProcessingTime.generateHistogramHtml(jsCollector)}</td>
+          <td class="timeline">{
+        graphUIDataForProcessingTime.generateTimelineHtml(jsCollector)
+      }</td>
+          <td class="histogram">{
+        graphUIDataForProcessingTime.generateHistogramHtml(jsCollector)
+      }</td>
         </tr>
         <tr>
           <td style="vertical-align: middle;">
             <div style="width: 160px;">
-              <div><strong>Total Delay {SparkUIUtils.tooltip("Total time taken to handle a batch", "right")}</strong></div>
+              <div><strong>Total Delay {
+        SparkUIUtils.tooltip("Total time taken to handle a batch", "right")
+      }</strong></div>
               <div>Avg: {totalDelay.formattedAvg}</div>
             </div>
           </td>
-          <td class="timeline">{graphUIDataForTotalDelay.generateTimelineHtml(jsCollector)}</td>
-          <td class="histogram">{graphUIDataForTotalDelay.generateHistogramHtml(jsCollector)}</td>
+          <td class="timeline">{
+        graphUIDataForTotalDelay.generateTimelineHtml(jsCollector)
+      }</td>
+          <td class="histogram">{
+        graphUIDataForTotalDelay.generateHistogramHtml(jsCollector)
+      }</td>
         </tr>
       </tbody>
     </table>
@@ -520,7 +561,9 @@ private[ui] class StreamingPage(parent: StreamingTab)
       <td colspan="3" class="timeline">
         {graphUIDataForEventRate.generateTimelineHtml(jsCollector)}
       </td>
-      <td class="histogram">{graphUIDataForEventRate.generateHistogramHtml(jsCollector)}</td>
+      <td class="histogram">{
+      graphUIDataForEventRate.generateHistogramHtml(jsCollector)
+    }</td>
     </tr>
   }
 
@@ -534,7 +577,9 @@ private[ui] class StreamingPage(parent: StreamingTab)
       .reverse
 
     val activeBatchesContent = {
-      <h4 id="active">Active Batches ({runningBatches.size + waitingBatches.size})</h4> ++ new ActiveBatchTable(
+      <h4 id="active">Active Batches ({
+        runningBatches.size + waitingBatches.size
+      })</h4> ++ new ActiveBatchTable(
         runningBatches,
         waitingBatches,
         listener.batchDuration).toNodeSeq
@@ -542,7 +587,9 @@ private[ui] class StreamingPage(parent: StreamingTab)
 
     val completedBatchesContent = {
       <h4 id="completed">
-        Completed Batches (last {completedBatches.size} out of {listener.numTotalCompletedBatches})
+        Completed Batches (last {completedBatches.size} out of {
+        listener.numTotalCompletedBatches
+      })
       </h4> ++ new CompletedBatchTable(completedBatches, listener.batchDuration).toNodeSeq
     }
 

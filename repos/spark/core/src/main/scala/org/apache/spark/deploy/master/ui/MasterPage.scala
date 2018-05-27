@@ -124,13 +124,15 @@ private[ui] class MasterPage(parent: MasterWebUI) extends WebUIPage("") {
             <ul class="unstyled">
               <li><strong>URL:</strong> {state.uri}</li>
               {
-                state.restUri.map { uri =>
-                  <li>
+      state.restUri
+        .map { uri =>
+          <li>
                     <strong>REST URL:</strong> {uri}
                     <span class="rest-uri"> (cluster mode)</span>
                   </li>
-                }.getOrElse { Seq.empty }
-              }
+        }
+        .getOrElse { Seq.empty }
+    }
               <li><strong>Alive Workers:</strong> {aliveWorkers.length}</li>
               <li><strong>Cores in use:</strong> {aliveWorkers.map(_.cores).sum} Total,
                 {aliveWorkers.map(_.coresUsed).sum} Used</li>
@@ -163,15 +165,16 @@ private[ui] class MasterPage(parent: MasterWebUI) extends WebUIPage("") {
         </div>
 
         <div>
-          {if (hasDrivers) {
-             <div class="row-fluid">
+          {
+      if (hasDrivers) {
+        <div class="row-fluid">
                <div class="span12">
                  <h4> Running Drivers </h4>
                  {activeDriversTable}
                </div>
              </div>
-           }
-          }
+      }
+    }
         </div>
 
         <div class="row-fluid">
@@ -183,15 +186,15 @@ private[ui] class MasterPage(parent: MasterWebUI) extends WebUIPage("") {
 
         <div>
           {
-            if (hasDrivers) {
-              <div class="row-fluid">
+      if (hasDrivers) {
+        <div class="row-fluid">
                 <div class="span12">
                   <h4> Completed Drivers </h4>
                   {completedDriversTable}
                 </div>
               </div>
-            }
-          }
+      }
+    }
         </div>;
 
     UIUtils.basicSparkPage(content, "Spark Master at " + state.uri)
@@ -265,7 +268,11 @@ private[ui] class MasterPage(parent: MasterWebUI) extends WebUIPage("") {
     <tr>
       <td>{driver.id} {killLink}</td>
       <td>{driver.submitDate}</td>
-      <td>{driver.worker.map(w => <a href={w.webUiAddress}>{w.id.toString}</a>).getOrElse("None")}
+      <td>{
+      driver.worker
+        .map(w => <a href={w.webUiAddress}>{w.id.toString}</a>)
+        .getOrElse("None")
+    }
       </td>
       <td>{driver.state}</td>
       <td sorttable_customkey={driver.desc.cores.toString}>

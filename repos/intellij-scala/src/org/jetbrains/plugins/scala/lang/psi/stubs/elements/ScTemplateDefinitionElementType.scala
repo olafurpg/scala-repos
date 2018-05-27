@@ -57,7 +57,7 @@ abstract class ScTemplateDefinitionElementType[TypeDef <: ScTemplateDefinition](
               typeText != "deprecated" && typeText != "scala.deprecated"
             }
             case _ => true
-        })
+          })
 
     val isImplicitObject =
       psi.isInstanceOf[ScObject] && psi.hasModifierProperty("implicit")

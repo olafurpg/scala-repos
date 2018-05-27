@@ -102,7 +102,7 @@ private[ml] class WeightedLeastSquares(
           s"training is not needed.")
         val coefficients = new DenseVector(Array.ofDim(k - 1))
         val intercept = bBar
-        val diagInvAtWA = new DenseVector(Array(0D))
+        val diagInvAtWA = new DenseVector(Array(0d))
         return new WeightedLeastSquaresModel(
           coefficients,
           intercept,

@@ -399,7 +399,7 @@ class TlsSpec
                 system.log.debug("me cancelled")
                 ctx.finish()
               }
-          })
+            })
           .via(debug)
           .collect { case SessionBytes(_, b) ⇒ b }
           .scan(ByteString.empty)(_ ++ _)

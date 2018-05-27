@@ -297,14 +297,14 @@ class HoconFormatter(settings: CodeStyleSettings) {
           child.getElementType match {
             case ObjectEntries => getChildren(child)
             case _             => Iterator(child)
-        })
+          })
       case ObjectEntries =>
         // immediately expand ObjectField into its doc comments and keyed field
         node.childrenIterator.flatMap(child =>
           child.getElementType match {
             case ObjectField => getChildren(child)
             case _           => Iterator(child)
-        })
+          })
       case _ => node.childrenIterator
     }
 }

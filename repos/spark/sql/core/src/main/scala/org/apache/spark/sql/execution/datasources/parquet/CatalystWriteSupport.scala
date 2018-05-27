@@ -160,25 +160,24 @@ private[parquet] class CatalystWriteSupport
             Binary.fromByteArray(row.getUTF8String(ordinal).getBytes))
 
       case TimestampType =>
-        (row: SpecializedGetters, ordinal: Int) =>
-          {
-            // TODO Writes `TimestampType` values as `TIMESTAMP_MICROS` once parquet-mr implements it
-            // Currently we only support timestamps stored as INT96, which is compatible with Hive
-            // and Impala.  However, INT96 is to be deprecated.  We plan to support `TIMESTAMP_MICROS`
-            // defined in the parquet-format spec.  But up until writing, the most recent parquet-mr
-            // version (1.8.1) hasn't implemented it yet.
+        (row: SpecializedGetters, ordinal: Int) => {
+          // TODO Writes `TimestampType` values as `TIMESTAMP_MICROS` once parquet-mr implements it
+          // Currently we only support timestamps stored as INT96, which is compatible with Hive
+          // and Impala.  However, INT96 is to be deprecated.  We plan to support `TIMESTAMP_MICROS`
+          // defined in the parquet-format spec.  But up until writing, the most recent parquet-mr
+          // version (1.8.1) hasn't implemented it yet.
 
-            // NOTE: Starting from Spark 1.5, Spark SQL `TimestampType` only has microsecond
-            // precision.  Nanosecond parts of timestamp values read from INT96 are simply stripped.
-            val (julianDay, timeOfDayNanos) =
-              DateTimeUtils.toJulianDay(row.getLong(ordinal))
-            val buf = ByteBuffer.wrap(timestampBuffer)
-            buf
-              .order(ByteOrder.LITTLE_ENDIAN)
-              .putLong(timeOfDayNanos)
-              .putInt(julianDay)
-            recordConsumer.addBinary(Binary.fromByteArray(timestampBuffer))
-          }
+          // NOTE: Starting from Spark 1.5, Spark SQL `TimestampType` only has microsecond
+          // precision.  Nanosecond parts of timestamp values read from INT96 are simply stripped.
+          val (julianDay, timeOfDayNanos) =
+            DateTimeUtils.toJulianDay(row.getLong(ordinal))
+          val buf = ByteBuffer.wrap(timestampBuffer)
+          buf
+            .order(ByteOrder.LITTLE_ENDIAN)
+            .putLong(timeOfDayNanos)
+            .putInt(julianDay)
+          recordConsumer.addBinary(Binary.fromByteArray(timestampBuffer))
+        }
 
       case BinaryType =>
         (row: SpecializedGetters, ordinal: Int) =>
@@ -407,36 +406,35 @@ private[parquet] class CatalystWriteSupport
         "key_value"
       }
 
-    (row: SpecializedGetters, ordinal: Int) =>
-      {
-        val map = row.getMap(ordinal)
-        val keyArray = map.keyArray()
-        val valueArray = map.valueArray()
+    (row: SpecializedGetters, ordinal: Int) => {
+      val map = row.getMap(ordinal)
+      val keyArray = map.keyArray()
+      val valueArray = map.valueArray()
 
-        consumeGroup {
-          // Only creates the repeated field if the map is non-empty.
-          if (map.numElements() > 0) {
-            consumeField(repeatedGroupName, 0) {
-              var i = 0
-              while (i < map.numElements()) {
-                consumeGroup {
-                  consumeField("key", 0) {
-                    keyWriter.apply(keyArray, i)
-                  }
+      consumeGroup {
+        // Only creates the repeated field if the map is non-empty.
+        if (map.numElements() > 0) {
+          consumeField(repeatedGroupName, 0) {
+            var i = 0
+            while (i < map.numElements()) {
+              consumeGroup {
+                consumeField("key", 0) {
+                  keyWriter.apply(keyArray, i)
+                }
 
-                  // Only creates the "value" field if the value if non-empty
-                  if (!map.valueArray().isNullAt(i)) {
-                    consumeField("value", 1) {
-                      valueWriter.apply(valueArray, i)
-                    }
+                // Only creates the "value" field if the value if non-empty
+                if (!map.valueArray().isNullAt(i)) {
+                  consumeField("value", 1) {
+                    valueWriter.apply(valueArray, i)
                   }
                 }
-                i += 1
               }
+              i += 1
             }
           }
         }
       }
+    }
   }
 
   private def consumeMessage(f: => Unit): Unit = {

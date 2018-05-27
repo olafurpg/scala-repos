@@ -270,7 +270,9 @@ trait Holes { self: Quasiquotes =>
         }
         val resIdx =
           if (idx != -1) idx
-          else { records +:= ((tpe, rank)); records.length - 1 }
+          else {
+            records +:= ((tpe, rank)); records.length - 1
+          }
         Some(Ident(TermName(nme.QUASIQUOTE_UNLIFT_HELPER + resIdx)))
       }
     }

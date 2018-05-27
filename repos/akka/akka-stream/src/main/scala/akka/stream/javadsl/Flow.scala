@@ -356,8 +356,7 @@ final class Flow[-In, +Out, +Mat](delegate: scaladsl.Flow[In, Out, Mat])
     : javadsl.Flow[In, T, Mat] =
     new Flow(delegate.statefulMapConcat { () ⇒
       val fun = f.create()
-      elem ⇒
-        Util.immutableSeq(fun(elem))
+      elem ⇒ Util.immutableSeq(fun(elem))
     })
 
   /**

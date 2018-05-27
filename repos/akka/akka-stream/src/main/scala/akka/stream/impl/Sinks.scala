@@ -416,7 +416,7 @@ final private[stream] class QueueSink[T]()
                 if (buffer.used == maxBuffer) tryPull(in)
                 sendDownstream(promise)
               }
-        })
+          })
 
       def sendDownstream(promise: Requested[T]): Unit = {
         val e = buffer.dequeue()

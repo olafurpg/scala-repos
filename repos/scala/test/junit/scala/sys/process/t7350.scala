@@ -209,7 +209,9 @@ class PipedProcessTest {
 @RunWith(classOf[JUnit4])
 class PipeSourceSinkTest {
   def throwsIOException(f: => Unit) = {
-    try { f; false } catch { case _: IOException => true }
+    try {
+      f; false
+    } catch { case _: IOException => true }
   }
 
   class PipeSink extends Process.PipeSink("TestPipeSink") {

@@ -53,7 +53,7 @@ class SpectralProjectedGradientTest
 
   property("optimize a simple multivariate gaussian") {
     val optimizer =
-      new SpectralProjectedGradient[DenseVector[Double]](tolerance = 1.0E-9)
+      new SpectralProjectedGradient[DenseVector[Double]](tolerance = 1.0e-9)
     forAll { init: DenseVector[Double] =>
       val f = new DiffFunction[DenseVector[Double]] {
         def calculate(x: DenseVector[Double]) = {
@@ -64,13 +64,13 @@ class SpectralProjectedGradientTest
       val result = optimizer.minimize(f, init)
       result should beSimilarTo(
         DenseVector.fill(result.size)(3.0),
-        allowedDeviation = 1E-5)
+        allowedDeviation = 1e-5)
     }
   }
 
   property("optimize a simple multivariate gaussian with projection") {
     val optimizer = new SpectralProjectedGradient[DenseVector[Double]](
-      tolerance = 1.0E-5,
+      tolerance = 1.0e-5,
       projection = _.map(scala.math.min(_, 2.0)))
 
     forAll { init: DenseVector[Double] =>
@@ -84,7 +84,7 @@ class SpectralProjectedGradientTest
       val result = optimizer.minimize(f, init)
       result should beSimilarTo(
         DenseVector.fill(result.size)(2.0),
-        allowedDeviation = 1E-10)
+        allowedDeviation = 1e-10)
     }
   }
 

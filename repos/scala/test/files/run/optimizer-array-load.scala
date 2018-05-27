@@ -10,7 +10,9 @@ object Test {
     }
   }
   def main(args: Array[String]): Unit = {
-    try { f(); assert(false, "should have thrown exception") } catch {
+    try {
+      f(); assert(false, "should have thrown exception")
+    } catch {
       case _: ArrayIndexOutOfBoundsException => ()
     }
   }

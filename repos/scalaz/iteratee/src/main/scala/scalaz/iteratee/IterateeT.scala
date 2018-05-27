@@ -35,7 +35,7 @@ sealed abstract class IterateeT[E, F[_], A] {
         s.fold(
           cont = _ => sys.error("diverging iteratee"),
           done = (a, _) => F.point(a)
-      ))
+        ))
   }
 
   def flatMap[B](f: A => IterateeT[E, F, B])(
@@ -52,7 +52,7 @@ sealed abstract class IterateeT[E, F[_], A] {
                   cont = kk => kk(i).value,
                   done = (aa, _) => F.point(StepT.sdone[E, F, B](aa, i))
                 ))
-        )))
+          )))
     through(this)
   }
 
@@ -134,7 +134,7 @@ sealed abstract class IterateeT[E, F[_], A] {
       cont = k =>
         k(eofInput) >>== { s =>
           s.mapContOr(_ => sys.error("diverging iteratee"), check(s))
-      },
+        },
       done = (a, _) => M0.point(a)
     )
 
@@ -155,7 +155,7 @@ sealed abstract class IterateeT[E, F[_], A] {
             isEof[E, F] flatMap { eof =>
               if (eof) done(scont(k), eofInput)
               else step(k)
-          }
+            }
         def step: (
             Input[A] => IterateeT[A, F, B]) => IterateeT[E, F, StepT[A, F, B]] =
           k => flatMap(a => k(elInput(a)) >>== loop)
@@ -186,7 +186,7 @@ sealed abstract class IterateeT[E, F[_], A] {
                   case _ => cont(loop(xx, yy))
                 }
             }
-      },
+        },
       empty = cont(loop(x, y)),
       eof = (x &= enumEofT[E, F]) flatMap
         (a => (y &= enumEofT[E, F]) map (b => (a, b)))

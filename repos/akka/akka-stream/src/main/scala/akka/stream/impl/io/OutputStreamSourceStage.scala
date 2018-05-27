@@ -188,7 +188,7 @@ private[akka] class OutputStreamAdapter(
       } catch {
         case e: IOException ⇒ throw e
         case NonFatal(e) ⇒ throw new IOException(e)
-    })
+      })
 
   @scala.throws(classOf[IOException])
   override def write(b: Int): Unit = {

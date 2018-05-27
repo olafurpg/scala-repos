@@ -116,8 +116,8 @@ class ScribeHandlerTest extends WordSpec with BeforeAndAfter with Eventually {
       scribe.publish(record1)
       scribe.publish(record2)
 
-      assert(statsReceiver.counter("dropped_records")() == 1l)
-      assert(statsReceiver.counter("sent_records")() == 0l)
+      assert(statsReceiver.counter("dropped_records")() == 1L)
+      assert(statsReceiver.counter("sent_records")() == 0L)
     }
 
     "have backoff on connection errors" in {
@@ -154,13 +154,13 @@ class ScribeHandlerTest extends WordSpec with BeforeAndAfter with Eventually {
           override private[logging] val flusher = new MockThreadPoolExecutor
         }
         scribe.publish(record1)
-        if (retries > 0 && statsReceiver.counter("connection_failed")() < 1l)
+        if (retries > 0 && statsReceiver.counter("connection_failed")() < 1L)
           scribeWithConnectionFailure(retries - 1)
         else scribe
       }
       val scribe = scribeWithConnectionFailure(2)
 
-      assert(statsReceiver.counter("connection_failed")() == 1l)
+      assert(statsReceiver.counter("connection_failed")() == 1L)
 
       scribe.publish(record2)
       scribe.publish(record1)
@@ -169,7 +169,7 @@ class ScribeHandlerTest extends WordSpec with BeforeAndAfter with Eventually {
       scribe.flusher.shutdown()
       scribe.flusher.awaitTermination(5, TimeUnit.SECONDS)
 
-      assert(statsReceiver.counter("connection_skipped")() == 3l)
+      assert(statsReceiver.counter("connection_skipped")() == 3L)
     }
 
     // TODO rewrite deterministically when we rewrite ScribeHandler
@@ -212,7 +212,7 @@ class ScribeHandlerTest extends WordSpec with BeforeAndAfter with Eventually {
       scribe.flusher.shutdown()
       scribe.flusher.awaitTermination(15, TimeUnit.SECONDS)
 
-      assert(statsReceiver.counter("published")() == 100l)
+      assert(statsReceiver.counter("published")() == 100L)
       // 100 publish requests, each creates a flush task enqueued to ThreadPoolExecutor
       // There will be 5 tasks stay in the threadpool's task queue.
       // There will be 1 task dequeued by the executor.

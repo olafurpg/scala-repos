@@ -173,7 +173,7 @@ object ContentFactory {
                     header = "Error saving sample SBT project",
                     message = t.getClass.getName + ": " + t.getMessage,
                     t)
-            }
+              }
           },
           new Button { thisButton =>
             text = "Copy Source"
@@ -193,7 +193,7 @@ object ContentFactory {
                     header = "Error copying source to clipboard",
                     message = t.getClass.getName + ": " + t.getMessage,
                     t)
-            }
+              }
           }
         )
       }

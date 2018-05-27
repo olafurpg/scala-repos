@@ -394,7 +394,7 @@ trait VectorOps {
   @expand
   @expand.valify
   implicit def v_v_nilpotent_Op[@expand.args(Int, Double, Float, Long) T](
-      implicit @expand.sequence[T](0, 0.0, 0.0f, 0l) zero: T)
+      implicit @expand.sequence[T](0, 0.0, 0.0f, 0L) zero: T)
     : BinaryRegistry[Vector[T], Vector[T], OpMulScalar.type, Vector[T]] =
     new BinaryRegistry[Vector[T], Vector[T], OpMulScalar.type, Vector[T]] {
       override def bindingMissing(a: Vector[T], b: Vector[T]): Vector[T] = {
@@ -459,7 +459,7 @@ trait VectorOps {
         }, { (a, b) =>
           b
         }, { _ % _ }, { _ pow _ }) op: Op.Impl2[T, T, T],
-      @expand.sequence[T](0, 0.0, 0.0f, 0l) zero: T)
+      @expand.sequence[T](0, 0.0, 0.0f, 0L) zero: T)
     : BinaryRegistry[Vector[T], T, Op.type, Vector[T]] =
     new BinaryRegistry[Vector[T], T, Op.type, Vector[T]] {
       override def bindingMissing(a: Vector[T], b: T): Vector[T] = {
@@ -493,7 +493,7 @@ trait VectorOps {
         }, { (a, b) =>
           b
         }, { _ % _ }, { _ pow _ }) op: Op.Impl2[T, T, T],
-      @expand.sequence[T](0, 0.0, 0.0f, 0l) zero: T)
+      @expand.sequence[T](0, 0.0, 0.0f, 0L) zero: T)
     : BinaryRegistry[T, Vector[T], Op.type, Vector[T]] =
     new BinaryRegistry[T, Vector[T], Op.type, Vector[T]] {
       override def bindingMissing(b: T, a: Vector[T]): Vector[T] = {
@@ -665,7 +665,7 @@ trait VectorOps {
   @expand
   @expand.valify
   implicit def canDot_V_V[@expand.args(Int, Long, Float, Double) T](
-      implicit @expand.sequence[T](0, 0l, 0.0f, 0.0) zero: T): BinaryRegistry[
+      implicit @expand.sequence[T](0, 0L, 0.0f, 0.0) zero: T): BinaryRegistry[
     Vector[T],
     Vector[T],
     breeze.linalg.operators.OpMulInner.type,

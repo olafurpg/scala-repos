@@ -94,7 +94,9 @@ object Test extends App {
       try {
         return 10
       } finally {
-        try { () } catch { case _: Throwable => () }
+        try {
+          ()
+        } catch { case _: Throwable => () }
         println("in finally 1")
       }
     } finally {

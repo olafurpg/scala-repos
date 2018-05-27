@@ -221,7 +221,7 @@ trait RepositoryService { self: AccountService =>
                 labelId = newLabelMap(oldLabelMap(x.labelId)),
                 userName = newUserName,
                 repositoryName = newRepositoryName
-            )): _*)
+              )): _*)
 
         if (account.isGroupAccount) {
           Collaborators.insertAll(getGroupMembers(newUserName).map(m =>

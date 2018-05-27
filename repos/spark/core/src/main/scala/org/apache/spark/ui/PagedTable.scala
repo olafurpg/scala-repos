@@ -228,41 +228,49 @@ private[ui] trait PagedTable[T] {
         <div class="pagination" style="margin-bottom: 0px;">
           <span style="float: left; padding-top: 4px; padding-right: 4px;">Page: </span>
           <ul>
-            {if (currentGroup > firstGroup) {
-            <li>
+            {
+        if (currentGroup > firstGroup) {
+          <li>
               <a href={Unparsed(pageLink(startPage - groupSize))} aria-label="Previous Group">
                 <span aria-hidden="true">
                   &lt;&lt;
                 </span>
               </a>
             </li>
-            }}
-            {if (page > 1) {
-            <li>
+        }
+      }
+            {
+        if (page > 1) {
+          <li>
             <a href={Unparsed(pageLink(page - 1))} aria-label="Previous">
               <span aria-hidden="true">
                 &lt;
               </span>
             </a>
             </li>
-            }}
+        }
+      }
             {pageTags}
-            {if (page < totalPages) {
-            <li>
+            {
+        if (page < totalPages) {
+          <li>
               <a href={Unparsed(pageLink(page + 1))} aria-label="Next">
                 <span aria-hidden="true">&gt;</span>
               </a>
             </li>
-            }}
-            {if (currentGroup < lastGroup) {
-            <li>
+        }
+      }
+            {
+        if (currentGroup < lastGroup) {
+          <li>
               <a href={Unparsed(pageLink(startPage + groupSize))} aria-label="Next Group">
                 <span aria-hidden="true">
                   &gt;&gt;
                 </span>
               </a>
             </li>
-          }}
+        }
+      }
           </ul>
         </div>
       </div>

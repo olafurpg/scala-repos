@@ -181,7 +181,10 @@ class MatchToPartialFunctionQuickFix(
       matchStmt: ScMatchStmt,
       indexes: Seq[Int]): Unit = {
     val clauses = matchStmt.caseClauses
-    val name = matchStmt.expr.map(_.getText).getOrElse(return )
+    val name = matchStmt.expr
+      .map(_.getText)
+      .getOrElse(return
+      )
     indexes.map(i => clauses(i).pattern).foreach {
       case Some(w: ScWildcardPattern) =>
         w.replace(

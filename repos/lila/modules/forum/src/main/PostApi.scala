@@ -60,7 +60,7 @@ final class PostApi(
                     post.isStaff.fold(
                       prop toStaffFriendsOf userId,
                       prop toFollowersOf userId toUsers topicUserIds exceptUser userId
-                  ))
+                    ))
               }
               lila.mon.forum.post.create()
             } inject post

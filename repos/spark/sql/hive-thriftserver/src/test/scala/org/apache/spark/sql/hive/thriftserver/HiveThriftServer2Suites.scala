@@ -823,7 +823,7 @@ abstract class HiveThriftServer2Test
               serverStarted.trySuccess(())
             }
           }
-      }
+        }
 
       val process = builder.start()
 

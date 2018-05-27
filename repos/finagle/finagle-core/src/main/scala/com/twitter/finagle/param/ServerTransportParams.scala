@@ -49,6 +49,6 @@ class ServerTransportParams[A <: Stack.Parameterized[A]](
               caCertificatePath.orNull,
               ciphers.orNull,
               nextProtocols.orNull
-          ))
+            ))
       ))
 }

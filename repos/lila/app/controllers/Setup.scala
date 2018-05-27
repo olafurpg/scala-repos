@@ -70,7 +70,7 @@ object Setup extends LilaController with TheftPrevention {
               negotiate(
                 html = Lobby.renderHome(Results.BadRequest),
                 api = _ => fuccess(BadRequest(errorsAsJson(f)))
-            ), {
+              ), {
               case config =>
                 userId ?? UserRepo.byId flatMap {
                   destUser =>
@@ -139,7 +139,7 @@ object Setup extends LilaController with TheftPrevention {
                     case e: IllegalArgumentException =>
                       BadRequest(jsonError(e.getMessage)) as JSON
                   }
-            }
+              }
           )
       }
     }
@@ -202,7 +202,7 @@ object Setup extends LilaController with TheftPrevention {
             negotiate(
               html = Lobby.renderHome(Results.BadRequest),
               api = _ => fuccess(BadRequest(errorsAsJson(f)))
-          ),
+            ),
           config =>
             op(config)(ctx) flatMap { pov =>
               negotiate(
@@ -210,9 +210,9 @@ object Setup extends LilaController with TheftPrevention {
                 api = apiVersion =>
                   Env.api.roundApi.player(pov, apiVersion) map { data =>
                     Created(data) as JSON
-                }
+                  }
               )
-          }
+            }
         )
       }
     }

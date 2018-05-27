@@ -170,7 +170,10 @@ trait HashTable[A, Entry >: Null <: HashEntry[A, Entry]]
   protected def findOrAddEntry[B](key: A, value: B): Entry = {
     val h = index(elemHashCode(key))
     val e = findEntry0(key, h)
-    if (e ne null) e else { addEntry0(createNewEntry(key, value), h); null }
+    if (e ne null) e
+    else {
+      addEntry0(createNewEntry(key, value), h); null
+    }
   }
 
   /** Creates new entry to be immediately inserted into the hashtable.

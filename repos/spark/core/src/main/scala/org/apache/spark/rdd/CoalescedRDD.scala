@@ -241,7 +241,9 @@ private class PartitionCoalescer(
       pgroup.arr += part // already assign this element
       initialHash += part // needed to avoid assigning partitions to multiple buckets
       true
-    } else { false }
+    } else {
+      false
+    }
   }
 
   /**

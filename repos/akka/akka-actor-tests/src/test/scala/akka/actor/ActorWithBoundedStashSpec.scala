@@ -38,7 +38,9 @@ object ActorWithBoundedStashSpec {
     def receive = {
       case msg: String if msg.startsWith("hello") ⇒
         numStashed += 1
-        try { stash(); sender() ! "ok" } catch {
+        try {
+          stash(); sender() ! "ok"
+        } catch {
           case _: StashOverflowException ⇒
             if (numStashed == 21) {
               sender() ! "STASHOVERFLOW"

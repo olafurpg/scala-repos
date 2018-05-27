@@ -223,7 +223,7 @@ class InterpretedUnpicklerRuntime(mirror: Mirror, typeTag: String)(
                   fir.hasGetter || {
                     // exists as Java field
                     scala.util.Try(clazz.getDeclaredField(fir.name)).isSuccess
-                })
+                  })
 
             def fieldVals =
               pendingFields.map(fir => {
@@ -334,7 +334,7 @@ class ShareNothingInterpretedUnpicklerRuntime(mirror: Mirror, typeTag: String)(
                   fir.hasGetter || {
                     // exists as Java field
                     scala.util.Try(clazz.getDeclaredField(fir.name)).isSuccess
-                })
+                  })
               }
 
             def fieldVals =

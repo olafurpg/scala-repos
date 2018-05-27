@@ -143,7 +143,7 @@ class MongoListField[OwnerType <: BsonRecord[OwnerType], ListType: Manifest](
         case x if datetype_?(x.getClass) =>
           datetype2jvalue(x)(owner.meta.formats)
         case _ => JNothing
-    }))
+      }))
 
   /*
    * Convert this field's value into a DBObject so it can be stored in Mongo.

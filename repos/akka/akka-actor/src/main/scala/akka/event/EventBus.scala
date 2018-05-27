@@ -377,7 +377,11 @@ trait ManagedActorClassification {
       }
     }
 
-    try { dissociateAsMonitored(actor) } finally { dissociateAsMonitor(actor) }
+    try {
+      dissociateAsMonitored(actor)
+    } finally {
+      dissociateAsMonitor(actor)
+    }
   }
 
   @tailrec
@@ -528,7 +532,9 @@ trait ActorClassification {
       }
     }
 
-    try { dissociateAsMonitored(monitored) } finally {
+    try {
+      dissociateAsMonitored(monitored)
+    } finally {
       dissociateAsMonitor(monitored)
     }
   }

@@ -20,7 +20,7 @@ class TransformProcessorTest extends AkkaIdentityProcessorVerification[Int] {
     val mkStage = () ⇒
       new PushStage[Int, Int] {
         override def onPush(in: Int, ctx: Context[Int]) = ctx.push(in)
-    }
+      }
 
     Flow[Int].transform(mkStage).toProcessor.run()
   }

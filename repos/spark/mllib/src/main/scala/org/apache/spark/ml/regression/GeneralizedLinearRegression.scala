@@ -184,7 +184,7 @@ class GeneralizedLinearRegression @Since("2.0.0")(
     */
   @Since("2.0.0")
   def setTol(value: Double): this.type = set(tol, value)
-  setDefault(tol -> 1E-6)
+  setDefault(tol -> 1e-6)
 
   /**
     * Sets the regularization parameter.
@@ -340,7 +340,7 @@ object GeneralizedLinearRegression
   private[ml] lazy val supportedLinkNames =
     supportedFamilyAndLinkPairs.map(_._2.name)
 
-  private[ml] val epsilon: Double = 1E-16
+  private[ml] val epsilon: Double = 1e-16
 
   /**
     * Wrapper of family and link combination used in the model.

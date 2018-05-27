@@ -1210,7 +1210,7 @@ class ReplicaManager(
                     .get
                     .getBrokerEndPoint(config.interBrokerSecurityProtocol),
                   partition.getReplica().get.logEndOffset.messageOffset
-              ))
+                ))
             .toMap
         replicaFetcherManager.addFetcherForPartitions(
           partitionsToMakeFollowerWithLeaderAndOffset)

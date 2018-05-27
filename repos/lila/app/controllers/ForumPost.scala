@@ -52,11 +52,11 @@ object ForumPost extends LilaController with ForumController {
                             Some(err -> captcha),
                             unsub))
                       }
-                  },
+                    },
                   data =>
                     postApi.makePost(categ, topic, data) map { post =>
                       Redirect(routes.ForumPost.redirect(post.id))
-                  }
+                    }
                 )
           }
         }

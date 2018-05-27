@@ -92,12 +92,17 @@ private[ui] class ExecutorsPage(
             <!-- Place the shuffle write tooltip on the left (rather than the default position
               of on top) because the shuffle write column is the last column on the right side and
               the tooltip is wider than the column, so it doesn't fit on top. -->
-            <span data-toggle="tooltip" data-placement="left" title={ToolTips.SHUFFLE_WRITE}>
+            <span data-toggle="tooltip" data-placement="left" title={
+        ToolTips.SHUFFLE_WRITE
+      }>
               Shuffle Write
             </span>
           </th>
           {if (logsExist) <th class="sorttable_nosort">Logs</th> else Seq.empty}
-          {if (threadDumpEnabled) <th class="sorttable_nosort">Thread Dump</th> else Seq.empty}
+          {
+        if (threadDumpEnabled) <th class="sorttable_nosort">Thread Dump</th>
+        else Seq.empty
+      }
         </thead>
         <tbody>
           {execInfoSorted.map(execRow(_, logsExist))}
@@ -148,8 +153,16 @@ private[ui] class ExecutorsPage(
         {Utils.bytesToString(diskUsed)}
       </td>
       <td>{info.totalCores}</td>
-      {taskData(info.maxTasks, info.activeTasks, info.failedTasks, info.completedTasks,
-      info.totalTasks, info.totalDuration, info.totalGCTime)}
+      {
+      taskData(
+        info.maxTasks,
+        info.activeTasks,
+        info.failedTasks,
+        info.completedTasks,
+        info.totalTasks,
+        info.totalDuration,
+        info.totalGCTime)
+    }
       <td sorttable_customkey={info.totalInputBytes.toString}>
         {Utils.bytesToString(info.totalInputBytes)}
       </td>
@@ -160,34 +173,35 @@ private[ui] class ExecutorsPage(
         {Utils.bytesToString(info.totalShuffleWrite)}
       </td>
       {
-        if (logsExist) {
-          <td>
+      if (logsExist) {
+        <td>
             {
-              info.executorLogs.map { case (logName, logUrl) =>
-                <div>
+          info.executorLogs.map {
+            case (logName, logUrl) =>
+              <div>
                   <a href={logUrl}>
                     {logName}
                   </a>
                 </div>
-              }
-            }
-          </td>
+          }
         }
+          </td>
       }
+    }
       {
-        if (threadDumpEnabled) {
-          if (info.isActive) {
-            val encodedId = URLEncoder.encode(info.id, "UTF-8")
-            <td>
+      if (threadDumpEnabled) {
+        if (info.isActive) {
+          val encodedId = URLEncoder.encode(info.id, "UTF-8")
+          <td>
               <a href={s"threadDump/?executorId=${encodedId}"}>Thread Dump</a>
             </td>
-          } else {
-            <td> </td>
-          }
         } else {
-          Seq.empty
+          <td> </td>
         }
+      } else {
+        Seq.empty
       }
+    }
     </tr>
   }
 
@@ -213,13 +227,17 @@ private[ui] class ExecutorsPage(
         {Utils.bytesToString(diskUsed)}
       </td>
       <td>{totalCores}</td>
-      {taskData(execInfo.map(_.maxTasks).sum,
-      execInfo.map(_.activeTasks).sum,
-      execInfo.map(_.failedTasks).sum,
-      execInfo.map(_.completedTasks).sum,
-      execInfo.map(_.totalTasks).sum,
-      execInfo.map(_.totalDuration).sum,
-      execInfo.map(_.totalGCTime).sum)}
+      {
+      taskData(
+        execInfo.map(_.maxTasks).sum,
+        execInfo.map(_.activeTasks).sum,
+        execInfo.map(_.failedTasks).sum,
+        execInfo.map(_.completedTasks).sum,
+        execInfo.map(_.totalTasks).sum,
+        execInfo.map(_.totalDuration).sum,
+        execInfo.map(_.totalGCTime).sum
+      )
+    }
       <td sorttable_customkey={totalInputBytes.toString}>
         {Utils.bytesToString(totalInputBytes)}
       </td>
@@ -255,7 +273,9 @@ private[ui] class ExecutorsPage(
         <th><span data-toggle="tooltip" title={ToolTips.INPUT}>Input</span></th>
         <th><span data-toggle="tooltip" title={ToolTips.SHUFFLE_READ}>Shuffle Read</span></th>
         <th>
-          <span data-toggle="tooltip" data-placement="left" title={ToolTips.SHUFFLE_WRITE}>
+          <span data-toggle="tooltip" data-placement="left" title={
+      ToolTips.SHUFFLE_WRITE
+    }>
             Shuffle Write
           </span>
         </th>
@@ -305,14 +325,14 @@ private[ui] class ExecutorsPage(
       } else {
         ""
       }
-      }>{activeTasks}</td>
+    }>{activeTasks}</td>
     <td style={
       if (failedTasks > 0) {
         "background:hsla(0, 100%, 50%, " + failedTasksAlpha + ");color:white"
       } else {
         ""
       }
-      }>{failedTasks}</td>
+    }>{failedTasks}</td>
     <td>{completedTasks}</td>
     <td>{totalTasks}</td>
     <td sorttable_customkey={totalDuration.toString} style={

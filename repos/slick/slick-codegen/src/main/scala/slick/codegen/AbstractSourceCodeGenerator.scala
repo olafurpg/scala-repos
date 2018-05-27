@@ -77,7 +77,7 @@ abstract class AbstractSourceCodeGenerator(model: m.Model)
                 .map(v => s"${c.name}: ${c.exposedType} = $v")
                 .getOrElse(
                   s"${c.name}: ${c.exposedType}"
-              ))
+                ))
           .mkString(", ")
         if (classEnabled) {
           val prns = (parents.take(1).map(" extends " + _) ++ parents

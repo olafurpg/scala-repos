@@ -322,7 +322,9 @@ class MapWithStateRDDSuite
           // else if the data is 2, remove the state if it exists
           data match {
             case Some(1) =>
-              if (state.exists()) { state.update(state.get + 1) } else
+              if (state.exists()) {
+                state.update(state.get + 1)
+              } else
                 state.update(0)
             case Some(2) =>
               state.remove()

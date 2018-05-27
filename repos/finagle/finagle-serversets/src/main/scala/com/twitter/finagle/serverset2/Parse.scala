@@ -52,7 +52,6 @@ private[serverset2] object JsonDict {
         case NonFatal(_) => return Function.const(None)
       }
 
-    key =>
-      Option(o.get(key))
+    key => Option(o.get(key))
   }
 }

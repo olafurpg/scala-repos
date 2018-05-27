@@ -1151,7 +1151,9 @@ object UriRendering {
             def append(s: String) = s.getBytes(charset).foreach(appendEncoded)
             if (Character.isHighSurrogate(c)) {
               append(new String(Array(string codePointAt ix), 0, 1)); 2
-            } else { append(c.toString); 1 }
+            } else {
+              append(c.toString); 1
+            }
         }
         rec(ix + charSize)
       } else r

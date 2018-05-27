@@ -30,7 +30,7 @@ class Formatting(indent: Int) {
         if (indenting(code)) str print indentation
         str println line
         str.flush()
-    })
+      })
 }
 object Formatting {
   def forPrompt(prompt: String) =

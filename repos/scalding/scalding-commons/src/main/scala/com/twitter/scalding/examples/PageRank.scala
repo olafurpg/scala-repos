@@ -106,7 +106,9 @@ class PageRank(args: Args) extends Job(args) {
     */
   @tailrec
   final def doPageRank(steps: Int)(pagerank: RichPipe): RichPipe = {
-    if (steps <= 0) { pagerank } else {
+    if (steps <= 0) {
+      pagerank
+    } else {
       val nodeRows = pagerank
       //remove any EDGE rows from the previous loop
         .filter('rowtype) { (rowtype: Int) =>

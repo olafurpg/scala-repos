@@ -61,7 +61,7 @@ object CodeGenerator extends App {
               else super.rawType
           }
         }
-    })
+      })
     codegenFuture.onSuccess {
       case codegen =>
         codegen.writeToFile(

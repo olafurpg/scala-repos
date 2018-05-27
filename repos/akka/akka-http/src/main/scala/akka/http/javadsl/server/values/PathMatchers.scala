@@ -144,6 +144,6 @@ object PathMatchers {
     new PathMatcherImpl[T](scalaMatcher(ScalaPathMatchers))
   private def matcher0(
       scalaMatcher: ScalaPathMatchers.type ⇒ PathMatcher0): PathMatcher[Void] =
-    new PathMatcherImpl[Void](
-      scalaMatcher(ScalaPathMatchers).tmap(_ ⇒ Tuple1(null)))
+    new PathMatcherImpl[Void](scalaMatcher(ScalaPathMatchers).tmap(_ ⇒
+      Tuple1(null)))
 }

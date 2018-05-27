@@ -243,8 +243,7 @@ case class Cast(child: Expression, dataType: DataType) extends UnaryExpression {
     // so we can return null
     // NULL is more reasonable here, since the query itself obeys the grammar.
     case _ =>
-      _ =>
-        null
+      _ => null
   }
 
   // IntervalConverter
@@ -252,8 +251,7 @@ case class Cast(child: Expression, dataType: DataType) extends UnaryExpression {
     case StringType =>
       buildCast[UTF8String](_, s => CalendarInterval.fromString(s.toString))
     case _ =>
-      _ =>
-        null
+      _ => null
   }
 
   // LongConverter
@@ -265,7 +263,7 @@ case class Cast(child: Expression, dataType: DataType) extends UnaryExpression {
           try s.toString.toLong
           catch {
             case _: NumberFormatException => null
-        })
+          })
     case BooleanType =>
       buildCast[Boolean](_, b => if (b) 1L else 0L)
     case DateType =>
@@ -273,8 +271,7 @@ case class Cast(child: Expression, dataType: DataType) extends UnaryExpression {
     case TimestampType =>
       buildCast[Long](_, t => timestampToLong(t))
     case x: NumericType =>
-      b =>
-        x.numeric.asInstanceOf[Numeric[Any]].toLong(b)
+      b => x.numeric.asInstanceOf[Numeric[Any]].toLong(b)
   }
 
   // IntConverter
@@ -286,7 +283,7 @@ case class Cast(child: Expression, dataType: DataType) extends UnaryExpression {
           try s.toString.toInt
           catch {
             case _: NumberFormatException => null
-        })
+          })
     case BooleanType =>
       buildCast[Boolean](_, b => if (b) 1 else 0)
     case DateType =>
@@ -294,8 +291,7 @@ case class Cast(child: Expression, dataType: DataType) extends UnaryExpression {
     case TimestampType =>
       buildCast[Long](_, t => timestampToLong(t).toInt)
     case x: NumericType =>
-      b =>
-        x.numeric.asInstanceOf[Numeric[Any]].toInt(b)
+      b => x.numeric.asInstanceOf[Numeric[Any]].toInt(b)
   }
 
   // ShortConverter
@@ -307,7 +303,7 @@ case class Cast(child: Expression, dataType: DataType) extends UnaryExpression {
           try s.toString.toShort
           catch {
             case _: NumberFormatException => null
-        })
+          })
     case BooleanType =>
       buildCast[Boolean](_, b => if (b) 1.toShort else 0.toShort)
     case DateType =>
@@ -315,8 +311,7 @@ case class Cast(child: Expression, dataType: DataType) extends UnaryExpression {
     case TimestampType =>
       buildCast[Long](_, t => timestampToLong(t).toShort)
     case x: NumericType =>
-      b =>
-        x.numeric.asInstanceOf[Numeric[Any]].toInt(b).toShort
+      b => x.numeric.asInstanceOf[Numeric[Any]].toInt(b).toShort
   }
 
   // ByteConverter
@@ -328,7 +323,7 @@ case class Cast(child: Expression, dataType: DataType) extends UnaryExpression {
           try s.toString.toByte
           catch {
             case _: NumberFormatException => null
-        })
+          })
     case BooleanType =>
       buildCast[Boolean](_, b => if (b) 1.toByte else 0.toByte)
     case DateType =>
@@ -336,8 +331,7 @@ case class Cast(child: Expression, dataType: DataType) extends UnaryExpression {
     case TimestampType =>
       buildCast[Long](_, t => timestampToLong(t).toByte)
     case x: NumericType =>
-      b =>
-        x.numeric.asInstanceOf[Numeric[Any]].toInt(b).toByte
+      b => x.numeric.asInstanceOf[Numeric[Any]].toInt(b).toByte
   }
 
   /**
@@ -364,7 +358,7 @@ case class Cast(child: Expression, dataType: DataType) extends UnaryExpression {
             changePrecision(Decimal(new JavaBigDecimal(s.toString)), target)
           } catch {
             case _: NumberFormatException => null
-        })
+          })
     case BooleanType =>
       buildCast[Boolean](
         _,
@@ -377,8 +371,7 @@ case class Cast(child: Expression, dataType: DataType) extends UnaryExpression {
         _,
         t => changePrecision(Decimal(timestampToDouble(t)), target))
     case dt: DecimalType =>
-      b =>
-        changePrecision(b.asInstanceOf[Decimal].clone(), target)
+      b => changePrecision(b.asInstanceOf[Decimal].clone(), target)
     case t: IntegralType =>
       b =>
         changePrecision(
@@ -404,7 +397,7 @@ case class Cast(child: Expression, dataType: DataType) extends UnaryExpression {
           try s.toString.toDouble
           catch {
             case _: NumberFormatException => null
-        })
+          })
     case BooleanType =>
       buildCast[Boolean](_, b => if (b) 1d else 0d)
     case DateType =>
@@ -412,8 +405,7 @@ case class Cast(child: Expression, dataType: DataType) extends UnaryExpression {
     case TimestampType =>
       buildCast[Long](_, t => timestampToDouble(t))
     case x: NumericType =>
-      b =>
-        x.numeric.asInstanceOf[Numeric[Any]].toDouble(b)
+      b => x.numeric.asInstanceOf[Numeric[Any]].toDouble(b)
   }
 
   // FloatConverter
@@ -425,7 +417,7 @@ case class Cast(child: Expression, dataType: DataType) extends UnaryExpression {
           try s.toString.toFloat
           catch {
             case _: NumberFormatException => null
-        })
+          })
     case BooleanType =>
       buildCast[Boolean](_, b => if (b) 1f else 0f)
     case DateType =>
@@ -433,8 +425,7 @@ case class Cast(child: Expression, dataType: DataType) extends UnaryExpression {
     case TimestampType =>
       buildCast[Long](_, t => timestampToDouble(t).toFloat)
     case x: NumericType =>
-      b =>
-        x.numeric.asInstanceOf[Numeric[Any]].toFloat(b)
+      b => x.numeric.asInstanceOf[Numeric[Any]].toFloat(b)
   }
 
   private[this] def castArray(
@@ -546,11 +537,9 @@ case class Cast(child: Expression, dataType: DataType) extends UnaryExpression {
     to match {
 
       case _ if from == NullType =>
-        (c, evPrim, evNull) =>
-          s"$evNull = true;"
+        (c, evPrim, evNull) => s"$evNull = true;"
       case _ if to == from =>
-        (c, evPrim, evNull) =>
-          s"$evPrim = $c;"
+        (c, evPrim, evNull) => s"$evPrim = $c;"
       case StringType           => castToStringCode(from, ctx)
       case BinaryType           => castToBinaryCode(from)
       case DateType             => castToDateCode(from, ctx)
@@ -577,8 +566,7 @@ case class Cast(child: Expression, dataType: DataType) extends UnaryExpression {
           if udt.userClass == from
             .asInstanceOf[UserDefinedType[_]]
             .userClass =>
-        (c, evPrim, evNull) =>
-          s"$evPrim = $c;"
+        (c, evPrim, evNull) => s"$evPrim = $c;"
       case _: UserDefinedType[_] =>
         throw new SparkException(s"Cannot cast $from to $to.")
     }
@@ -607,15 +595,12 @@ case class Cast(child: Expression, dataType: DataType) extends UnaryExpression {
       ctx: CodegenContext): CastFunction = {
     from match {
       case BinaryType =>
-        (c, evPrim, evNull) =>
-          s"$evPrim = UTF8String.fromBytes($c);"
+        (c, evPrim, evNull) => s"$evPrim = UTF8String.fromBytes($c);"
       case DateType =>
-        (c, evPrim, evNull) =>
-          s"""$evPrim = UTF8String.fromString(
+        (c, evPrim, evNull) => s"""$evPrim = UTF8String.fromString(
           org.apache.spark.sql.catalyst.util.DateTimeUtils.dateToString($c));"""
       case TimestampType =>
-        (c, evPrim, evNull) =>
-          s"""$evPrim = UTF8String.fromString(
+        (c, evPrim, evNull) => s"""$evPrim = UTF8String.fromString(
           org.apache.spark.sql.catalyst.util.DateTimeUtils.timestampToString($c));"""
       case _ =>
         (c, evPrim, evNull) =>
@@ -626,8 +611,7 @@ case class Cast(child: Expression, dataType: DataType) extends UnaryExpression {
   private[this] def castToBinaryCode(from: DataType): CastFunction =
     from match {
       case StringType =>
-        (c, evPrim, evNull) =>
-          s"$evPrim = $c.getBytes();"
+        (c, evPrim, evNull) => s"$evPrim = $c.getBytes();"
     }
 
   private[this] def castToDateCode(
@@ -635,8 +619,7 @@ case class Cast(child: Expression, dataType: DataType) extends UnaryExpression {
       ctx: CodegenContext): CastFunction = from match {
     case StringType =>
       val intOpt = ctx.freshName("intOpt")
-      (c, evPrim, evNull) =>
-        s"""
+      (c, evPrim, evNull) => s"""
         scala.Option<Integer> $intOpt =
           org.apache.spark.sql.catalyst.util.DateTimeUtils.stringToDate($c);
         if ($intOpt.isDefined()) {
@@ -649,8 +632,7 @@ case class Cast(child: Expression, dataType: DataType) extends UnaryExpression {
       (c, evPrim, evNull) =>
         s"$evPrim = org.apache.spark.sql.catalyst.util.DateTimeUtils.millisToDays($c / 1000L);";
     case _ =>
-      (c, evPrim, evNull) =>
-        s"$evNull = true;"
+      (c, evPrim, evNull) => s"$evNull = true;"
   }
 
   private[this] def changePrecision(
@@ -673,8 +655,7 @@ case class Cast(child: Expression, dataType: DataType) extends UnaryExpression {
     val tmp = ctx.freshName("tmpDecimal")
     from match {
       case StringType =>
-        (c, evPrim, evNull) =>
-          s"""
+        (c, evPrim, evNull) => s"""
             try {
               Decimal $tmp = Decimal.apply(new java.math.BigDecimal($c.toString()));
               ${changePrecision(tmp, target, evPrim, evNull)}
@@ -683,39 +664,33 @@ case class Cast(child: Expression, dataType: DataType) extends UnaryExpression {
             }
           """
       case BooleanType =>
-        (c, evPrim, evNull) =>
-          s"""
+        (c, evPrim, evNull) => s"""
             Decimal $tmp = $c ? Decimal.apply(1) : Decimal.apply(0);
             ${changePrecision(tmp, target, evPrim, evNull)}
           """
       case DateType =>
         // date can't cast to decimal in Hive
-        (c, evPrim, evNull) =>
-          s"$evNull = true;"
+        (c, evPrim, evNull) => s"$evNull = true;"
       case TimestampType =>
         // Note that we lose precision here.
-        (c, evPrim, evNull) =>
-          s"""
+        (c, evPrim, evNull) => s"""
             Decimal $tmp = Decimal.apply(
               scala.math.BigDecimal.valueOf(${timestampToDoubleCode(c)}));
             ${changePrecision(tmp, target, evPrim, evNull)}
           """
       case DecimalType() =>
-        (c, evPrim, evNull) =>
-          s"""
+        (c, evPrim, evNull) => s"""
             Decimal $tmp = $c.clone();
             ${changePrecision(tmp, target, evPrim, evNull)}
           """
       case x: IntegralType =>
-        (c, evPrim, evNull) =>
-          s"""
+        (c, evPrim, evNull) => s"""
             Decimal $tmp = Decimal.apply((long) $c);
             ${changePrecision(tmp, target, evPrim, evNull)}
           """
       case x: FractionalType =>
         // All other numeric types can be represented precisely as Doubles
-        (c, evPrim, evNull) =>
-          s"""
+        (c, evPrim, evNull) => s"""
             try {
               Decimal $tmp = Decimal.apply(scala.math.BigDecimal.valueOf((double) $c));
               ${changePrecision(tmp, target, evPrim, evNull)}
@@ -731,8 +706,7 @@ case class Cast(child: Expression, dataType: DataType) extends UnaryExpression {
       ctx: CodegenContext): CastFunction = from match {
     case StringType =>
       val longOpt = ctx.freshName("longOpt")
-      (c, evPrim, evNull) =>
-        s"""
+      (c, evPrim, evNull) => s"""
           scala.Option<Long> $longOpt =
             org.apache.spark.sql.catalyst.util.DateTimeUtils.stringToTimestamp($c);
           if ($longOpt.isDefined()) {
@@ -742,20 +716,16 @@ case class Cast(child: Expression, dataType: DataType) extends UnaryExpression {
           }
          """
     case BooleanType =>
-      (c, evPrim, evNull) =>
-        s"$evPrim = $c ? 1L : 0L;"
+      (c, evPrim, evNull) => s"$evPrim = $c ? 1L : 0L;"
     case _: IntegralType =>
-      (c, evPrim, evNull) =>
-        s"$evPrim = ${longToTimeStampCode(c)};"
+      (c, evPrim, evNull) => s"$evPrim = ${longToTimeStampCode(c)};"
     case DateType =>
       (c, evPrim, evNull) =>
         s"$evPrim = org.apache.spark.sql.catalyst.util.DateTimeUtils.daysToMillis($c) * 1000;"
     case DecimalType() =>
-      (c, evPrim, evNull) =>
-        s"$evPrim = ${decimalToTimestampCode(c)};"
+      (c, evPrim, evNull) => s"$evPrim = ${decimalToTimestampCode(c)};"
     case DoubleType =>
-      (c, evPrim, evNull) =>
-        s"""
+      (c, evPrim, evNull) => s"""
           if (Double.isNaN($c) || Double.isInfinite($c)) {
             $evNull = true;
           } else {
@@ -763,8 +733,7 @@ case class Cast(child: Expression, dataType: DataType) extends UnaryExpression {
           }
         """
     case FloatType =>
-      (c, evPrim, evNull) =>
-        s"""
+      (c, evPrim, evNull) => s"""
           if (Float.isNaN($c) || Float.isInfinite($c)) {
             $evNull = true;
           } else {
@@ -792,8 +761,7 @@ case class Cast(child: Expression, dataType: DataType) extends UnaryExpression {
     from match {
       case StringType =>
         val stringUtils = StringUtils.getClass.getName.stripSuffix("$")
-        (c, evPrim, evNull) =>
-          s"""
+        (c, evPrim, evNull) => s"""
           if ($stringUtils.isTrueString($c)) {
             $evPrim = true;
           } else if ($stringUtils.isFalseString($c)) {
@@ -803,24 +771,19 @@ case class Cast(child: Expression, dataType: DataType) extends UnaryExpression {
           }
         """
       case TimestampType =>
-        (c, evPrim, evNull) =>
-          s"$evPrim = $c != 0;"
+        (c, evPrim, evNull) => s"$evPrim = $c != 0;"
       case DateType =>
         // Hive would return null when cast from date to boolean
-        (c, evPrim, evNull) =>
-          s"$evNull = true;"
+        (c, evPrim, evNull) => s"$evNull = true;"
       case DecimalType() =>
-        (c, evPrim, evNull) =>
-          s"$evPrim = !$c.isZero();"
+        (c, evPrim, evNull) => s"$evPrim = !$c.isZero();"
       case n: NumericType =>
-        (c, evPrim, evNull) =>
-          s"$evPrim = $c != 0;"
+        (c, evPrim, evNull) => s"$evPrim = $c != 0;"
     }
 
   private[this] def castToByteCode(from: DataType): CastFunction = from match {
     case StringType =>
-      (c, evPrim, evNull) =>
-        s"""
+      (c, evPrim, evNull) => s"""
           try {
             $evPrim = Byte.valueOf($c.toString());
           } catch (java.lang.NumberFormatException e) {
@@ -828,27 +791,21 @@ case class Cast(child: Expression, dataType: DataType) extends UnaryExpression {
           }
         """
     case BooleanType =>
-      (c, evPrim, evNull) =>
-        s"$evPrim = $c ? (byte) 1 : (byte) 0;"
+      (c, evPrim, evNull) => s"$evPrim = $c ? (byte) 1 : (byte) 0;"
     case DateType =>
-      (c, evPrim, evNull) =>
-        s"$evNull = true;"
+      (c, evPrim, evNull) => s"$evNull = true;"
     case TimestampType =>
-      (c, evPrim, evNull) =>
-        s"$evPrim = (byte) ${timestampToIntegerCode(c)};"
+      (c, evPrim, evNull) => s"$evPrim = (byte) ${timestampToIntegerCode(c)};"
     case DecimalType() =>
-      (c, evPrim, evNull) =>
-        s"$evPrim = $c.toByte();"
+      (c, evPrim, evNull) => s"$evPrim = $c.toByte();"
     case x: NumericType =>
-      (c, evPrim, evNull) =>
-        s"$evPrim = (byte) $c;"
+      (c, evPrim, evNull) => s"$evPrim = (byte) $c;"
   }
 
   private[this] def castToShortCode(from: DataType): CastFunction =
     from match {
       case StringType =>
-        (c, evPrim, evNull) =>
-          s"""
+        (c, evPrim, evNull) => s"""
           try {
             $evPrim = Short.valueOf($c.toString());
           } catch (java.lang.NumberFormatException e) {
@@ -856,26 +813,21 @@ case class Cast(child: Expression, dataType: DataType) extends UnaryExpression {
           }
         """
       case BooleanType =>
-        (c, evPrim, evNull) =>
-          s"$evPrim = $c ? (short) 1 : (short) 0;"
+        (c, evPrim, evNull) => s"$evPrim = $c ? (short) 1 : (short) 0;"
       case DateType =>
-        (c, evPrim, evNull) =>
-          s"$evNull = true;"
+        (c, evPrim, evNull) => s"$evNull = true;"
       case TimestampType =>
         (c, evPrim, evNull) =>
           s"$evPrim = (short) ${timestampToIntegerCode(c)};"
       case DecimalType() =>
-        (c, evPrim, evNull) =>
-          s"$evPrim = $c.toShort();"
+        (c, evPrim, evNull) => s"$evPrim = $c.toShort();"
       case x: NumericType =>
-        (c, evPrim, evNull) =>
-          s"$evPrim = (short) $c;"
+        (c, evPrim, evNull) => s"$evPrim = (short) $c;"
     }
 
   private[this] def castToIntCode(from: DataType): CastFunction = from match {
     case StringType =>
-      (c, evPrim, evNull) =>
-        s"""
+      (c, evPrim, evNull) => s"""
           try {
             $evPrim = Integer.valueOf($c.toString());
           } catch (java.lang.NumberFormatException e) {
@@ -883,26 +835,20 @@ case class Cast(child: Expression, dataType: DataType) extends UnaryExpression {
           }
         """
     case BooleanType =>
-      (c, evPrim, evNull) =>
-        s"$evPrim = $c ? 1 : 0;"
+      (c, evPrim, evNull) => s"$evPrim = $c ? 1 : 0;"
     case DateType =>
-      (c, evPrim, evNull) =>
-        s"$evNull = true;"
+      (c, evPrim, evNull) => s"$evNull = true;"
     case TimestampType =>
-      (c, evPrim, evNull) =>
-        s"$evPrim = (int) ${timestampToIntegerCode(c)};"
+      (c, evPrim, evNull) => s"$evPrim = (int) ${timestampToIntegerCode(c)};"
     case DecimalType() =>
-      (c, evPrim, evNull) =>
-        s"$evPrim = $c.toInt();"
+      (c, evPrim, evNull) => s"$evPrim = $c.toInt();"
     case x: NumericType =>
-      (c, evPrim, evNull) =>
-        s"$evPrim = (int) $c;"
+      (c, evPrim, evNull) => s"$evPrim = (int) $c;"
   }
 
   private[this] def castToLongCode(from: DataType): CastFunction = from match {
     case StringType =>
-      (c, evPrim, evNull) =>
-        s"""
+      (c, evPrim, evNull) => s"""
           try {
             $evPrim = Long.valueOf($c.toString());
           } catch (java.lang.NumberFormatException e) {
@@ -910,27 +856,21 @@ case class Cast(child: Expression, dataType: DataType) extends UnaryExpression {
           }
         """
     case BooleanType =>
-      (c, evPrim, evNull) =>
-        s"$evPrim = $c ? 1L : 0L;"
+      (c, evPrim, evNull) => s"$evPrim = $c ? 1L : 0L;"
     case DateType =>
-      (c, evPrim, evNull) =>
-        s"$evNull = true;"
+      (c, evPrim, evNull) => s"$evNull = true;"
     case TimestampType =>
-      (c, evPrim, evNull) =>
-        s"$evPrim = (long) ${timestampToIntegerCode(c)};"
+      (c, evPrim, evNull) => s"$evPrim = (long) ${timestampToIntegerCode(c)};"
     case DecimalType() =>
-      (c, evPrim, evNull) =>
-        s"$evPrim = $c.toLong();"
+      (c, evPrim, evNull) => s"$evPrim = $c.toLong();"
     case x: NumericType =>
-      (c, evPrim, evNull) =>
-        s"$evPrim = (long) $c;"
+      (c, evPrim, evNull) => s"$evPrim = (long) $c;"
   }
 
   private[this] def castToFloatCode(from: DataType): CastFunction =
     from match {
       case StringType =>
-        (c, evPrim, evNull) =>
-          s"""
+        (c, evPrim, evNull) => s"""
           try {
             $evPrim = Float.valueOf($c.toString());
           } catch (java.lang.NumberFormatException e) {
@@ -938,27 +878,22 @@ case class Cast(child: Expression, dataType: DataType) extends UnaryExpression {
           }
         """
       case BooleanType =>
-        (c, evPrim, evNull) =>
-          s"$evPrim = $c ? 1.0f : 0.0f;"
+        (c, evPrim, evNull) => s"$evPrim = $c ? 1.0f : 0.0f;"
       case DateType =>
-        (c, evPrim, evNull) =>
-          s"$evNull = true;"
+        (c, evPrim, evNull) => s"$evNull = true;"
       case TimestampType =>
         (c, evPrim, evNull) =>
           s"$evPrim = (float) (${timestampToDoubleCode(c)});"
       case DecimalType() =>
-        (c, evPrim, evNull) =>
-          s"$evPrim = $c.toFloat();"
+        (c, evPrim, evNull) => s"$evPrim = $c.toFloat();"
       case x: NumericType =>
-        (c, evPrim, evNull) =>
-          s"$evPrim = (float) $c;"
+        (c, evPrim, evNull) => s"$evPrim = (float) $c;"
     }
 
   private[this] def castToDoubleCode(from: DataType): CastFunction =
     from match {
       case StringType =>
-        (c, evPrim, evNull) =>
-          s"""
+        (c, evPrim, evNull) => s"""
           try {
             $evPrim = Double.valueOf($c.toString());
           } catch (java.lang.NumberFormatException e) {
@@ -966,20 +901,15 @@ case class Cast(child: Expression, dataType: DataType) extends UnaryExpression {
           }
         """
       case BooleanType =>
-        (c, evPrim, evNull) =>
-          s"$evPrim = $c ? 1.0d : 0.0d;"
+        (c, evPrim, evNull) => s"$evPrim = $c ? 1.0d : 0.0d;"
       case DateType =>
-        (c, evPrim, evNull) =>
-          s"$evNull = true;"
+        (c, evPrim, evNull) => s"$evNull = true;"
       case TimestampType =>
-        (c, evPrim, evNull) =>
-          s"$evPrim = ${timestampToDoubleCode(c)};"
+        (c, evPrim, evNull) => s"$evPrim = ${timestampToDoubleCode(c)};"
       case DecimalType() =>
-        (c, evPrim, evNull) =>
-          s"$evPrim = $c.toDouble();"
+        (c, evPrim, evNull) => s"$evPrim = $c.toDouble();"
       case x: NumericType =>
-        (c, evPrim, evNull) =>
-          s"$evPrim = (double) $c;"
+        (c, evPrim, evNull) => s"$evPrim = (double) $c;"
     }
 
   private[this] def castArrayCode(
@@ -1115,8 +1045,7 @@ case class Cast(child: Expression, dataType: DataType) extends UnaryExpression {
       }
       .mkString("\n")
 
-    (c, evPrim, evNull) =>
-      s"""
+    (c, evPrim, evNull) => s"""
         final $rowClass $result = new $rowClass(${fieldsCasts.length});
         final InternalRow $tmpRow = $c;
         $fieldsEvalCode

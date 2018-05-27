@@ -473,9 +473,9 @@ object Buf {
   def hash(buf: Buf): Int = finishHash(hashBuf(buf))
 
   // Adapted from util-hashing.
-  private[this] val UintMax: Long = 0xFFFFFFFFL
+  private[this] val UintMax: Long = 0XFFFFFFFFL
   private[this] val Fnv1a32Prime: Int = 16777619
-  private[this] val Fnv1a32Init: Long = 0x811c9dc5L
+  private[this] val Fnv1a32Init: Long = 0X811C9DC5L
   private[this] def finishHash(hash: Long): Int = (hash & UintMax).toInt
   private[this] def hashBuf(buf: Buf, init: Long = Fnv1a32Init): Long =
     buf match {

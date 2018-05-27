@@ -11,7 +11,7 @@ package com.twitter.finagle.util
   */
 private[finagle] class Ema(window: Long) {
   private[this] var time = Long.MinValue
-  private[this] var ema = 0D
+  private[this] var ema = 0d
 
   def isEmpty: Boolean = synchronized { time < 0 }
 

@@ -464,7 +464,9 @@ abstract class ClassfileParser {
       } else
         raiseLoaderLevel {
           val superType =
-            if (jflags.isAnnotation) { u2; AnnotationClass.tpe } else
+            if (jflags.isAnnotation) {
+              u2; AnnotationClass.tpe
+            } else
               pool.getSuperClass(u2).tpe_*
           val ifaceCount = u2
           var ifaces = for (i <- List.range(0, ifaceCount))

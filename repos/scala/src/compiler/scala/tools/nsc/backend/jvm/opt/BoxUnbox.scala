@@ -354,7 +354,7 @@ class BoxUnbox[BT <: BTypes](val btypes: BT) {
                   case ops =>
                     toReplace(extraction.consumer) = ops
                     toDelete ++= extraction.allInsns - extraction.consumer
-              })
+                })
           } else {
             for (extraction <- allConsumers) {
               val valueIndex = boxKind.extractedValueIndex(extraction)
@@ -505,7 +505,7 @@ class BoxUnbox[BT <: BTypes](val btypes: BT) {
             addBoxConsumers(boxCreation)
 
           case _ => false
-      })
+        })
     }
 
     def addBoxConsumers(creation: BoxCreation): Boolean = {
@@ -524,7 +524,7 @@ class BoxUnbox[BT <: BTypes](val btypes: BT) {
               consumers += EscapingConsumer(cons)
               true
             }
-      })
+        })
     }
 
     if (addBoxConsumers(initialCreation)) Some((creations, consumers))

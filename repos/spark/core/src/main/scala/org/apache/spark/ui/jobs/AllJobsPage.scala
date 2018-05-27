@@ -200,8 +200,11 @@ private[ui] class AllJobsPage(parent: JobsTab) extends WebUIPage("") {
         </div>
       </div>
     </div> ++ <script type="text/javascript">
-      {Unparsed(s"drawApplicationTimeline(${groupJsonArrayAsStr}," +
-      s"${eventArrayAsStr}, ${startTime});")}
+      {
+      Unparsed(
+        s"drawApplicationTimeline(${groupJsonArrayAsStr}," +
+          s"${eventArrayAsStr}, ${startTime});")
+    }
     </script>
   }
 
@@ -246,16 +249,26 @@ private[ui] class AllJobsPage(parent: JobsTab) extends WebUIPage("") {
         <td sorttable_customkey={job.submissionTime.getOrElse(-1).toString}>
           {formattedSubmissionTime}
         </td>
-        <td sorttable_customkey={duration.getOrElse(-1).toString}>{formattedDuration}</td>
+        <td sorttable_customkey={duration.getOrElse(-1).toString}>{
+        formattedDuration
+      }</td>
         <td class="stage-progress-cell">
-          {job.completedStageIndices.size}/{job.stageIds.size - job.numSkippedStages}
+          {job.completedStageIndices.size}/{
+        job.stageIds.size - job.numSkippedStages
+      }
           {if (job.numFailedStages > 0) s"(${job.numFailedStages} failed)"}
           {if (job.numSkippedStages > 0) s"(${job.numSkippedStages} skipped)"}
         </td>
         <td class="progress-cell">
-          {UIUtils.makeProgressBar(started = job.numActiveTasks, completed = job.numCompletedTasks,
-           failed = job.numFailedTasks, skipped = job.numSkippedTasks,
-           total = job.numTasks - job.numSkippedTasks)}
+          {
+        UIUtils.makeProgressBar(
+          started = job.numActiveTasks,
+          completed = job.numCompletedTasks,
+          failed = job.numFailedTasks,
+          skipped = job.numSkippedTasks,
+          total = job.numTasks - job.numSkippedTasks
+        )
+      }
         </td>
       </tr>
     }
@@ -300,41 +313,41 @@ private[ui] class AllJobsPage(parent: JobsTab) extends WebUIPage("") {
             <li>
               <strong>Total Uptime:</strong>
               {
-                if (endTime < 0 && parent.sc.isDefined) {
-                  UIUtils.formatDuration(System.currentTimeMillis() - startTime)
-                } else if (endTime > 0) {
-                  UIUtils.formatDuration(endTime - startTime)
-                }
-              }
+        if (endTime < 0 && parent.sc.isDefined) {
+          UIUtils.formatDuration(System.currentTimeMillis() - startTime)
+        } else if (endTime > 0) {
+          UIUtils.formatDuration(endTime - startTime)
+        }
+      }
             </li>
             <li>
               <strong>Scheduling Mode: </strong>
               {listener.schedulingMode.map(_.toString).getOrElse("Unknown")}
             </li>
             {
-              if (shouldShowActiveJobs) {
-                <li>
+        if (shouldShowActiveJobs) {
+          <li>
                   <a href="#active"><strong>Active Jobs:</strong></a>
                   {activeJobs.size}
                 </li>
-              }
-            }
+        }
+      }
             {
-              if (shouldShowCompletedJobs) {
-                <li id="completed-summary">
+        if (shouldShowCompletedJobs) {
+          <li id="completed-summary">
                   <a href="#completed"><strong>Completed Jobs:</strong></a>
                   {completedJobNumStr}
                 </li>
-              }
-            }
+        }
+      }
             {
-              if (shouldShowFailedJobs) {
-                <li>
+        if (shouldShowFailedJobs) {
+          <li>
                   <a href="#failed"><strong>Failed Jobs:</strong></a>
                   {listener.numFailedJobs}
                 </li>
-              }
-            }
+        }
+      }
           </ul>
         </div>
 

@@ -378,7 +378,7 @@ object Schemifier extends Loggable {
             logger.trace(
               "Column exists: %s.%s ".format(table.dbTableName, columnName))
           }
-      })
+        })
       // FIXME deal with column types
       (field
         .dbColumnNames(field.name)
@@ -541,7 +541,7 @@ object Schemifier extends Loggable {
                 foundIt =
                   (field._dbColumnNameLC.toLowerCase == fkName.toLowerCase &&
                     field.dbKeyToColumn._dbColumnNameLC.toLowerCase == pkName.toLowerCase)
-            })
+              })
 
             if (!foundIt) {
               cmds += maybeWrite(performWrite, logFunc, connection) { () =>

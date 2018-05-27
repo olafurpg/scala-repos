@@ -663,7 +663,11 @@ object Test9_parallel {
 
 object Test10_util {
   import scala.util.Random
-  def rep[A](n: Int)(f: => A) { if (n > 0) { f; rep(n - 1)(f) } }
+  def rep[A](n: Int)(f: => A) {
+    if (n > 0) {
+      f; rep(n - 1)(f)
+    }
+  }
 
   {
     val random = new Random(345)

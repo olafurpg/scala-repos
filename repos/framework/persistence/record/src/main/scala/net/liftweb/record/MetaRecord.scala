@@ -367,7 +367,7 @@ trait MetaRecord[BaseRecord <: Record[BaseRecord]] { self: BaseRecord =>
                 child = toForm(inst, elem.child.flatMap(n => toForm(inst, n))))
 
             case x => x
-        })
+          })
     }
   }
 
@@ -416,8 +416,7 @@ trait MetaRecord[BaseRecord <: Record[BaseRecord]] { self: BaseRecord =>
 
       def apply(r: Req): () => Box[LiftResponse] = {
         val rec = fromReq(r)
-        () =>
-          func(r)(rec)
+        () => func(r)(rec)
       }
     }
 

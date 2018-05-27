@@ -67,7 +67,7 @@ object Env {
       appleCertificate = path =>
         lila.common.PlayApp.withApp {
           _.classloader.getResourceAsStream(path)
-      },
+        },
       config = lila.common.PlayApp loadConfig "push"
     )
 }

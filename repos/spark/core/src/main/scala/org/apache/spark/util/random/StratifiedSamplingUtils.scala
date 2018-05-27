@@ -86,57 +86,56 @@ private[spark] object StratifiedSamplingUtils extends Logging {
       mutable.Map[K, AcceptanceResult],
       (K, V)) => mutable.Map[K, AcceptanceResult] = {
     val delta = 5e-5
-    (result: mutable.Map[K, AcceptanceResult], item: (K, V)) =>
-      {
-        val key = item._1
-        val fraction = fractions(key)
-        if (!result.contains(key)) {
-          result += (key -> new AcceptanceResult())
-        }
-        val acceptResult = result(key)
-
-        if (withReplacement) {
-          // compute acceptBound and waitListBound only if they haven't been computed already
-          // since they don't change from iteration to iteration.
-          // TODO change this to the streaming version
-          if (acceptResult.areBoundsEmpty) {
-            val n = counts.get(key)
-            val sampleSize = math.ceil(n * fraction).toLong
-            val lmbd1 = PoissonBounds.getLowerBound(sampleSize)
-            val lmbd2 = PoissonBounds.getUpperBound(sampleSize)
-            acceptResult.acceptBound = lmbd1 / n
-            acceptResult.waitListBound = (lmbd2 - lmbd1) / n
-          }
-          val acceptBound = acceptResult.acceptBound
-          val copiesAccepted =
-            if (acceptBound == 0.0) 0L else rng.nextPoisson(acceptBound)
-          if (copiesAccepted > 0) {
-            acceptResult.numAccepted += copiesAccepted
-          }
-          val copiesWaitlisted = rng.nextPoisson(acceptResult.waitListBound)
-          if (copiesWaitlisted > 0) {
-            acceptResult.waitList ++=
-              ArrayBuffer.fill(copiesWaitlisted)(rng.nextUniform())
-          }
-        } else {
-          // We use the streaming version of the algorithm for sampling without replacement to avoid
-          // using an extra pass over the RDD for computing the count.
-          // Hence, acceptBound and waitListBound change on every iteration.
-          acceptResult.acceptBound =
-            BinomialBounds.getLowerBound(delta, acceptResult.numItems, fraction)
-          acceptResult.waitListBound =
-            BinomialBounds.getUpperBound(delta, acceptResult.numItems, fraction)
-
-          val x = rng.nextUniform()
-          if (x < acceptResult.acceptBound) {
-            acceptResult.numAccepted += 1
-          } else if (x < acceptResult.waitListBound) {
-            acceptResult.waitList += x
-          }
-        }
-        acceptResult.numItems += 1
-        result
+    (result: mutable.Map[K, AcceptanceResult], item: (K, V)) => {
+      val key = item._1
+      val fraction = fractions(key)
+      if (!result.contains(key)) {
+        result += (key -> new AcceptanceResult())
       }
+      val acceptResult = result(key)
+
+      if (withReplacement) {
+        // compute acceptBound and waitListBound only if they haven't been computed already
+        // since they don't change from iteration to iteration.
+        // TODO change this to the streaming version
+        if (acceptResult.areBoundsEmpty) {
+          val n = counts.get(key)
+          val sampleSize = math.ceil(n * fraction).toLong
+          val lmbd1 = PoissonBounds.getLowerBound(sampleSize)
+          val lmbd2 = PoissonBounds.getUpperBound(sampleSize)
+          acceptResult.acceptBound = lmbd1 / n
+          acceptResult.waitListBound = (lmbd2 - lmbd1) / n
+        }
+        val acceptBound = acceptResult.acceptBound
+        val copiesAccepted =
+          if (acceptBound == 0.0) 0L else rng.nextPoisson(acceptBound)
+        if (copiesAccepted > 0) {
+          acceptResult.numAccepted += copiesAccepted
+        }
+        val copiesWaitlisted = rng.nextPoisson(acceptResult.waitListBound)
+        if (copiesWaitlisted > 0) {
+          acceptResult.waitList ++=
+            ArrayBuffer.fill(copiesWaitlisted)(rng.nextUniform())
+        }
+      } else {
+        // We use the streaming version of the algorithm for sampling without replacement to avoid
+        // using an extra pass over the RDD for computing the count.
+        // Hence, acceptBound and waitListBound change on every iteration.
+        acceptResult.acceptBound =
+          BinomialBounds.getLowerBound(delta, acceptResult.numItems, fraction)
+        acceptResult.waitListBound =
+          BinomialBounds.getUpperBound(delta, acceptResult.numItems, fraction)
+
+        val x = rng.nextUniform()
+        if (x < acceptResult.acceptBound) {
+          acceptResult.numAccepted += 1
+        } else if (x < acceptResult.waitListBound) {
+          acceptResult.waitList += x
+        }
+      }
+      acceptResult.numItems += 1
+      result
+    }
   }
 
   /**
@@ -220,14 +219,13 @@ private[spark] object StratifiedSamplingUtils extends Logging {
       val finalResult = getAcceptanceResults(rdd, false, fractions, None, seed)
       samplingRateByKey = computeThresholdByKey(finalResult, fractions)
     }
-    (idx: Int, iter: Iterator[(K, V)]) =>
-      {
-        val rng = new RandomDataGenerator()
-        rng.reSeed(seed + idx)
-        // Must use the same invoke pattern on the rng as in getSeqOp for without replacement
-        // in order to generate the same sequence of random numbers when creating the sample
-        iter.filter(t => rng.nextUniform() < samplingRateByKey(t._1))
-      }
+    (idx: Int, iter: Iterator[(K, V)]) => {
+      val rng = new RandomDataGenerator()
+      rng.reSeed(seed + idx)
+      // Must use the same invoke pattern on the rng as in getSeqOp for without replacement
+      // in order to generate the same sequence of random numbers when creating the sample
+      iter.filter(t => rng.nextUniform() < samplingRateByKey(t._1))
+    }
   }
 
   /**
@@ -250,29 +248,28 @@ private[spark] object StratifiedSamplingUtils extends Logging {
       val counts = Some(rdd.countByKey())
       val finalResult = getAcceptanceResults(rdd, true, fractions, counts, seed)
       val thresholdByKey = computeThresholdByKey(finalResult, fractions)
-      (idx: Int, iter: Iterator[(K, V)]) =>
-        {
-          val rng = new RandomDataGenerator()
-          rng.reSeed(seed + idx)
-          iter.flatMap { item =>
-            val key = item._1
-            val acceptBound = finalResult(key).acceptBound
-            // Must use the same invoke pattern on the rng as in getSeqOp for with replacement
-            // in order to generate the same sequence of random numbers when creating the sample
-            val copiesAccepted =
-              if (acceptBound == 0) 0L else rng.nextPoisson(acceptBound)
-            val copiesWaitlisted =
-              rng.nextPoisson(finalResult(key).waitListBound)
-            val copiesInSample =
-              copiesAccepted + (0 until copiesWaitlisted).count(i =>
-                rng.nextUniform() < thresholdByKey(key))
-            if (copiesInSample > 0) {
-              Iterator.fill(copiesInSample.toInt)(item)
-            } else {
-              Iterator.empty
-            }
+      (idx: Int, iter: Iterator[(K, V)]) => {
+        val rng = new RandomDataGenerator()
+        rng.reSeed(seed + idx)
+        iter.flatMap { item =>
+          val key = item._1
+          val acceptBound = finalResult(key).acceptBound
+          // Must use the same invoke pattern on the rng as in getSeqOp for with replacement
+          // in order to generate the same sequence of random numbers when creating the sample
+          val copiesAccepted =
+            if (acceptBound == 0) 0L else rng.nextPoisson(acceptBound)
+          val copiesWaitlisted =
+            rng.nextPoisson(finalResult(key).waitListBound)
+          val copiesInSample =
+            copiesAccepted + (0 until copiesWaitlisted).count(i =>
+              rng.nextUniform() < thresholdByKey(key))
+          if (copiesInSample > 0) {
+            Iterator.fill(copiesInSample.toInt)(item)
+          } else {
+            Iterator.empty
           }
         }
+      }
     } else { (idx: Int, iter: Iterator[(K, V)]) =>
       {
         val rng = new RandomDataGenerator()

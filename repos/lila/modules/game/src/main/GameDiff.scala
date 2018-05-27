@@ -66,7 +66,7 @@ private[game] object GameDiff {
       (o: Option[Clock]) =>
         o map { c =>
           BSONHandlers.clockBSONWrite(a.createdAt, c)
-      })
+        })
     dOpt(
       checkCount,
       _.checkCount,

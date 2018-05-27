@@ -375,7 +375,7 @@ trait BlockStoreColumnarTableModule[M[+ _]]
       }
     }
     object JDBMState {
-      def empty(prefix: String) = JDBMState(prefix, None, Map(), 0l)
+      def empty(prefix: String) = JDBMState(prefix, None, Map(), 0L)
     }
 
     case class WriteState(
@@ -388,7 +388,7 @@ trait BlockStoreColumnarTableModule[M[+ _]]
 
     object addGlobalIdScanner extends CScanner {
       type A = Long
-      val init = 0l
+      val init = 0L
       def scan(
           a: Long,
           cols: Map[ColumnRef, Column],

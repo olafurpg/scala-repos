@@ -175,7 +175,11 @@ trait ResolvableStableCodeReferenceElement
         }
       case ScalaResolveResult(typed: ScTypedDefinition, s) =>
         val fromType =
-          s.subst(typed.getType(TypingContext.empty).getOrElse(return ))
+          s.subst(
+            typed
+              .getType(TypingContext.empty)
+              .getOrElse(return
+              ))
         processor.processType(
           fromType,
           this,

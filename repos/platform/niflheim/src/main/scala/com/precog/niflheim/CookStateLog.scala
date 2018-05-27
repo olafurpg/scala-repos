@@ -66,7 +66,7 @@ class CookStateLog(baseDir: File, scheduler: ScheduledExecutorService)
   // Maps from blockId to txKey
   private[this] var pendingCookIds0 = SortedMap.empty[Long, Long]
 
-  private[this] var currentBlockId0 = -1l
+  private[this] var currentBlockId0 = -1L
 
   def pendingCookIds: List[Long] = pendingCookIds0.keys.toList
 

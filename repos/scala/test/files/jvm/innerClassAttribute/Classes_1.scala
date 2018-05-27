@@ -109,7 +109,9 @@ class A18 {
       class A
       new A6 {}
       val y = {
-        if ((new Object).hashCode() == 1) { class B {}; new B } else 2
+        if ((new Object).hashCode() == 1) {
+          class B {}; new B
+        } else 2
         if ((new Object).hashCode() == 1) new A6 {} else "haifish"
       }
     }
@@ -118,10 +120,12 @@ class A18 {
 
 class A19 { ((x: String) => x + "3")
 
-val x = { ((x: String) => x + "1")
+val x = { ((x: String) =>
+  x + "1")
 }
 
-{ ((x: String) => x + "2")
+{ ((x: String) =>
+  x + "2")
 }
 }
 

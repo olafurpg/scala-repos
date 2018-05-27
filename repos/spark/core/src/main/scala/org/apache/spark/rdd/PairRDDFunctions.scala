@@ -856,7 +856,7 @@ class PairRDDFunctions[K, V](self: RDD[(K, V)])(
           iter.flatMap {
             case (k, v) =>
               cleanF(v).map(x => (k, x))
-        },
+          },
         preservesPartitioning = true)
     }
 

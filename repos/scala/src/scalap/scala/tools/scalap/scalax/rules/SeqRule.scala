@@ -31,24 +31,19 @@ class InRule[In, +Out, +A, +X](rule: Rule[In, Out, A, X]) {
   /** Creates a rule that succeeds only if the original rule would fail on the given context. */
   def unary_! : Rule[In, In, Unit, Nothing] = mapRule {
     case Success(_, _) =>
-      in: In =>
-        Failure
+      in: In => Failure
     case _ =>
-      in: In =>
-        Success(in, ())
+      in: In => Success(in, ())
   }
 
   /** Creates a rule that succeeds if the original rule succeeds, but returns the original input. */
   def & : Rule[In, In, A, X] = mapRule {
     case Success(_, a) =>
-      in: In =>
-        Success(in, a)
+      in: In => Success(in, a)
     case Failure =>
-      in: In =>
-        Failure
+      in: In => Failure
     case Error(x) =>
-      in: In =>
-        Error(x)
+      in: In => Error(x)
   }
 }
 
@@ -57,14 +52,11 @@ class SeqRule[S, +A, +X](rule: Rule[S, S, A, X]) {
 
   def ? = rule mapRule {
     case Success(out, a) =>
-      in: S =>
-        Success(out, Some(a))
+      in: S => Success(out, Some(a))
     case Failure =>
-      in: S =>
-        Success(in, None)
+      in: S => Success(in, None)
     case Error(x) =>
-      in: S =>
-        Error(x)
+      in: S => Error(x)
   }
 
   /** Creates a rule that always succeeds with a Boolean value.
@@ -78,8 +70,7 @@ class SeqRule[S, +A, +X](rule: Rule[S, S, A, X]) {
       case Failure         => Success(in, acc.reverse)
       case err: Error[_]   => err
     }
-    in =>
-      rep(in, Nil)
+    in => rep(in, Nil)
   }
 
   def + = rule ~++ *
@@ -127,7 +118,6 @@ class SeqRule[S, +A, +X](rule: Rule[S, S, A, X]) {
           case err: Error[_] => err
         }
     }
-    in =>
-      rep(0, in)
+    in => rep(0, in)
   }
 }

@@ -40,7 +40,9 @@ object ByteIterator {
 
     final def next(): Byte = {
       if (!hasNext) Iterator.empty.next
-      else { val i = from; from = from + 1; array(i) }
+      else {
+        val i = from; from = from + 1; array(i)
+      }
     }
 
     def clear(): Unit = {
@@ -94,7 +96,11 @@ object ByteIterator {
     final override def dropWhile(p: Byte ⇒ Boolean): this.type = {
       var stop = false
       while (!stop && hasNext) {
-        if (p(array(from))) { from = from + 1 } else { stop = true }
+        if (p(array(from))) {
+          from = from + 1
+        } else {
+          stop = true
+        }
       }
       this
     }
@@ -512,7 +518,9 @@ abstract class ByteIterator extends BufferedIterator[Byte] {
   override def indexWhere(p: Byte ⇒ Boolean): Int = {
     var index = 0
     var found = false
-    while (!found && hasNext) if (p(next())) { found = true } else {
+    while (!found && hasNext) if (p(next())) {
+      found = true
+    } else {
       index += 1
     }
     if (found) index else -1

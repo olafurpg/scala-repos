@@ -185,15 +185,18 @@ private[concurrent] object ExecutionContextImpl {
       extends ForkJoinTask[Unit] {
     final override def setRawResult(u: Unit): Unit = ()
     final override def getRawResult(): Unit = ()
-    final override def exec(): Boolean = try { runnable.run(); true } catch {
-      case anything: Throwable =>
-        val t = Thread.currentThread
-        t.getUncaughtExceptionHandler match {
-          case null =>
-          case some => some.uncaughtException(t, anything)
-        }
-        throw anything
-    }
+    final override def exec(): Boolean =
+      try {
+        runnable.run(); true
+      } catch {
+        case anything: Throwable =>
+          val t = Thread.currentThread
+          t.getUncaughtExceptionHandler match {
+            case null =>
+            case some => some.uncaughtException(t, anything)
+          }
+          throw anything
+      }
   }
 
   def fromExecutor(

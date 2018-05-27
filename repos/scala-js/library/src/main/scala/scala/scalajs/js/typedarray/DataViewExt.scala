@@ -22,7 +22,7 @@ object DataViewExt {
         dataView.getInt32(index + (if (littleEndian) 4 else 0), littleEndian)
       val low =
         dataView.getInt32(index + (if (littleEndian) 0 else 4), littleEndian)
-      (high.toLong << 32) | (low.toLong & 0xffffffffL)
+      (high.toLong << 32) | (low.toLong & 0XFFFFFFFFL)
     }
 
     /** Writes a 2's complement signed 64-bit integers to the data view.

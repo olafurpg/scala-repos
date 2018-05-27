@@ -186,7 +186,7 @@ class CoreBTypes[BTFS <: BTypesFromSymbols[_ <: Global]](val bTypes: BTFS) {
       s.paramss match {
         case List(List(param)) => param.info.typeSymbol == cls
         case _                 => false
-    }
+      }
 
   // java/lang/Boolean -> MethodNameAndType(valueOf,(Z)Ljava/lang/Boolean;)
   lazy val javaBoxMethods: Map[InternalName, MethodNameAndType] = {

@@ -88,12 +88,10 @@ object Stopwatch extends Stopwatch {
   def start(): Elapsed = Time.localGetTime() match {
     case Some(local) =>
       val startAt: Time = local()
-      () =>
-        local() - startAt
+      () => local() - startAt
     case None =>
       val startAt: Long = systemNanos()
-      () =>
-        Duration.fromNanoseconds(systemNanos() - startAt)
+      () => Duration.fromNanoseconds(systemNanos() - startAt)
   }
 
   /**

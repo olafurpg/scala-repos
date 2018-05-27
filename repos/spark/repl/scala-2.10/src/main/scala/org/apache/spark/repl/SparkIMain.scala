@@ -154,8 +154,7 @@ class SparkIMain(
 
   private val nextReqId = {
     var counter = 0
-    () =>
-      { counter += 1; counter }
+    () => { counter += 1; counter }
   }
 
   private def compilerClasspath: Seq[URL] =
@@ -1433,7 +1432,9 @@ class SparkIMain(
 
     /** load and run the code using reflection */
     def loadAndRun: (String, Boolean) = {
-      try { ("" + (lineRep call sessionNames.print), true) } catch {
+      try {
+        ("" + (lineRep call sessionNames.print), true)
+      } catch {
         case ex: Throwable => (lineRep.bindError(ex), false)
       }
     }

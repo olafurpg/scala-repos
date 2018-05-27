@@ -38,11 +38,11 @@ class BernoulliTest
   def arbParameter = Arbitrary(arbitrary[Double].map(x => math.abs(x) % 1.0))
 
   def paramsClose(p: Double, b: Double) =
-    if (b == 0.0) p < 1E-4 else (p - b).abs / b.abs.max(1E-4) < 1E-1
+    if (b == 0.0) p < 1e-4 else (p - b).abs / b.abs.max(1e-4) < 1e-1
 
   implicit def arbDistr = Arbitrary {
     for (p <- arbitrary[Double].map { x =>
-           math.abs(x) % 1.0 + 1E-4
+           math.abs(x) % 1.0 + 1e-4
          }) yield new Bernoulli(p)
   }
 

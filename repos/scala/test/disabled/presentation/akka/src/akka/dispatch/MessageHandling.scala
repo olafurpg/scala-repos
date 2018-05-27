@@ -136,7 +136,7 @@ trait MessageDispatcher {
           }
         }
       }
-  }
+    }
 
   private[akka] def register(actorRef: ActorRef) {
     if (actorRef.mailbox eq null) actorRef.mailbox = createMailbox(actorRef)

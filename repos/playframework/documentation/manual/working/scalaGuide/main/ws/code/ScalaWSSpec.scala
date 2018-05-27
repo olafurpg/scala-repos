@@ -310,7 +310,7 @@ class ScalaWSSpec extends PlaySpecification with Results with AfterAll {
           })
         }
         //#stream-count-bytes
-        await(bytesReturned) must_== 10000l
+        await(bytesReturned) must_== 10000L
       }
 
       "stream to a file" in withServer {
@@ -385,8 +385,8 @@ class ScalaWSSpec extends PlaySpecification with Results with AfterAll {
         val file = File.createTempFile("stream-to-file-", ".txt")
         await(
           downloadFile(FakeRequest())
-            .flatMap(_.body.dataStream.runFold(0l)((t, b) => t + b.length))
-        ) must_== 10000l
+            .flatMap(_.body.dataStream.runFold(0L)((t, b) => t + b.length))
+        ) must_== 10000L
         file.delete()
       }
 
@@ -404,7 +404,7 @@ class ScalaWSSpec extends PlaySpecification with Results with AfterAll {
           })
         }
         //#stream-count-bytes
-        await(bytesReturned) must_== 10000l
+        await(bytesReturned) must_== 10000L
       }
 
       "stream request body" in withServer {

@@ -201,7 +201,9 @@ final class Eval(
         val extra = ev.read(cacheFile(back, moduleName))
         (extra, loader)
       case _ =>
-        try { compileAndLoad(run, unit, imports, backing, moduleName, ev) } finally {
+        try {
+          compileAndLoad(run, unit, imports, backing, moduleName, ev)
+        } finally {
           unlinkAll()
         }
     }

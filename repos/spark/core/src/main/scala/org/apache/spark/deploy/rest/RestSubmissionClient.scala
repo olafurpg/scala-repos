@@ -271,7 +271,9 @@ private[spark] class RestSubmissionClient(master: String) extends Logging {
       }
     }
 
-    try { Await.result(responseFuture, 10.seconds) } catch {
+    try {
+      Await.result(responseFuture, 10.seconds)
+    } catch {
       case unreachable @ (_: FileNotFoundException | _: SocketException) =>
         throw new SubmitRestConnectionException(
           "Unable to connect to server",

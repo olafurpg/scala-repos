@@ -57,8 +57,8 @@ trait PathReads {
                 a match {
                   case JsNull => JsSuccess(None)
                   case js     => reads.reads(js).repath(path).map(Some(_))
-              }
-          )
+                }
+            )
         )
   }
 
@@ -94,7 +94,7 @@ trait PathReads {
             .map(opath => o.deepMerge(opath))
         case _ =>
           JsError(JsPath(), ValidationError("error.expected.jsobject"))
-    })
+      })
 
   def jsPrune(path: JsPath) = Reads[JsObject](js => path.prune(js))
 }
@@ -114,7 +114,7 @@ trait ConstraintReads {
       js match {
         case JsNull => JsSuccess(None)
         case js     => rds.reads(js).map(Some(_))
-    })
+      })
 
   /** Stupidly reads a field as an Option mapping any error (format or missing field) to None */
   def optionNoError[A](implicit reads: Reads[A]): Reads[Option[A]] =
@@ -174,7 +174,7 @@ trait ConstraintReads {
           .reads(js)
           .flatMap { o =>
             regex.unapplySeq(o).map(_ => JsSuccess(o)).getOrElse(JsError(error))
-        })
+          })
 
   def email(implicit reads: Reads[String]): Reads[String] =
     pattern(

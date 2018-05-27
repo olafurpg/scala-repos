@@ -159,7 +159,7 @@ class RuntimeArrayTests extends FunSuite {
   }
 
   test("array-float") {
-    val p: Any = Array(1F, 2F, 3F)
+    val p: Any = Array(1f, 2f, 3f)
     val pickle = p.pickle
     assert(pickle.value === """
       |{

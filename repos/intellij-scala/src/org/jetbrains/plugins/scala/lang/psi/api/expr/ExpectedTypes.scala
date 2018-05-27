@@ -419,7 +419,7 @@ private[expr] object ExpectedTypes {
               tps = tps.map {
                 case (r, isDynamicNamed) =>
                   (call.updateAccordingToExpectedType(r), isDynamicNamed)
-            })
+              })
             tps.foreach {
               case (r, isDynamicNamed) =>
                 processArgsExpected(

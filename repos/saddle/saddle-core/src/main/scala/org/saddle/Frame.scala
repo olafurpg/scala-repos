@@ -1379,7 +1379,9 @@ class Frame[RX: ST: ORD, CX: ST: ORD, T: ST](
           result(loc) = v //   and save vec in array.
 
           loc += len // Increment offset into result array
-          if (loc >= cix.length) { off += 1; loc = off }
+          if (loc >= cix.length) {
+            off += 1; loc = off
+          }
         }
       }
 

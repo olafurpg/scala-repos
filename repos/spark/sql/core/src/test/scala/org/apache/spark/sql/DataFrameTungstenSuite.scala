@@ -36,7 +36,7 @@ class DataFrameTungstenSuite extends QueryTest with SharedSQLContext {
   }
 
   test("test struct type") {
-    val struct = Row(1, 2L, 3.0F, 3.0)
+    val struct = Row(1, 2L, 3.0f, 3.0)
     val data = sparkContext.parallelize(Seq(Row(1, struct)))
 
     val schema = new StructType()
@@ -55,7 +55,7 @@ class DataFrameTungstenSuite extends QueryTest with SharedSQLContext {
 
   test("test nested struct type") {
     val innerStruct = Row(1, "abcd")
-    val outerStruct = Row(1, 2L, 3.0F, 3.0, innerStruct, "efg")
+    val outerStruct = Row(1, 2L, 3.0f, 3.0, innerStruct, "efg")
     val data = sparkContext.parallelize(Seq(Row(1, outerStruct)))
 
     val schema = new StructType()

@@ -210,7 +210,7 @@ object ScalaPluginUpdater {
           case e: Throwable =>
             LOG.info("Failed to check plugin compatibility", e)
         }
-    })
+      })
   }
 
   def postCheckIdeaCompatibility(): Unit =

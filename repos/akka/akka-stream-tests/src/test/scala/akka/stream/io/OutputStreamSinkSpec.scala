@@ -32,7 +32,7 @@ class OutputStreamSinkSpec extends AkkaSpec(UnboundedMailboxConfig) {
             override def write(i: Int): Unit = ()
             override def write(bytes: Array[Byte]): Unit =
               p.ref ! ByteString(bytes).utf8String
-        }))
+          }))
 
       p.expectMsg(datas(0).utf8String)
       p.expectMsg(datas(1).utf8String)
@@ -48,7 +48,7 @@ class OutputStreamSinkSpec extends AkkaSpec(UnboundedMailboxConfig) {
           new OutputStream {
             override def write(i: Int): Unit = ()
             override def close() = p.ref ! "closed"
-        }))
+          }))
 
       p.expectMsg("closed")
     }
@@ -61,7 +61,7 @@ class OutputStreamSinkSpec extends AkkaSpec(UnboundedMailboxConfig) {
           override def write(bytes: Array[Byte]): Unit =
             p.ref ! ByteString(bytes).utf8String
           override def close() = p.ref ! "closed"
-      }))
+        }))
 
       p.expectMsg("closed")
     }

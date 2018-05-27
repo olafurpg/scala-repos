@@ -49,35 +49,49 @@ private[sql] class ExecutionPage(parent: SQLTab)
           val summary = <div>
           <ul class="unstyled">
             <li>
-              <strong>Submitted Time: </strong>{UIUtils.formatDate(executionUIData.submissionTime)}
+              <strong>Submitted Time: </strong>{
+            UIUtils.formatDate(executionUIData.submissionTime)
+          }
             </li>
             <li>
               <strong>Duration: </strong>{UIUtils.formatDuration(duration)}
             </li>
-            {if (executionUIData.runningJobs.nonEmpty) {
+            {
+            if (executionUIData.runningJobs.nonEmpty) {
               <li>
                 <strong>Running Jobs: </strong>
-                {executionUIData.runningJobs.sorted.map { jobId =>
-                <a href={jobURL(jobId)}>{jobId.toString}</a><span>&nbsp;</span>
-              }}
+                {
+                executionUIData.runningJobs.sorted.map { jobId =>
+                  <a href={jobURL(jobId)}>{jobId.toString}</a><span>&nbsp;</span>
+                }
+              }
               </li>
-            }}
-            {if (executionUIData.succeededJobs.nonEmpty) {
+            }
+          }
+            {
+            if (executionUIData.succeededJobs.nonEmpty) {
               <li>
                 <strong>Succeeded Jobs: </strong>
-                {executionUIData.succeededJobs.sorted.map { jobId =>
+                {
+                executionUIData.succeededJobs.sorted.map { jobId =>
                   <a href={jobURL(jobId)}>{jobId.toString}</a><span>&nbsp;</span>
-                }}
+                }
+              }
               </li>
-            }}
-            {if (executionUIData.failedJobs.nonEmpty) {
+            }
+          }
+            {
+            if (executionUIData.failedJobs.nonEmpty) {
               <li>
                 <strong>Failed Jobs: </strong>
-                {executionUIData.failedJobs.sorted.map { jobId =>
+                {
+                executionUIData.failedJobs.sorted.map { jobId =>
                   <a href={jobURL(jobId)}>{jobId.toString}</a><span>&nbsp;</span>
-                }}
+                }
+              }
               </li>
-            }}
+            }
+          }
           </ul>
         </div>
 
@@ -101,7 +115,9 @@ private[sql] class ExecutionPage(parent: SQLTab)
 
   private def planVisualizationResources: Seq[Node] = {
     // scalastyle:off
-    <link rel="stylesheet" href={UIUtils.prependBaseUri("/static/sql/spark-sql-viz.css")} type="text/css"/>
+    <link rel="stylesheet" href={
+      UIUtils.prependBaseUri("/static/sql/spark-sql-viz.css")
+    } type="text/css"/>
     <script src={UIUtils.prependBaseUri("/static/d3.min.js")}></script>
     <script src={UIUtils.prependBaseUri("/static/dagre-d3.min.js")}></script>
     <script src={UIUtils.prependBaseUri("/static/graphlib-dot.min.js")}></script>

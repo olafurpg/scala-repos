@@ -58,7 +58,7 @@ object LinearAlgebraExamples extends App {
             newtype(
               gen.from((gen.to(p) :: gen.to(other.tupled) :: HNil).transpose
                 .map(sum)))
-      }
+        }
   }
 
   def Vector(p: Double) =

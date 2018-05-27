@@ -662,7 +662,7 @@ object ScalaDocumentationProvider {
                     }
                   case _ =>
                 }
-          })
+            })
 
           buffer.append(" \n")
         }

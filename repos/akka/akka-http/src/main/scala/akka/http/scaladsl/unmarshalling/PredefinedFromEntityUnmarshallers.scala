@@ -14,7 +14,7 @@ trait PredefinedFromEntityUnmarshallers extends MultipartUnmarshallers {
       implicit mat ⇒ {
         case HttpEntity.Strict(_, data) ⇒ FastFuture.successful(data)
         case entity ⇒ entity.dataBytes.runFold(ByteString.empty)(_ ++ _)
-    })
+      })
 
   implicit def byteArrayUnmarshaller: FromEntityUnmarshaller[Array[Byte]] =
     byteStringUnmarshaller.map(_.toArray[Byte])

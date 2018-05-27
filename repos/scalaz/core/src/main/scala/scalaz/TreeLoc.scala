@@ -181,7 +181,7 @@ final case class TreeLoc[A](
       val f = () =>
         std.stream.unfold(tz.firstChild) { (o: Option[TreeLoc[A]]) =>
           for (c <- o) yield (c, c.right)
-      }
+        }
       (tz, f)
     }
     def uf[A](
@@ -298,7 +298,7 @@ sealed abstract class TreeLocInstances {
                         lefts = lefts.head #:: lefts.tail,
                         rights = rights.head #:: rights.tail,
                         parents = parents.head #:: parents.tail
-                    )
+                      )
                   )
                 case Empty =>
                   G.apply3(fa.tree.traverse1(f), lefts1, rights1)(
@@ -308,7 +308,7 @@ sealed abstract class TreeLocInstances {
                         lefts = lefts.head #:: lefts.tail,
                         rights = rights.head #:: rights.tail,
                         parents = Empty
-                    )
+                      )
                   )
               }
             case Empty =>
@@ -324,7 +324,7 @@ sealed abstract class TreeLocInstances {
                         lefts = lefts.head #:: lefts.tail,
                         rights = Empty,
                         parents = parents.head #:: parents.tail
-                    )
+                      )
                   )
                 case Empty =>
                   G.apply2(fa.tree.traverse1(f), lefts1)(
@@ -334,7 +334,7 @@ sealed abstract class TreeLocInstances {
                         lefts = lefts.head #:: lefts.tail,
                         rights = Empty,
                         parents = Empty
-                    )
+                      )
                   )
               }
           }
@@ -354,7 +354,7 @@ sealed abstract class TreeLocInstances {
                         lefts = Empty,
                         rights = rights.head #:: rights.tail,
                         parents = parents.head #:: parents.tail
-                    )
+                      )
                   )
                 case Empty =>
                   G.apply2(fa.tree.traverse1(f), rights1)(
@@ -364,7 +364,7 @@ sealed abstract class TreeLocInstances {
                         lefts = Empty,
                         rights = rights.head #:: rights.tail,
                         parents = Empty
-                    )
+                      )
                   )
               }
             case Empty =>
@@ -379,7 +379,7 @@ sealed abstract class TreeLocInstances {
                         lefts = Empty,
                         rights = Empty,
                         parents = parents.head #:: parents.tail
-                    )
+                      )
                   )
                 case Empty =>
                   G.map(fa.tree.traverse1(f))(t =>

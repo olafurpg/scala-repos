@@ -298,12 +298,12 @@ trait ExtensionMethodConversions {
       c: Rep[Option[B1]]): OptionColumnExtensionMethods[B1] =
     new OptionColumnExtensionMethods[B1](c)
   implicit def numericColumnExtensionMethods[B1](c: Rep[B1])(
-      implicit tm: BaseTypedType[B1] with NumericTypedType)
-    : BaseNumericColumnExtensionMethods[B1] =
+      implicit tm: BaseTypedType[B1]
+        with NumericTypedType): BaseNumericColumnExtensionMethods[B1] =
     new BaseNumericColumnExtensionMethods[B1](c)
   implicit def numericOptionColumnExtensionMethods[B1](c: Rep[Option[B1]])(
-      implicit tm: BaseTypedType[B1] with NumericTypedType)
-    : OptionNumericColumnExtensionMethods[B1] =
+      implicit tm: BaseTypedType[B1]
+        with NumericTypedType): OptionNumericColumnExtensionMethods[B1] =
     new OptionNumericColumnExtensionMethods[B1](c)
   implicit def stringColumnExtensionMethods(
       c: Rep[String]): StringColumnExtensionMethods[String] =

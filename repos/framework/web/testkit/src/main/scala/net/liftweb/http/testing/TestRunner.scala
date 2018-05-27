@@ -230,10 +230,9 @@ class Item(
     (func, forkFunc) match {
       case (Full(f), _) => f
       case (_, Full(cf)) =>
-        () =>
-          cf(cnt)
+        () => cf(cnt)
       case _ => () =>
-      }
+    }
   }
 }
 

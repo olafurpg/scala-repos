@@ -8,7 +8,7 @@ import breeze.linalg._
   * @author dlwh
   */
 object InteriorPoint {
-  val TOLERANCE = 1E-18
+  val TOLERANCE = 1e-18
 
   /**
     *
@@ -85,7 +85,7 @@ object InteriorPoint {
       b: DenseVector[Double],
       c: DenseVector[Double],
       x0: DenseVector[Double]) = {
-    val s = max(A * x0 - b) + 1E-7
+    val s = max(A * x0 - b) + 1e-7
     val newA = DenseMatrix.zeros[Double](A.rows + 1, A.cols + 1)
     newA(0 until A.rows, 0 until A.cols) := A
     newA(0 until A.rows + 1, A.cols) := -1.0
@@ -100,7 +100,7 @@ object InteriorPoint {
       throw new RuntimeException("Problem seems to be infeasible!")
     }
     val r = minimize(newA, newB, newC, newX)
-    if (r(x0.size) > 1E-8)
+    if (r(x0.size) > 1e-8)
       println("Problem appears to be infeasible: " + r(x0.size))
     r.slice(0, x0.size)
   }
@@ -152,7 +152,7 @@ object InteriorPoint {
       horzcat(A.t, zeros[Double](n, n + m)),
       horzcat(diag(s), zeros[Double](m, n), diag(z)))
 
-    diag(mat) += 1E-20
+    diag(mat) += 1e-20
 
     val r = DenseVector.zeros[Double](m + n + m)
     r.slice((m + n), (m + n + m)) -= (dsaff :* dzaff - sigma / m * (s dot z))

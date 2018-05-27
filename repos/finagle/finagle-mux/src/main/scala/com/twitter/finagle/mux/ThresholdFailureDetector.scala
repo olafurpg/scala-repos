@@ -70,7 +70,7 @@ private class ThresholdFailureDetector(
     x match {
       case _: TimeoutException => markBusy()
       case _                   =>
-  }
+    }
 
   def status: Status = state.get
 

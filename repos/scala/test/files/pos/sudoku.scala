@@ -40,7 +40,7 @@ object SudokuSolver extends App {
               val newaccu = search(x + 1, y, f, accu);
               m(y)(x) = '0';
               newaccu
-          },
+            },
           accu,
           1,
           10)

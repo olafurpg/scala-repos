@@ -48,7 +48,7 @@ object Test {
         Console.withErr(stream) {
           ScriptRunner.runCommand(settings, code, Nil)
         }
-    })
+      })
 
   val tests: List[(String, String)] = List(
     test1 -> output1,

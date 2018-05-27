@@ -35,7 +35,10 @@ class ScalaDeprecationInspection extends LocalInspectionTool {
         result: Option[ScalaResolveResult],
         elementToHighlight: PsiElement,
         name: String) {
-      val refElement = result.getOrElse(return ).element
+      val refElement = result
+        .getOrElse(return
+        )
+        .element
       refElement match {
         case param: ScParameter
             if result.get.isNamedParameter &&

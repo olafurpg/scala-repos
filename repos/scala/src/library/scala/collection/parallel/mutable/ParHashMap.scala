@@ -80,7 +80,9 @@ class ParHashMap[K, V] private[collection] (
   def put(key: K, value: V): Option[V] = {
     val e = findOrAddEntry(key, value)
     if (e eq null) None
-    else { val v = e.value; e.value = value; Some(v) }
+    else {
+      val v = e.value; e.value = value; Some(v)
+    }
   }
 
   def update(key: K, value: V): Unit = put(key, value)

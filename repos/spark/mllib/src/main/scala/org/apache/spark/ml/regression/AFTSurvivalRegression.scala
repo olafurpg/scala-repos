@@ -194,7 +194,7 @@ class AFTSurvivalRegression @Since("1.6.0")(
     */
   @Since("1.6.0")
   def setTol(value: Double): this.type = set(tol, value)
-  setDefault(tol -> 1E-6)
+  setDefault(tol -> 1e-6)
 
   /**
     * Extract [[featuresCol]], [[labelCol]] and [[censorCol]] from input dataset,
@@ -579,11 +579,11 @@ private class AFTCostFun(data: RDD[AFTPoint], fitIntercept: Boolean)
         seqOp = (c, v) =>
           (c, v) match {
             case (aggregator, instance) => aggregator.add(instance)
-        },
+          },
         combOp = (c1, c2) =>
           (c1, c2) match {
             case (aggregator1, aggregator2) => aggregator1.merge(aggregator2)
-        }
+          }
       )
 
     (aftAggregator.loss, aftAggregator.gradient)

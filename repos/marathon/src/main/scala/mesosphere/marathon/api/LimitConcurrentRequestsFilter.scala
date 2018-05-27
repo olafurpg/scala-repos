@@ -21,7 +21,11 @@ class LimitConcurrentRequestsFilter(concurrentOption: Option[Int])
       response: ServletResponse,
       chain: FilterChain): Unit = {
     if (semaphore.tryAcquire()) {
-      try { chain.doFilter(request, response) } finally { semaphore.release() }
+      try {
+        chain.doFilter(request, response)
+      } finally {
+        semaphore.release()
+      }
     } else {
       response match {
         //scalastyle:off magic.number

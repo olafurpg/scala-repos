@@ -411,7 +411,7 @@ class AccountServiceHandlers(
           } getOrElse {
             Future(badRequest("Missing account Id"))
           }
-      }
+        }
 
     val metadata = DescriptionMetadata(
       "Adds the grant specified by the grantId property of the request body to the account resource specified in the URL path. The account requesting this change (as determined by HTTP Basic authentication) will be recorded.")

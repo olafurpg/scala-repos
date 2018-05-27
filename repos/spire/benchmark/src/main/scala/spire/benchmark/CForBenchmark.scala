@@ -114,19 +114,25 @@ class CForBenchmarks extends MyBenchmark {
     var t: Long = 0L
     val len = size - 1
     @tailrec def loop1(i: Int): Unit = {
-      if (i < len) { t = t ^ or(arr(i), arr(i + 1)); loop1(i + 1) }
+      if (i < len) {
+        t = t ^ or(arr(i), arr(i + 1)); loop1(i + 1)
+      }
     }
     loop1(0)
 
     val len2 = size / 2
     @tailrec def loop2(i: Int): Unit = {
-      if (i < len2) { t = t ^ or(arr(i + 3), arr(i + 2)); loop2(i + 1) }
+      if (i < len2) {
+        t = t ^ or(arr(i + 3), arr(i + 2)); loop2(i + 1)
+      }
     }
     loop2(0)
 
     val len3 = size / 3
     @tailrec def loop3(i: Int): Unit = {
-      if (i < len2) { t = t ^ or(arr(i + 1), arr(i + 2)); loop3(i + 1) }
+      if (i < len2) {
+        t = t ^ or(arr(i + 1), arr(i + 2)); loop3(i + 1)
+      }
     }
     loop3(0)
   }
@@ -135,19 +141,25 @@ class CForBenchmarks extends MyBenchmark {
     var t: Long = 0L
     val len = size - 1
     @tailrec def loop1(i: Int): Unit = {
-      if (i < len) { t = t ^ min(arr(i), arr(i + 1)); loop1(i + 1) }
+      if (i < len) {
+        t = t ^ min(arr(i), arr(i + 1)); loop1(i + 1)
+      }
     }
     loop1(0)
 
     val len2 = size / 2
     @tailrec def loop2(i: Int): Unit = {
-      if (i < len2) { t = t ^ min(arr(i + 3), arr(i + 2)); loop2(i + 1) }
+      if (i < len2) {
+        t = t ^ min(arr(i + 3), arr(i + 2)); loop2(i + 1)
+      }
     }
     loop2(0)
 
     val len3 = size / 3
     @tailrec def loop3(i: Int): Unit = {
-      if (i < len2) { t = t ^ min(arr(i + 1), arr(i + 2)); loop3(i + 1) }
+      if (i < len2) {
+        t = t ^ min(arr(i + 1), arr(i + 2)); loop3(i + 1)
+      }
     }
     loop3(0)
   }
@@ -156,19 +168,25 @@ class CForBenchmarks extends MyBenchmark {
     var t: Long = 0L
     val len = size - 1
     @tailrec def loop1(i: Int): Unit = {
-      if (i < len) { t = t ^ gcd(arr(i), arr(i + 1)); loop1(i + 1) }
+      if (i < len) {
+        t = t ^ gcd(arr(i), arr(i + 1)); loop1(i + 1)
+      }
     }
     loop1(0)
 
     val len2 = size / 2
     @tailrec def loop2(i: Int): Unit = {
-      if (i < len2) { t = t ^ gcd(arr(i + 3), arr(i + 2)); loop2(i + 1) }
+      if (i < len2) {
+        t = t ^ gcd(arr(i + 3), arr(i + 2)); loop2(i + 1)
+      }
     }
     loop2(0)
 
     val len3 = size / 3
     @tailrec def loop3(i: Int): Unit = {
-      if (i < len2) { t = t ^ gcd(arr(i + 1), arr(i + 2)); loop3(i + 1) }
+      if (i < len2) {
+        t = t ^ gcd(arr(i + 1), arr(i + 2)); loop3(i + 1)
+      }
     }
     loop3(0)
   }

@@ -248,7 +248,7 @@ class MutableSettings(val errorFn: String => Unit)
           sett.withDeprecationMessage(
             s"${name}:${sett.value} is deprecated, forcing use of $default")
           sett.value = default
-      })
+        })
   def IntSetting(
       name: String,
       descr: String,
@@ -491,7 +491,9 @@ class MutableSettings(val errorFn: String => Unit)
 
     def parseArgument(x: String): Option[Int] = {
       parser(x) orElse {
-        try { Some(x.toInt) } catch { case _: NumberFormatException => None }
+        try {
+          Some(x.toInt)
+        } catch { case _: NumberFormatException => None }
       }
     }
 
@@ -878,7 +880,9 @@ class MutableSettings(val errorFn: String => Unit)
       def loop(args: List[String]): List[String] = args match {
         case arg :: rest =>
           if (halting && (arg startsWith "-")) args
-          else { appendToValue(arg); loop(rest) }
+          else {
+            appendToValue(arg); loop(rest)
+          }
         case Nil => Nil
       }
       Some(loop(args))

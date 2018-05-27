@@ -50,7 +50,7 @@ class BufferTest extends FunSuite {
 
   test("read Long") {
     val br = BufferReader(bytes)
-    assert(br.readLong() == 0x7877665544332211L)
+    assert(br.readLong() == 0X7877665544332211L)
   }
 
   test("read null terminated string") {
@@ -103,8 +103,8 @@ class BufferTest extends FunSuite {
   test("write Long") {
     val ctx = writerCtx()
     import ctx._
-    bw.writeLong(0x7877665544332211L)
-    assert(0x7877665544332211L == br.readLong)
+    bw.writeLong(0X7877665544332211L)
+    assert(0X7877665544332211L == br.readLong)
   }
 
   test("tiny length coded binary") {

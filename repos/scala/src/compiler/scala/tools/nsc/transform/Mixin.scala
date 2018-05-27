@@ -866,7 +866,7 @@ abstract class Mixin extends InfoTransform with ast.TreeDSL {
                   sym))(
                   if (sym.tpe.resultType.typeSymbol == UnitClass) UNIT
                   else rhs
-              ))
+                ))
           } else if (sym.isConstructor) {
             deriveDefDef(stat)(addInitBits(clazz, _))
           } else if (settings.checkInit && !clazz.isTrait && sym.isSetter) {

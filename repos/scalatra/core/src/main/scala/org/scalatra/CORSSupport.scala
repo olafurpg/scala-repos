@@ -140,7 +140,7 @@ trait CorsSupport extends Handler with Initializable { self: ScalatraBase ⇒
     if (corsConfig.preflightMaxAge > 0)
       response
         .headers(AccessControlMaxAgeHeader) =
-          corsConfig.preflightMaxAge.toString
+        corsConfig.preflightMaxAge.toString
     // 5.2.9
     response
       .headers(AccessControlAllowMethodsHeader) = corsConfig.allowedMethods mkString ","

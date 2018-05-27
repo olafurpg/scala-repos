@@ -88,9 +88,12 @@ object BackendReporting {
   /**
     * See documentation of orThrow above.
     */
-  def tryEither[A, B](op: => Either[A, B]): Either[A, B] = try { op } catch {
-    case Invalid(e) => Left(e.asInstanceOf[A])
-  }
+  def tryEither[A, B](op: => Either[A, B]): Either[A, B] =
+    try {
+      op
+    } catch {
+      case Invalid(e) => Left(e.asInstanceOf[A])
+    }
 
   sealed trait OptimizerWarning {
     def emitWarning(settings: ScalaSettings): Boolean

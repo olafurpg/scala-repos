@@ -89,7 +89,7 @@ trait GrouperSpec[M[+ _]]
       }
     case c: LongColumn =>
       new Map1Column(c) with BoolColumn {
-        def apply(row: Int) = c(row) == 12l
+        def apply(row: Int) = c(row) == 12L
       }
     case c: NumColumn =>
       new Map1Column(c) with BoolColumn {

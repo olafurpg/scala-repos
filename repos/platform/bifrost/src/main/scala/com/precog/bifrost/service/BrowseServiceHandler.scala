@@ -213,7 +213,7 @@ class BrowseServiceHandler[A](
           }
         )
       }
-  }
+    }
 
   val metadata = DescriptionMetadata(
     """Browse the children of the given path.""")

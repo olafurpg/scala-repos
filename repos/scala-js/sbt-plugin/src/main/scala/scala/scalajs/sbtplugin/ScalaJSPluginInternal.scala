@@ -154,7 +154,7 @@ object ScalaJSPluginInternal {
         def generated(classes: Iterable[File]): Unit =
           inherited.generated(classes)
         def complete(success: Boolean): Unit = inherited.complete(success)
-    }
+      }
     incOptions.withNewClassfileManager(newClassfileManager)
   }
 

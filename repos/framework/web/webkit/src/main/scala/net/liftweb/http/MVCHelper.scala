@@ -95,8 +95,7 @@ trait MVCHelper extends LiftRules.DispatchPF {
           .apply(path)
           .toResponse
 
-        () =>
-          resp
+        () => resp
 
       case _ =>
         S.init(Box !! in, curSession.is) {
@@ -106,8 +105,7 @@ trait MVCHelper extends LiftRules.DispatchPF {
             .apply(path)
             .toResponse
 
-          () =>
-            resp
+          () => resp
         }
     }
   }

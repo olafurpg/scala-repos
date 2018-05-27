@@ -593,8 +593,7 @@ class LiftSession(
 
     def buildFunc(i: RunnerHolder): () => Any = i.func match {
       case bfh if bfh.supportsFileParams_? =>
-        () =>
-          state.uploadedFiles.filter(_.name == i.name).map(v => bfh(v))
+        () => state.uploadedFiles.filter(_.name == i.name).map(v => bfh(v))
       case normal =>
         () =>
           normal(
@@ -614,7 +613,7 @@ class LiftSession(
             a.!?(ActionMessageSet(f.map(i => buildFunc(i)), state)) match {
               case li: List[_] => li
               case other       => Nil
-          })
+            })
         case _ => f.map(i => buildFunc(i).apply())
       }
     }
@@ -1633,7 +1632,7 @@ class LiftSession(
             snippetMap.doWith(snippetMap.is ++ currentMap) {
               super.apply(in)
             }
-        })
+          })
 
       override def apply(in: FileParamHolder): Any =
         requestVarFunc(() =>
@@ -1641,7 +1640,7 @@ class LiftSession(
             snippetMap.doWith(snippetMap.is ++ currentMap) {
               super.apply(in)
             }
-        })
+          })
     }
   }
 
@@ -1662,11 +1661,10 @@ class LiftSession(
     val renderVersion = RenderVersion.get
     val requestVarFunc = RequestVarHandler.generateSnapshotRestorer[T]()
 
-    () =>
-      {
-        requestVarFunc(
-          () => executeInScope(currentReq, renderVersion)(deferredFunction()))
-      }
+    () => {
+      requestVarFunc(
+        () => executeInScope(currentReq, renderVersion)(deferredFunction()))
+    }
   }
 
   /**
@@ -1681,11 +1679,10 @@ class LiftSession(
     val renderVersion = RenderVersion.get
     val requestVarFunc = RequestVarHandler.generateSnapshotRestorer[T]()
 
-    (in: A) =>
-      {
-        requestVarFunc(
-          () => executeInScope(currentReq, renderVersion)(deferredFunction(in)))
-      }
+    (in: A) => {
+      requestVarFunc(
+        () => executeInScope(currentReq, renderVersion)(deferredFunction(in)))
+    }
   }
 
   def executeInScope[T](req: Box[Req], renderVersion: String)(f: => T): T = {
@@ -1908,12 +1905,17 @@ class LiftSession(
                             snippetName,
                             LiftRules.SnippetFailures.MethodNotFound,
                             if (intersection.isEmpty) NodeSeq.Empty
-                            else <div>There are possible matching methods (
-                                {intersection}
+                            else
+                              <div>There are possible matching methods (
+                                {
+                                intersection
+                              }
                                 ),
                                 but none has the required signature:
                                 <pre>def
-                                  {method}
+                                  {
+                                method
+                              }
                                   (in: NodeSeq): NodeSeq</pre>
                               </div>,
                             wholeTag
@@ -2781,8 +2783,7 @@ class LiftSession(
     <html xmlns:lift="http://liftweb.net" xmlns="http://www.w3.org/1999/xhtml">
         <head/>
       <body>
-        {Helpers.errorDiv(
-        <div>Error locating template.
+        {Helpers.errorDiv(<div>Error locating template.
             <br/>
           Message:
           <b>

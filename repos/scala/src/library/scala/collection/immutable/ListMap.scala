@@ -140,7 +140,9 @@ class ListMap[A, +B]
       def next(): (A, B) =
         if (!hasNext)
           throw new NoSuchElementException("next on empty iterator")
-        else { val res = (self.key, self.value); self = self.next; res }
+        else {
+          val res = (self.key, self.value); self = self.next; res
+        }
     }.toList.reverseIterator
 
   protected def key: A = throw new NoSuchElementException("empty map")

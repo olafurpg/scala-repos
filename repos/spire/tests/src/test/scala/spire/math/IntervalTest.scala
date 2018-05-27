@@ -75,16 +75,16 @@ class IntervalTest extends FunSuite {
   test("c.contains(0.0) is false") { assert(c.contains(0.0) === false) }
   test("c.crosses(0.0) is false") { assert(c.crosses(0.0) === false) }
 
-  test("[3, 6] -- [3, 6] = nil") { assert(cc(3D, 6D) -- cc(3D, 6D) === Nil) }
+  test("[3, 6] -- [3, 6] = nil") { assert(cc(3d, 6d) -- cc(3d, 6d) === Nil) }
   test("[3, 6] -- empty = [3, 6]") {
-    assert(cc(3D, 6D) -- e === List(cc(3D, 6D)))
+    assert(cc(3d, 6d) -- e === List(cc(3d, 6d)))
   }
-  test("[3, 6] -- all = nil") { assert(cc(3D, 6D) -- all === Nil) }
+  test("[3, 6] -- all = nil") { assert(cc(3d, 6d) -- all === Nil) }
   test("[3, 6] -- [4, 6] = [3, 4)") {
-    assert(cc(3D, 6D) -- cc(4D, 6D) === List(co(3D, 4D)))
+    assert(cc(3d, 6d) -- cc(4d, 6d) === List(co(3d, 4d)))
   }
   test("[3, 6] -- [4, 5] = [3, 4), (5, 6]") {
-    assert(cc(3D, 6D) -- cc(4D, 5D) === List(co(3D, 4D), oc(5D, 6D)))
+    assert(cc(3d, 6d) -- cc(4d, 5d) === List(co(3d, 4d), oc(5d, 6d)))
   }
 }
 
@@ -386,8 +386,7 @@ class IntervalCheck
                 case _ => y - (Rational(rng.nextGaussian).abs * Long.MaxValue)
               }
           case (_, _) =>
-            () =>
-              Rational(rng.nextGaussian) * Long.MaxValue
+            () => Rational(rng.nextGaussian) * Long.MaxValue
         }
 
       def nextf(): Rational = {

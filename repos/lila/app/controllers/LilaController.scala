@@ -188,7 +188,7 @@ private[controllers] trait LilaController
                 jsonError(
                   s"Banned from playing for ${ban.remainingMinutes} minutes. Reason: Too many aborts or unplayed games"
                 )) as JSON
-          }
+            }
         )
       }
     }
@@ -205,7 +205,7 @@ private[controllers] trait LilaController
                 jsonError(
                   s"You are already playing ${current.opponent}"
                 )) as JSON
-          }
+            }
         )
       }
     }
@@ -229,7 +229,7 @@ private[controllers] trait LilaController
       _.fold(notFound(ctx))(a =>
         op(a) map { b =>
           Ok(Json toJson b) as JSON
-      })
+        })
     }
 
   protected def JsOk(fua: Fu[String], headers: (String, String)*) =
@@ -267,7 +267,7 @@ private[controllers] trait LilaController
       _.fold(notFound(ctx))(a =>
         op(a) map { b =>
           Redirect(b)
-      })
+        })
     }
 
   protected def OptionFuRedirectUrl[A](fua: Fu[Option[A]])(op: A => Fu[String])(
@@ -276,7 +276,7 @@ private[controllers] trait LilaController
       _.fold(notFound(ctx))(a =>
         op(a) map { b =>
           Redirect(b)
-      })
+        })
     }
 
   protected def OptionResult[A](fua: Fu[Option[A]])(op: A => Result)(

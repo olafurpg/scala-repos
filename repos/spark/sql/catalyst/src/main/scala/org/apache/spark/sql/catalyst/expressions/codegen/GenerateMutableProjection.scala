@@ -145,9 +145,8 @@ object GenerateMutableProjection
       s"code for ${expressions.mkString(",")}:\n${CodeFormatter.format(code)}")
 
     val c = CodeGenerator.compile(code)
-    () =>
-      {
-        c.generate(ctx.references.toArray).asInstanceOf[MutableProjection]
-      }
+    () => {
+      c.generate(ctx.references.toArray).asInstanceOf[MutableProjection]
+    }
   }
 }

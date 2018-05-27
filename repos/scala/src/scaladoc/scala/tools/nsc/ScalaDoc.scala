@@ -41,7 +41,9 @@ class ScalaDoc {
     else if (docSettings.help.value || !hasFiles)
       reporter.echo(command.usageMsg)
     else
-      try { new DocFactory(reporter, docSettings) document command.files } catch {
+      try {
+        new DocFactory(reporter, docSettings) document command.files
+      } catch {
         case ex @ FatalError(msg) =>
           if (docSettings.debug.value) ex.printStackTrace()
           reporter.error(null, "fatal error: " + msg)

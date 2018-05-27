@@ -93,7 +93,7 @@ class ImplicitSuite {
 
   def testFloatAccumulatorParam(): Unit = {
     val sc = mockSparkContext
-    sc.accumulator(123F)
+    sc.accumulator(123f)
   }
 
   def testIntWritableConverter(): Unit = {

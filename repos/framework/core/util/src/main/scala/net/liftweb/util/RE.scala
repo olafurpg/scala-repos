@@ -148,7 +148,10 @@ class REMatcher(val str: String, val compiled: Pattern) {
         }
       }
 
-      if (!matcher.find) return else { runIt(0); doIt }
+      if (!matcher.find) return
+      else {
+        runIt(0); doIt
+      }
     }
 
     doIt

@@ -17,7 +17,7 @@ class LSMRTest extends FunSuite {
     val lsmrSolved = LSMR.solve(matrix, b)
     val solved: DenseVector[Double] = matrix \ b
 
-    assert(norm(solved - lsmrSolved) < 1E-5, s"$solved $lsmrSolved")
+    assert(norm(solved - lsmrSolved) < 1e-5, s"$solved $lsmrSolved")
   }
 
   test("regularized solve") {
@@ -31,8 +31,8 @@ class LSMRTest extends FunSuite {
     val bfgsSolved = lbfgsSolve(matrix, b, 1)
     val lsmrSolved = LSMR.solve(matrix, b, regularization = 1.0)
 
-    assert(norm(solved - lsmrSolved) < 1E-5, s"$solved $lsmrSolved")
-    assert(norm(solved - bfgsSolved) < 1E-5, s"$solved $bfgsSolved")
+    assert(norm(solved - lsmrSolved) < 1e-5, s"$solved $lsmrSolved")
+    assert(norm(solved - bfgsSolved) < 1e-5, s"$solved $bfgsSolved")
   }
 
   test("regularized solve, 2.0") {
@@ -44,7 +44,7 @@ class LSMRTest extends FunSuite {
     val bfgsSolved = lbfgsSolve(matrix, b, 2.0)
     val lsmrSolved = LSMR.solve(matrix, b, regularization = 2.0)
 
-    assert(norm(bfgsSolved - lsmrSolved) < 1E-5, s"$bfgsSolved $lsmrSolved")
+    assert(norm(bfgsSolved - lsmrSolved) < 1e-5, s"$bfgsSolved $lsmrSolved")
   }
 
   def gen = RandBasis.mt0.uniform
@@ -55,9 +55,9 @@ class LSMRTest extends FunSuite {
     val b = DenseVector.rand(100, g)
     val bfgsSolved = lbfgsSolve(matrix, b, 2.0)
     val lsmrSolved =
-      LSMR.solve(matrix, b, regularization = 2.0, tolerance = 1E-9)
+      LSMR.solve(matrix, b, regularization = 2.0, tolerance = 1e-9)
 
-    assert(norm(bfgsSolved - lsmrSolved) < 1E-2, s"$bfgsSolved $lsmrSolved")
+    assert(norm(bfgsSolved - lsmrSolved) < 1e-2, s"$bfgsSolved $lsmrSolved")
   }
 
   private def lbfgsSolve(
@@ -76,7 +76,7 @@ class LSMRTest extends FunSuite {
       DenseVector.rand[Double](mat.cols, gen),
       1.0)
 
-    new LBFGS[DenseVector[Double]](tolerance = 1E-9)
+    new LBFGS[DenseVector[Double]](tolerance = 1e-9)
       .minimize(obj, DenseVector.rand[Double](mat.cols, gen))
   }
 
@@ -165,6 +165,6 @@ class LSMRTest extends FunSuite {
     val xsolve = LSMR.solve(A, b)
     val r = b - A * xsolve
     val normr = norm(r)
-    assert(normr < 1E-4, normr)
+    assert(normr < 1e-4, normr)
   }
 }

@@ -816,15 +816,15 @@ object Algebraic extends AlgebraicInstances {
       def flagBits: Int = Flags.DoubleLeaf.bits
 
       def upperBound: BitBound =
-        if (value == 0D) {
+        if (value == 0d) {
           new BitBound(0)
         } else {
           new BitBound(ceil(log(abs(value))).toLong)
         }
 
       def signum: Int =
-        if (value < 0D) -1
-        else if (value > 0D) 1
+        if (value < 0d) -1
+        else if (value > 0d) 1
         else 0
 
       def toBigDecimal(digits: Int): JBigDecimal =
@@ -1111,9 +1111,9 @@ object Algebraic extends AlgebraicInstances {
   }
 
   object BitBound {
-    private val Epsilon: Double = 2.220446049250313E-16
+    private val Epsilon: Double = 2.220446049250313e-16
 
-    private val FudgeFactor: Double = 1D + 4D * Epsilon
+    private val FudgeFactor: Double = 1d + 4d * Epsilon
 
     private val lg2ToLg10: Double = log(2, 10) * FudgeFactor
 
@@ -1148,7 +1148,7 @@ object Algebraic extends AlgebraicInstances {
     // remaining exponenent is divisible by n.
     val safeWidth = width + (x.scale - width) % k
     val approx = new JBigDecimal(x.unscaledValue.abs, safeWidth).doubleValue
-    new JBigDecimal(x.signum * pow(approx, 1D / k))
+    new JBigDecimal(x.signum * pow(approx, 1d / k))
       .scaleByPowerOfTen(-(x.scale - safeWidth) / k)
       .round(MathContext.DECIMAL64)
   }

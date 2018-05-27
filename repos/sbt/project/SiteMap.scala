@@ -27,16 +27,16 @@ object SiteMap {
         entries.size <= 50000,
         "A site map cannot contain more than 50,000 entries.")
       <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-            { entries }
+            {entries}
           </urlset>
     }
 
     def entryXML(e: Entry, f: File, relPath: String) =
       <url>
-          <loc>{ remoteBase.resolve(relPath).toString }</loc>
-          <lastmod>{ lastModifiedString(f) }</lastmod>
-          <changefreq>{ e.changeFreq }</changefreq>
-          <priority>{ e.priority.toString }</priority>
+          <loc>{remoteBase.resolve(relPath).toString}</loc>
+          <lastmod>{lastModifiedString(f)}</lastmod>
+          <changefreq>{e.changeFreq}</changefreq>
+          <priority>{e.priority.toString}</priority>
         </url>
 
     def singleSiteMap(dir: File, files: PathFinder): Option[File] = {
@@ -52,12 +52,12 @@ object SiteMap {
     }
     def indexEntryXML(sub: File, relPath: String): xml.Elem =
       <sitemap>
-          <loc>{ remoteBase.resolve(relPath).toString }</loc>
-          <lastmod>{ lastModifiedString(sub) }</lastmod>
+          <loc>{remoteBase.resolve(relPath).toString}</loc>
+          <lastmod>{lastModifiedString(sub)}</lastmod>
         </sitemap>
     def indexEntriesXML(entries: Seq[xml.Node]): xml.Elem =
       <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-          { entries }
+          {entries}
         </sitemapindex>
     def indexEntries(subs: Seq[File]) =
       relativize(subs) map { case (f, path) => indexEntryXML(f, path) }

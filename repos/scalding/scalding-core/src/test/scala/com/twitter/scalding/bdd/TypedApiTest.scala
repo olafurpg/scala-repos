@@ -155,7 +155,7 @@ class TypedApiTest extends WordSpec with Matchers with TBddDsl {
       } And {
         List(("user1", 40), ("user2", 22))
       } And {
-        List(("user1", 1000l), ("user2", 800l))
+        List(("user1", 1000L), ("user2", 800L))
       } And {
         List(("user1", true), ("user2", false))
       } When { pipes: List[TypedPipe[_]] =>

@@ -1,5 +1,5 @@
 trait Base {
-  private val secure_# = 10l
+  private val secure_# = 10L
 }
 
 class TestUser extends Base {

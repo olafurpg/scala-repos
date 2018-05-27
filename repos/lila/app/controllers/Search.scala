@@ -24,7 +24,7 @@ object Search extends LilaController {
               env.paginator(query, page) map (_.some)
             } map { pager =>
               Ok(html.search.index(searchForm fill data, pager))
-          }
+            }
         )
       }
     }
@@ -50,7 +50,7 @@ object Search extends LilaController {
                       ("attachment; filename=" +
                         s"lichess_search_$date.pgn"))
             }
-        }
+          }
       )
     }
   }

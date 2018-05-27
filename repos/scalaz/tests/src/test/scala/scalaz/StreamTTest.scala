@@ -14,8 +14,7 @@ object StreamTTest extends SpecLite {
 
   "fromStream / asStream" ! forAll {
     import Id._
-    (as: Stream[Int]) =>
-      StreamT.fromStream[Id, Int](as).asStream must_=== (as)
+    (as: Stream[Int]) => StreamT.fromStream[Id, Int](as).asStream must_=== (as)
   }
 
   "asStream" should {

@@ -191,7 +191,7 @@ class VectorsSuite extends SparkFunSuite with Logging {
     val vectors = Seq(
       Vectors.dense(Array.empty[Double]),
       Vectors.dense(1.0),
-      Vectors.dense(1.0E6, 0.0, -2.0e-7),
+      Vectors.dense(1.0e6, 0.0, -2.0e-7),
       Vectors.sparse(0, Array.empty[Int], Array.empty[Double]),
       Vectors.sparse(1, Array(0), Array(1.0)),
       Vectors.sparse(3, Array(0, 2), Array(1.0, -2.0))
@@ -285,15 +285,15 @@ class VectorsSuite extends SparkFunSuite with Logging {
       // SparseVector vs. SparseVector
       assert(
         Vectors.sqdist(sparseVector1, sparseVector2) ~==
-          squaredDist relTol 1E-8)
+          squaredDist relTol 1e-8)
       // DenseVector  vs. SparseVector
       assert(
         Vectors.sqdist(denseVector1, sparseVector2) ~==
-          squaredDist relTol 1E-8)
+          squaredDist relTol 1e-8)
       // DenseVector  vs. DenseVector
       assert(
         Vectors.sqdist(denseVector1, denseVector2) ~==
-          squaredDist relTol 1E-8)
+          squaredDist relTol 1e-8)
     }
   }
 
@@ -328,33 +328,33 @@ class VectorsSuite extends SparkFunSuite with Logging {
 
     assert(
       Vectors.norm(dv, 1.0) ~==
-        dv.toArray.foldLeft(0.0)((a, v) => a + math.abs(v)) relTol 1E-8)
+        dv.toArray.foldLeft(0.0)((a, v) => a + math.abs(v)) relTol 1e-8)
     assert(
       Vectors.norm(sv, 1.0) ~==
-        sv.toArray.foldLeft(0.0)((a, v) => a + math.abs(v)) relTol 1E-8)
+        sv.toArray.foldLeft(0.0)((a, v) => a + math.abs(v)) relTol 1e-8)
 
     assert(
       Vectors.norm(dv, 2.0) ~==
-        math.sqrt(dv.toArray.foldLeft(0.0)((a, v) => a + v * v)) relTol 1E-8)
+        math.sqrt(dv.toArray.foldLeft(0.0)((a, v) => a + v * v)) relTol 1e-8)
     assert(
       Vectors.norm(sv, 2.0) ~==
-        math.sqrt(sv.toArray.foldLeft(0.0)((a, v) => a + v * v)) relTol 1E-8)
+        math.sqrt(sv.toArray.foldLeft(0.0)((a, v) => a + v * v)) relTol 1e-8)
 
     assert(
       Vectors.norm(dv, Double.PositiveInfinity) ~==
-        dv.toArray.map(math.abs).max relTol 1E-8)
+        dv.toArray.map(math.abs).max relTol 1e-8)
     assert(
       Vectors.norm(sv, Double.PositiveInfinity) ~==
-        sv.toArray.map(math.abs).max relTol 1E-8)
+        sv.toArray.map(math.abs).max relTol 1e-8)
 
     assert(
       Vectors.norm(dv, 3.7) ~== math.pow(
         dv.toArray.foldLeft(0.0)((a, v) => a + math.pow(math.abs(v), 3.7)),
-        1.0 / 3.7) relTol 1E-8)
+        1.0 / 3.7) relTol 1e-8)
     assert(
       Vectors.norm(sv, 3.7) ~== math.pow(
         sv.toArray.foldLeft(0.0)((a, v) => a + math.pow(math.abs(v), 3.7)),
-        1.0 / 3.7) relTol 1E-8)
+        1.0 / 3.7) relTol 1e-8)
   }
 
   test("Vector numActive and numNonzeros") {

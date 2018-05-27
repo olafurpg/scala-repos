@@ -52,12 +52,11 @@ object HTTPRequest {
   private def UaMatcher(
       regex: scala.util.matching.Regex): RequestHeader => Boolean = {
     val pattern = regex.pattern
-    req =>
-      {
-        userAgent(req) ?? { ua =>
-          pattern.matcher(ua).matches
-        }
+    req => {
+      userAgent(req) ?? { ua =>
+        pattern.matcher(ua).matches
       }
+    }
   }
 
   def isHuman(req: RequestHeader) = !isBot(req)

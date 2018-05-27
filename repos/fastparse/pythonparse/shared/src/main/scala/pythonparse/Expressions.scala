@@ -128,8 +128,7 @@ object Expressions {
   val trailer: P[Ast.expr => Ast.expr] = {
     val call = P("(" ~ arglist ~ ")").map {
       case (args, (keywords, starargs, kwargs)) =>
-        (lhs: Ast.expr) =>
-          Ast.expr.Call(lhs, args, keywords, starargs, kwargs)
+        (lhs: Ast.expr) => Ast.expr.Call(lhs, args, keywords, starargs, kwargs)
     }
     val slice = P("[" ~ subscriptlist ~ "]").map(args =>
       (lhs: Ast.expr) => Ast.expr.Subscript(lhs, args, Ast.expr_context.Load))

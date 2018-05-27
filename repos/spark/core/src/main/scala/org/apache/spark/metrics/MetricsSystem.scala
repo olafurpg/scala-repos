@@ -140,13 +140,17 @@ private[spark] class MetricsSystem private (
         // Other instance types, e.g. Master and Worker, are not related to a specific application.
         val warningMsg =
           s"Using default name $defaultName for source because %s is not set."
-        if (appId.isEmpty) { logWarning(warningMsg.format("spark.app.id")) }
+        if (appId.isEmpty) {
+          logWarning(warningMsg.format("spark.app.id"))
+        }
         if (executorId.isEmpty) {
           logWarning(warningMsg.format("spark.executor.id"))
         }
         defaultName
       }
-    } else { defaultName }
+    } else {
+      defaultName
+    }
   }
 
   def getSourcesByName(sourceName: String): Seq[Source] =

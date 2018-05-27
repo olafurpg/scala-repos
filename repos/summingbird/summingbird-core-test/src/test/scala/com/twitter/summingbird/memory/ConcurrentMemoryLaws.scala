@@ -56,7 +56,9 @@ class ConcurrentMemoryLaws extends WordSpec {
     val leftMap = left.groupBy(identity).mapValues(_.size)
     val rightMap = right.groupBy(identity).mapValues(_.size)
     val eqv = leftMap == rightMap
-    if (!eqv) { println(s"from Queue: $leftMap\nfrom scala: $rightMap") }
+    if (!eqv) {
+      println(s"from Queue: $leftMap\nfrom scala: $rightMap")
+    }
     eqv
   }
 
@@ -64,12 +66,11 @@ class ConcurrentMemoryLaws extends WordSpec {
       T: Manifest: Arbitrary,
       K: Arbitrary,
       V: Monoid: Arbitrary: Equiv] =
-    new TestGraphs[ConcurrentMemory, T, K, V](new ConcurrentMemory)(() =>
-      new ConcurrentHashMap[K, V]())(() => new LinkedBlockingQueue[T]())(
-      Producer.source[ConcurrentMemory, T](_))(s => { k =>
-      Option(s.get(k))
-    })({ (f, items) =>
-      unorderedEq(empty(f), items)
+    new TestGraphs[ConcurrentMemory, T, K, V](new ConcurrentMemory)(
+      () => new ConcurrentHashMap[K, V]())(() => new LinkedBlockingQueue[T]())(
+      Producer.source[ConcurrentMemory, T](_))(s => { k => Option(s.get(k)) })({
+      (f, items) =>
+        unorderedEq(empty(f), items)
     })({ (p: ConcurrentMemory, plan: ConcurrentMemoryPlan) =>
       Await.result(plan.run, Duration.Inf)
     })

@@ -206,11 +206,11 @@ class Flags extends ModifierFlags {
   // they could be used as normal flags.
 
   final val InitialFlags =
-    0x0007FFFFFFFFFFFFL // normal flags, enabled from the first phase: 1L to (1L << 50)
+    0X0007FFFFFFFFFFFFL // normal flags, enabled from the first phase: 1L to (1L << 50)
   final val LateFlags =
-    0x00F8000000000000L // flags that override flags in (1L << 4) to (1L << 8): DEFERRED, FINAL, INTERFACE, METHOD, MODULE
+    0X00F8000000000000L // flags that override flags in (1L << 4) to (1L << 8): DEFERRED, FINAL, INTERFACE, METHOD, MODULE
   final val AntiFlags =
-    0x0700000000000000L // flags that cancel flags in 1L to (1L << 2): PROTECTED, OVERRIDE, PRIVATE
+    0X0700000000000000L // flags that cancel flags in 1L to (1L << 2): PROTECTED, OVERRIDE, PRIVATE
   final val LateShift = 47
   final val AntiShift = 56
 
@@ -477,20 +477,20 @@ class Flags extends ModifierFlags {
     case JAVA_DEFAULTMETHOD  => "<defaultmethod>" // (1L << 47)
     case JAVA_ENUM           => "<enum>" // (1L << 48)
     case JAVA_ANNOTATION     => "<annotation>" // (1L << 49)
-    case 0x4000000000000L    => "" // (1L << 50)
+    case 0X4000000000000L    => "" // (1L << 50)
     case `lateDEFERRED`      => "<latedeferred>" // (1L << 51)
     case `lateFINAL`         => "<latefinal>" // (1L << 52)
     case `lateMETHOD`        => "<latemethod>" // (1L << 53)
-    case 0x80000000000000L   => "" // (1L << 54)
+    case 0X80000000000000L   => "" // (1L << 54)
     case `lateMODULE`        => "<latemodule>" // (1L << 55)
     case `notPROTECTED`      => "<notprotected>" // (1L << 56)
     case `notOVERRIDE`       => "<notoverride>" // (1L << 57)
     case `notPRIVATE`        => "<notprivate>" // (1L << 58)
-    case 0x800000000000000L  => "" // (1L << 59)
-    case 0x1000000000000000L => "" // (1L << 60)
-    case 0x2000000000000000L => "" // (1L << 61)
-    case 0x4000000000000000L => "" // (1L << 62)
-    case 0x8000000000000000L => "" // (1L << 63)
+    case 0X800000000000000L  => "" // (1L << 59)
+    case 0X1000000000000000L => "" // (1L << 60)
+    case 0X2000000000000000L => "" // (1L << 61)
+    case 0X4000000000000000L => "" // (1L << 62)
+    case 0X8000000000000000L => "" // (1L << 63)
     case _                   => ""
   }
 

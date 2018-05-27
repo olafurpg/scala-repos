@@ -71,7 +71,9 @@ abstract class BCodeBodyBuilder extends BCodeSkelBuilder {
       tree match {
         case Assign(lhs @ Select(_, _), rhs) =>
           val isStatic = lhs.symbol.isStaticMember
-          if (!isStatic) { genLoadQualifier(lhs) }
+          if (!isStatic) {
+            genLoadQualifier(lhs)
+          }
           genLoad(rhs, symInfoTK(lhs.symbol))
           lineNumber(tree)
           fieldStore(lhs.symbol)
@@ -220,7 +222,9 @@ abstract class BCodeBodyBuilder extends BCodeSkelBuilder {
       val resKind = if (hasUnitBranch) UNIT else tpeTK(tree)
 
       genLoad(thenp, resKind)
-      if (hasElse) { bc goTo postIf }
+      if (hasElse) {
+        bc goTo postIf
+      }
       markProgramPoint(failure)
       if (hasElse) {
         genLoad(elsep, resKind)
@@ -294,7 +298,11 @@ abstract class BCodeBodyBuilder extends BCodeSkelBuilder {
           /* most of the time, !locals.contains(sym), unless the current activation of genLoad() is being called
              while duplicating a finalizer that contains this ValDef. */
           val Local(tk, _, idx, isSynth) = locals.getOrMakeLocal(sym)
-          if (rhs == EmptyTree) { emitZeroOf(tk) } else { genLoad(rhs, tk) }
+          if (rhs == EmptyTree) {
+            emitZeroOf(tk)
+          } else {
+            genLoad(rhs, tk)
+          }
           val localVarStart = currProgramPoint()
           bc.store(idx, tk)
           if (!isSynth) {
@@ -378,7 +386,9 @@ abstract class BCodeBodyBuilder extends BCodeSkelBuilder {
           val qualSafeToElide = treeInfo isQualifierSafeToElide qualifier
 
           def genLoadQualUnlessElidable() {
-            if (!qualSafeToElide) { genLoadQualifier(tree) }
+            if (!qualSafeToElide) {
+              genLoadQualifier(tree)
+            }
           }
 
           if (sym.isModule) {
@@ -396,7 +406,11 @@ abstract class BCodeBodyBuilder extends BCodeSkelBuilder {
           val sym = tree.symbol
           if (!sym.hasPackageFlag) {
             val tk = symInfoTK(sym)
-            if (sym.isModule) { genLoadModule(tree) } else { locals.load(sym) }
+            if (sym.isModule) {
+              genLoadModule(tree)
+            } else {
+              locals.load(sym)
+            }
             generatedType = tk
           }
 
@@ -429,7 +443,9 @@ abstract class BCodeBodyBuilder extends BCodeSkelBuilder {
           generatedType = genMatch(mtch)
 
         case EmptyTree =>
-          if (expectedType != UNIT) { emitZeroOf(expectedType) }
+          if (expectedType != UNIT) {
+            emitZeroOf(expectedType)
+          }
 
         case _ =>
           abort(
@@ -1099,14 +1115,20 @@ abstract class BCodeBodyBuilder extends BCodeSkelBuilder {
     }
 
     def genConversion(from: BType, to: BType, cast: Boolean) {
-      if (cast) { bc.emitT2T(from, to) } else {
+      if (cast) {
+        bc.emitT2T(from, to)
+      } else {
         bc drop from
         bc boolconst (from == to)
       }
     }
 
     def genCast(to: RefBType, cast: Boolean) {
-      if (cast) { bc checkCast to } else { bc isInstance to }
+      if (cast) {
+        bc checkCast to
+      } else {
+        bc isInstance to
+      }
     }
 
     /* Is the given symbol a primitive operation? */
@@ -1209,12 +1231,16 @@ abstract class BCodeBodyBuilder extends BCodeSkelBuilder {
         }
       }
 
-      if (style.isStatic) { bc.invokestatic(jowner, jname, mdescr, pos) } else if (style.isSpecial) {
+      if (style.isStatic) {
+        bc.invokestatic(jowner, jname, mdescr, pos)
+      } else if (style.isSpecial) {
         bc.invokespecial(jowner, jname, mdescr, pos)
       } else if (style.isVirtual) {
         if (needsInterfaceCall(receiver)) {
           bc.invokeinterface(jowner, jname, mdescr, pos)
-        } else { bc.invokevirtual(jowner, jname, mdescr, pos) }
+        } else {
+          bc.invokevirtual(jowner, jname, mdescr, pos)
+        }
       } else {
         assert(style.isSuper, s"An unknown InvokeStyle: $style")
         bc.invokespecial(jowner, jname, mdescr, pos)

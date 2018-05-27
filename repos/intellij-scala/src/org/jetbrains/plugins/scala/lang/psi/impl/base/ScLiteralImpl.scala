@@ -127,7 +127,7 @@ class ScLiteralImpl(node: ASTNode)
           if (endsWithL) java.lang.Long.MAX_VALUE
           else java.lang.Integer.MAX_VALUE
         val divider = if (base == 10) 1 else 2
-        var value = 0l
+        var value = 0L
         for (d <- number.map(_.asDigit)) {
           if (value < 0 || limit / (base / divider) < value / divider ||
               limit - (d / divider) < value * (base / divider)) {

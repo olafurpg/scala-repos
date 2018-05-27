@@ -12,7 +12,7 @@ object Test {
             case x: Throwable => failure = x
           }
         }
-    })
+      })
     for (t <- threads) t.start
     for (t <- threads) t.join
     if (failure != null) println("FAILURE: " + failure)

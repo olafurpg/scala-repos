@@ -103,7 +103,7 @@ class NumberTest extends FunSuite {
     Number(3.toShort)
     Number(3)
     Number(3L)
-    Number(3.0F)
+    Number(3.0f)
     Number(3.0)
     Number("333333333333333333333333333333")
     Number("99.253895895395839583958953895389538958395839583958958953")

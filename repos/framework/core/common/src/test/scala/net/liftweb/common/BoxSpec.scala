@@ -203,7 +203,7 @@ class BoxSpec extends Specification with ScalaCheck with BoxGenerator {
     }
 
     "define a 'asA' method must work with Double" in {
-      Full(44d).asA[Double] must_== Full(44D)
+      Full(44d).asA[Double] must_== Full(44d)
       Full(44d).asA[Boolean] must_== Empty
     }
 

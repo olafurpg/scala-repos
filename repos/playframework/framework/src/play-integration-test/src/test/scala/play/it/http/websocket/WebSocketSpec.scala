@@ -218,7 +218,7 @@ trait WebSocketSpec
             Flow.fromSinkAndSource(
               onFramesConsumed[String](consumed.success(_)),
               Source.maybe[String])
-        }) { app =>
+          }) { app =>
           import app.materializer
           val result = runWebSocket { flow =>
             sendFrames(
@@ -243,7 +243,7 @@ trait WebSocketSpec
             Flow.fromSinkAndSource(
               onFramesConsumed[ByteString](consumed.success(_)),
               Source.maybe[ByteString])
-        }) { app =>
+          }) { app =>
           import app.materializer
           val result = runWebSocket { flow =>
             sendFrames(
@@ -264,7 +264,7 @@ trait WebSocketSpec
         withServer(app =>
           WebSocket.accept[String, String] { req =>
             Flow.fromSinkAndSource(Sink.ignore, Source.maybe[String])
-        }) { app =>
+          }) { app =>
           import app.materializer
           val frames = runWebSocket { flow =>
             sendFrames(
@@ -285,7 +285,7 @@ trait WebSocketSpec
         withServer(app =>
           WebSocket.accept[String, String] { req =>
             Flow.fromSinkAndSource(Sink.ignore, Source.maybe[String])
-        }) { app =>
+          }) { app =>
           import app.materializer
           val frames = runWebSocket { flow =>
             sendFrames(
@@ -304,7 +304,7 @@ trait WebSocketSpec
         withServer(app =>
           WebSocket.accept[String, String] { req =>
             Flow.fromSinkAndSource(Sink.ignore, Source.maybe[String])
-        }) { app =>
+          }) { app =>
           import app.materializer
           val frames = runWebSocket { flow =>
             sendFrames(
@@ -324,7 +324,7 @@ trait WebSocketSpec
         withServer(app =>
           WebSocket.accept[String, String] { req =>
             Flow.fromSinkAndSource(Sink.ignore, Source.maybe[String])
-        }) { app =>
+          }) { app =>
           import app.materializer
           val frames = runWebSocket { flow =>
             sendFrames(

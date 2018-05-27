@@ -144,12 +144,12 @@ private[akka] object ByteStringParser {
     def readShortLE(): Int = readByte() | (readByte() << 8)
     def readIntLE(): Int = readShortLE() | (readShortLE() << 16)
     def readLongLE(): Long =
-      (readIntLE() & 0xffffffffL) | ((readIntLE() & 0xffffffffL) << 32)
+      (readIntLE() & 0XFFFFFFFFL) | ((readIntLE() & 0XFFFFFFFFL) << 32)
 
     def readShortBE(): Int = (readByte() << 8) | readByte()
     def readIntBE(): Int = (readShortBE() << 16) | readShortBE()
     def readLongBE(): Long =
-      ((readIntBE() & 0xffffffffL) << 32) | (readIntBE() & 0xffffffffL)
+      ((readIntBE() & 0XFFFFFFFFL) << 32) | (readIntBE() & 0XFFFFFFFFL)
 
     def skip(numBytes: Int): Unit =
       if (off + numBytes <= input.length) off += numBytes

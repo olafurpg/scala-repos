@@ -175,7 +175,7 @@ trait LinearRegressionLibModule[M[+ _]]
         if (indices.isEmpty) {
           values
         } else {
-          val zero = 0D
+          val zero = 0d
           val length = vlength + indices.length
           val bitset = BitSetUtil.create(indices)
           val acc = new Array[Double](length)
@@ -184,7 +184,9 @@ trait LinearRegressionLibModule[M[+ _]]
           var j = 0
           while (i < length) {
             val idx = {
-              if (bitset(i)) { j += 1; zero } else values(i - j)
+              if (bitset(i)) {
+                j += 1; zero
+              } else values(i - j)
             }
             acc(i) = idx
             i += 1

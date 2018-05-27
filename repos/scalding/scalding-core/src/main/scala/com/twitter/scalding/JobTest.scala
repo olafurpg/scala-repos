@@ -249,7 +249,11 @@ class JobTest(cons: (Args) => Job) {
     // Make sure to clean the state:
     job.clear
 
-    val next: Option[Job] = if (runNext) { job.next } else { None }
+    val next: Option[Job] = if (runNext) {
+      job.next
+    } else {
+      None
+    }
     next match {
       case Some(nextjob) => runJob(nextjob, runNext)
       case None => {

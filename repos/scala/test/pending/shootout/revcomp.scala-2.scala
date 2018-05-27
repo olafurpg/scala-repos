@@ -82,10 +82,14 @@ object revcomp {
       inplaceComplementReverse(line)
 
       if (isSplitLine) {
-        if (isFirstLine) { w.write(line); isFirstLine = false } else {
+        if (isFirstLine) {
+          w.write(line); isFirstLine = false
+        } else {
           w.write(line, 0, n - k); w.write(nl); w.write(line, n - k, k)
         }
-      } else { w.write(line); w.write(nl) }
+      } else {
+        w.write(line); w.write(nl)
+      }
     }
     if (isSplitLine && !isFirstLine) w.write(nl)
   }

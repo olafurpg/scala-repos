@@ -333,7 +333,7 @@ class RationalTest extends FunSuite {
   }
 
   test("Rational(0D) is Zero") {
-    assert(Rational(0D) === Rational.zero)
+    assert(Rational(0d) === Rational.zero)
   }
 
   test("compareToOne") {

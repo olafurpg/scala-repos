@@ -68,7 +68,7 @@ trait ExistentialsAndSkolems { self: SymbolTable =>
       s.existentialBound match {
         case TypeBounds(lo, hi) => TypeBounds(lo, hiBound(s))
         case _                  => hiBound(s)
-    })
+      })
   }
 
   /** Given a set `rawSyms` of term- and type-symbols, and a type

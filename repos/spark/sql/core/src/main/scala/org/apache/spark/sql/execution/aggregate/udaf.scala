@@ -49,8 +49,7 @@ sealed trait BufferSetterGetterUtils {
     while (i < getters.length) {
       getters(i) = dataTypes(i) match {
         case NullType =>
-          (row: InternalRow, ordinal: Int) =>
-            null
+          (row: InternalRow, ordinal: Int) => null
 
         case BooleanType =>
           (row: InternalRow, ordinal: Int) =>
@@ -115,8 +114,7 @@ sealed trait BufferSetterGetterUtils {
     while (i < setters.length) {
       setters(i) = dataTypes(i) match {
         case NullType =>
-          (row: MutableRow, ordinal: Int, value: Any) =>
-            row.setNullAt(ordinal)
+          (row: MutableRow, ordinal: Int, value: Any) => row.setNullAt(ordinal)
 
         case b: BooleanType =>
           (row: MutableRow, ordinal: Int, value: Any) =>

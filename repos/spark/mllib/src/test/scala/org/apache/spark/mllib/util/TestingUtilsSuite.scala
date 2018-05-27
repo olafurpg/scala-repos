@@ -168,65 +168,65 @@ class TestingUtilsSuite extends SparkFunSuite {
     // Comparisons of two dense vectors
     assert(
       Vectors.dense(Array(3.1, 3.5, 0.0)) ~==
-        Vectors.dense(Array(3.1 + 1E-8, 3.5 + 2E-7, 1E-8)) absTol 1E-6)
+        Vectors.dense(Array(3.1 + 1e-8, 3.5 + 2e-7, 1e-8)) absTol 1e-6)
 
     assert(
       Vectors.dense(Array(3.1, 3.5, 0.0)) !~==
-        Vectors.dense(Array(3.1 + 1E-5, 3.5 + 2E-7, 1 + 1E-3)) absTol 1E-6)
+        Vectors.dense(Array(3.1 + 1e-5, 3.5 + 2e-7, 1 + 1e-3)) absTol 1e-6)
 
     assert(
       Vectors.dense(Array(3.1, 3.5, 0.0)) ~=
-        Vectors.dense(Array(3.1 + 1E-8, 3.5 + 2E-7, 1E-8)) absTol 1E-6)
+        Vectors.dense(Array(3.1 + 1e-8, 3.5 + 2e-7, 1e-8)) absTol 1e-6)
 
     assert(
       Vectors.dense(Array(3.1, 3.5, 0.0)) !~=
-        Vectors.dense(Array(3.1 + 1E-5, 3.5 + 2E-7, 1 + 1E-3)) absTol 1E-6)
+        Vectors.dense(Array(3.1 + 1e-5, 3.5 + 2e-7, 1 + 1e-3)) absTol 1e-6)
 
     assert(
       !(Vectors.dense(Array(3.1, 3.5, 0.0)) !~=
-        Vectors.dense(Array(3.1 + 1E-8, 3.5 + 2E-7, 1E-8)) absTol 1E-6))
+        Vectors.dense(Array(3.1 + 1e-8, 3.5 + 2e-7, 1e-8)) absTol 1e-6))
 
     assert(
       !(Vectors.dense(Array(3.1, 3.5, 0.0)) ~= Vectors.dense(
-        Array(3.1 + 1E-5, 3.5 + 2E-7, 1 + 1E-3)) absTol 1E-6))
+        Array(3.1 + 1e-5, 3.5 + 2e-7, 1 + 1e-3)) absTol 1e-6))
 
     // Should throw exception with message when test fails.
     intercept[TestFailedException](
       Vectors.dense(Array(3.1, 3.5, 0.0)) !~==
-        Vectors.dense(Array(3.1 + 1E-8, 3.5 + 2E-7, 1E-8)) absTol 1E-6)
+        Vectors.dense(Array(3.1 + 1e-8, 3.5 + 2e-7, 1e-8)) absTol 1e-6)
 
     intercept[TestFailedException](
       Vectors.dense(Array(3.1, 3.5, 0.0)) ~==
-        Vectors.dense(Array(3.1 + 1E-5, 3.5 + 2E-7, 1 + 1E-3)) absTol 1E-6)
+        Vectors.dense(Array(3.1 + 1e-5, 3.5 + 2e-7, 1 + 1e-3)) absTol 1e-6)
 
     // Comparisons of two sparse vectors
     assert(
       Vectors.sparse(3, Array(0, 2), Array(3.1, 2.4)) ~== Vectors
-        .sparse(3, Array(0, 2), Array(3.1 + 1E-8, 2.4 + 1E-7)) absTol 1E-6)
+        .sparse(3, Array(0, 2), Array(3.1 + 1e-8, 2.4 + 1e-7)) absTol 1e-6)
 
     assert(
-      Vectors.sparse(3, Array(0, 2), Array(3.1 + 1E-8, 2.4 + 1E-7)) ~==
-        Vectors.sparse(3, Array(0, 2), Array(3.1, 2.4)) absTol 1E-6)
+      Vectors.sparse(3, Array(0, 2), Array(3.1 + 1e-8, 2.4 + 1e-7)) ~==
+        Vectors.sparse(3, Array(0, 2), Array(3.1, 2.4)) absTol 1e-6)
 
     assert(
       Vectors.sparse(3, Array(0, 2), Array(3.1, 2.4)) !~==
-        Vectors.sparse(3, Array(0, 2), Array(3.1 + 1E-3, 2.4)) absTol 1E-6)
+        Vectors.sparse(3, Array(0, 2), Array(3.1 + 1e-3, 2.4)) absTol 1e-6)
 
     assert(
-      Vectors.sparse(3, Array(0, 2), Array(3.1 + 1E-3, 2.4)) !~==
-        Vectors.sparse(3, Array(0, 2), Array(3.1, 2.4)) absTol 1E-6)
+      Vectors.sparse(3, Array(0, 2), Array(3.1 + 1e-3, 2.4)) !~==
+        Vectors.sparse(3, Array(0, 2), Array(3.1, 2.4)) absTol 1e-6)
 
     // Comparisons of a dense vector and a sparse vector
     assert(
       Vectors.sparse(3, Array(0, 2), Array(3.1, 2.4)) ~==
-        Vectors.dense(Array(3.1 + 1E-8, 0, 2.4 + 1E-7)) absTol 1E-6)
+        Vectors.dense(Array(3.1 + 1e-8, 0, 2.4 + 1e-7)) absTol 1e-6)
 
     assert(
-      Vectors.dense(Array(3.1 + 1E-8, 0, 2.4 + 1E-7)) ~==
-        Vectors.sparse(3, Array(0, 2), Array(3.1, 2.4)) absTol 1E-6)
+      Vectors.dense(Array(3.1 + 1e-8, 0, 2.4 + 1e-7)) ~==
+        Vectors.sparse(3, Array(0, 2), Array(3.1, 2.4)) absTol 1e-6)
 
     assert(
       Vectors.sparse(3, Array(0, 2), Array(3.1, 2.4)) !~==
-        Vectors.dense(Array(3.1, 1E-3, 2.4)) absTol 1E-6)
+        Vectors.dense(Array(3.1, 1e-3, 2.4)) absTol 1e-6)
   }
 }

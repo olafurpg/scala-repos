@@ -93,8 +93,14 @@ private[ui] class LogPage(parent: WorkerWebUI)
 
     val backButton =
       if (startByte > 0) {
-        <a href={"?%s&logType=%s&offset=%s&byteLength=%s"
-          .format(params, logType, math.max(startByte - byteLength, 0), byteLength)}>
+        <a href={
+          "?%s&logType=%s&offset=%s&byteLength=%s"
+            .format(
+              params,
+              logType,
+              math.max(startByte - byteLength, 0),
+              byteLength)
+        }>
           <button type="button" class="btn btn-default">
             Previous {Utils.bytesToString(math.min(byteLength, startByte))}
           </button>
@@ -107,10 +113,17 @@ private[ui] class LogPage(parent: WorkerWebUI)
 
     val nextButton =
       if (endByte < logLength) {
-        <a href={"?%s&logType=%s&offset=%s&byteLength=%s".
-          format(params, logType, endByte, byteLength)}>
+        <a href={
+          "?%s&logType=%s&offset=%s&byteLength=%s".format(
+            params,
+            logType,
+            endByte,
+            byteLength)
+        }>
           <button type="button" class="btn btn-default">
-            Next {Utils.bytesToString(math.min(byteLength, logLength - endByte))}
+            Next {
+          Utils.bytesToString(math.min(byteLength, logLength - endByte))
+        }
           </button>
         </a>
       } else {

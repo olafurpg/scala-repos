@@ -495,7 +495,11 @@ trait MetaMapper[A <: Mapper[A]] extends BaseMetaMapper with Mapper[A] {
 
     var wav = whereAdded
 
-    def whereOrAnd = if (wav) " AND " else { wav = true; " WHERE " }
+    def whereOrAnd =
+      if (wav) " AND "
+      else {
+        wav = true; " WHERE "
+      }
 
     class DBFuncWrapper(dbFunc: Box[String]) {
       def apply(field: String) = dbFunc match {
@@ -551,7 +555,7 @@ trait MetaMapper[A <: Mapper[A]] extends BaseMetaMapper with Mapper[A] {
                 .map(
                   v =>
                     MapperRules.quoteColumnName.vend(field._dbColumnNameLC) +
-                    " = ?")
+                      " = ?")
                 .mkString(whereOrAnd + " (", " OR ", ")")
 
           case in: InRaw[A, _] =>
@@ -754,7 +758,7 @@ trait MetaMapper[A <: Mapper[A]] extends BaseMetaMapper with Mapper[A] {
               }
               _afterDelete(toDelete)
               ret
-          })
+            })
           .openOr(false)
     }
 
@@ -1350,7 +1354,7 @@ trait MetaMapper[A <: Mapper[A]] extends BaseMetaMapper with Mapper[A] {
       ??(f.method, in) match {
         case field if (field.i_name_! eq null) => field.setName_!(f.name)
         case _                                 =>
-    })
+      })
   }
 
   /**
@@ -1717,7 +1721,7 @@ trait MetaMapper[A <: Mapper[A]] extends BaseMetaMapper with Mapper[A] {
       e._2.invoke(what) match {
         case lccb: LifecycleCallbacks => f(lccb)
         case _                        =>
-    })
+      })
     toRun.foreach { tf =>
       tf(what)
     }
@@ -2552,7 +2556,7 @@ trait KeyedMetaMapper[Type, A <: KeyedMapper[Type, A]]
       obj match {
         case Full(obj) => true
         case _         => false
-    }) match {
+      }) match {
       case obj :: _ => obj
       case _        => Empty
     }

@@ -30,7 +30,9 @@ trait AjaxEditableField[FieldType, OwnerType <: Mapper[OwnerType]]
     if (editableField) {
       <xml:group>{
         toForm.map { form =>
-          SHtml.ajaxEditable(super.asHtml, form, () => {fieldOwner.save; onSave; net.liftweb.http.js.JsCmds.Noop})
+          SHtml.ajaxEditable(super.asHtml, form, () => {
+            fieldOwner.save; onSave; net.liftweb.http.js.JsCmds.Noop
+          })
         } openOr super.asHtml
       }</xml:group>
     } else {

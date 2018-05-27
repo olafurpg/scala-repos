@@ -73,7 +73,7 @@ sealed abstract class IndexedStateT[F[_], -S1, S2, A] { self =>
         F.bind[(S2, A), (S3, B)](sf(s)) { t =>
           val sfb: F[(S2 => F[(S3, B)])] = f(t._2).getF(F)
           F.bind[S2 => F[(S3, B)], (S3, B)](sfb)(ff => ff(t._1))
-    })
+        })
 
   def lift[M[_]](
       implicit F: Monad[F],
@@ -91,7 +91,7 @@ sealed abstract class IndexedStateT[F[_], -S1, S2, A] { self =>
     (m: Monad[FF]) =>
       (s: S) => {
         M.copoint(ev(self)(s))
-    }
+      }
   )
 
   def unliftId[M[_], S <: S1](
@@ -109,7 +109,7 @@ sealed abstract class IndexedStateT[F[_], -S1, S2, A] { self =>
           (sf: (S1 => F[(S2, A)])) =>
             F.map(sf(s)) {
               case (s, a) => (W.zero, a, s)
-          })
+            })
     )
 
   def zoom[S0, S3, S <: S1](l: LensFamily[S0, S3, S, S2])(

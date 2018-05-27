@@ -115,7 +115,7 @@ object HiveTypeCoercion {
         case None => None
         case Some(d) =>
           findTightestCommonTypeToString(d, c)
-    })
+      })
   }
 
   /**
@@ -127,7 +127,7 @@ object HiveTypeCoercion {
       r match {
         case None    => None
         case Some(d) => findTightestCommonTypeOfTwo(d, c)
-    })
+      })
   }
 
   /**
@@ -157,7 +157,7 @@ object HiveTypeCoercion {
       r match {
         case Some(d) => findWiderTypeForTwo(d, c)
         case None    => None
-    })
+      })
   }
 
   /**

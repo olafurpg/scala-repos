@@ -40,7 +40,7 @@ class LinearProgramTest extends FunSuite {
 
     val result = maximize(lpp)
 
-    assert(norm(result.result - DenseVector(40.0, 17.5, 42.5), 2) < 1E-4)
+    assert(norm(result.result - DenseVector(40.0, 17.5, 42.5), 2) < 1e-4)
   }
 
   test("minimize") {
@@ -58,7 +58,7 @@ class LinearProgramTest extends FunSuite {
 
     val res = minimize(lpp)
     println(res.result)
-    assert(norm(res.result - DenseVector(10.0, 0.0, 0.0, 10.0), 2) < 1E-4)
+    assert(norm(res.result - DenseVector(10.0, 0.0, 0.0, 10.0), 2) < 1e-4)
   }
 
   /*

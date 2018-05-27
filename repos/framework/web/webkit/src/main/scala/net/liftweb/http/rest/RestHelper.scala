@@ -592,11 +592,9 @@ trait RestHelper extends LiftRules.DispatchPF {
       implicit c: T => LiftResponse): () => Box[LiftResponse] =
     in match {
       case Full(v) =>
-        () =>
-          Full(c(v))
+        () => Full(c(v))
       case e: EmptyBox =>
-        () =>
-          emptyToResp(e)
+        () => emptyToResp(e)
     }
 
   protected def emptyToResp(eb: EmptyBox): Box[LiftResponse] =
@@ -623,11 +621,9 @@ trait RestHelper extends LiftRules.DispatchPF {
       implicit c: T => LiftResponse): () => Box[LiftResponse] =
     in match {
       case Some(v) =>
-        () =>
-          Full(c(v))
+        () => Full(c(v))
       case _ =>
-        () =>
-          Empty
+        () => Empty
     }
 
   /**
@@ -666,7 +662,7 @@ trait RestHelper extends LiftRules.DispatchPF {
       in() match {
         case Some(v) => Full(c(v))
         case _       => Empty
-    }
+      }
 
   /**
     * Override this method to create an AppXmlResponse with the

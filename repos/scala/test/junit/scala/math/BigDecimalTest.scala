@@ -67,12 +67,18 @@ class BigDecimalTest {
   // Motivated by SI-6456: scala.math.BigDecimal should not accept a null value
   @Test
   def refusesNullTest() {
-    def isIAE[A](a: => A) = try { a; false } catch {
-      case iae: IllegalArgumentException => true
-    }
-    def isNPE[A](a: => A) = try { a; false } catch {
-      case npe: NullPointerException => true
-    }
+    def isIAE[A](a: => A) =
+      try {
+        a; false
+      } catch {
+        case iae: IllegalArgumentException => true
+      }
+    def isNPE[A](a: => A) =
+      try {
+        a; false
+      } catch {
+        case npe: NullPointerException => true
+      }
     assert(
       isIAE(new BigDecimal(null: BD, new MC(2))) &&
         isIAE(new BigDecimal(new BD("5.7"), null: MC)) &&

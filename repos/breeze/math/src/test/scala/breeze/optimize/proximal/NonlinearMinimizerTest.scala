@@ -59,7 +59,7 @@ class NonlinearMinimizerTest extends OptimizeTestBase with Matchers {
       QuadraticMinimizer.Cost(ata, atb :* (-1.0)),
       DenseVector.zeros[Double](n))
     println(s"Positivity projection iter ${nlResult.iter}")
-    assert(norm(nlResult.x - goodx, 2) < 1E-3)
+    assert(norm(nlResult.x - goodx, 2) < 1e-3)
   }
 
   test("Nonlinear Minimization with positivity proximal compared to Octave") {
@@ -77,7 +77,7 @@ class NonlinearMinimizerTest extends OptimizeTestBase with Matchers {
       QuadraticMinimizer.Cost(ata, atb :* (-1.0)),
       DenseVector.zeros[Double](n))
     println(s"Positivity proximal iter ${nlResult.iter}")
-    assert(norm(nlResult.z - goodx, 2) < 1E-3)
+    assert(norm(nlResult.z - goodx, 2) < 1e-3)
   }
 
   test(
@@ -87,7 +87,7 @@ class NonlinearMinimizerTest extends OptimizeTestBase with Matchers {
     val nlResult =
       NonlinearMinimizer(n, BOX, 0.0).minimizeAndReturnState(cost, init)
     println(s"Bounds projection iter ${nlResult.iter}")
-    assert(norm(nlResult.x - gold) < 1E-4)
+    assert(norm(nlResult.x - gold) < 1e-4)
   }
 
   test(
@@ -99,7 +99,7 @@ class NonlinearMinimizerTest extends OptimizeTestBase with Matchers {
     val nlResult = new NonlinearMinimizer(ProjectBox(lb, ub))
       .minimizeAndReturnState(cost, init)
     println(s"Bounds proximal iter ${nlResult.iter}")
-    assert(norm(nlResult.z - gold) < 1E-4)
+    assert(norm(nlResult.z - gold) < 1e-4)
   }
 
   test("Nonlinear Minimization with probability simplex compared to Octave") {

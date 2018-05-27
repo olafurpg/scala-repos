@@ -52,7 +52,7 @@ object Test {
   @elidable(FINEST)
   def fa() = 1
   @elidable(FINEST)
-  def fb() = 1l
+  def fb() = 1L
   @elidable(FINEST)
   def fc() = 1.0f
   @elidable(FINEST)

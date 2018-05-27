@@ -204,8 +204,7 @@ trait Rule[-In, +Out, +A, +X] extends (In => Result[Out, A, X]) {
   def ^~>~^[B1, B2, B3, B >: A <% B2 ~ B3, C](f: (B1, B2, B3) => C) = map { a =>
     (a: B2 ~ B3) match {
       case b2 ~ b3 =>
-        b1: B1 =>
-          f(b1, b2, b3)
+        b1: B1 => f(b1, b2, b3)
     }
   }
 }

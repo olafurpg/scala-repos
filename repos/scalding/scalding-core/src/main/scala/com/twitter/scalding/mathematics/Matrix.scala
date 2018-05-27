@@ -372,7 +372,12 @@ class Matrix[RowT, ColT, ValT](
   def binarizeAs[NewValT](
       implicit mon: Monoid[ValT],
       ring: Ring[NewValT]): Matrix[RowT, ColT, NewValT] = {
-    mapValues(x => if (mon.isNonZero(x)) { ring.one } else { ring.zero })(ring)
+    mapValues(x =>
+      if (mon.isNonZero(x)) {
+        ring.one
+      } else {
+        ring.zero
+      })(ring)
   }
 
   // Row Operations
@@ -1211,7 +1216,9 @@ class RowVector[ColT, ValT](
 
   def topElems(k: Int)(implicit ord: Ordering[ValT]): RowVector[ColT, ValT] = {
     // TODO this should be tunable:
-    if (k < 1000) { topWithTiny(k) } else {
+    if (k < 1000) {
+      topWithTiny(k)
+    } else {
       val fieldName = valS.toString
       val ordValS = new Fields(fieldName)
       ordValS.setComparator(fieldName, ord)
@@ -1355,7 +1362,9 @@ class ColVector[RowT, ValT](
   }
 
   def topElems(k: Int)(implicit ord: Ordering[ValT]): ColVector[RowT, ValT] = {
-    if (k < 1000) { topWithTiny(k) } else {
+    if (k < 1000) {
+      topWithTiny(k)
+    } else {
       val newPipe = pipe
         .groupAll {
           _.sortBy(valS).reverse.take(k)

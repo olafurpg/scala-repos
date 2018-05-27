@@ -36,7 +36,7 @@ class ElementwiseProductSuite extends SparkFunSuite with MLlibTestSparkContext {
     val transformedVec = transformedVecs(0)
     val expectedVec = Vectors.dense(2.0, 2.0, 0.0, -2.25)
     assert(
-      transformedVec ~== expectedVec absTol 1E-5,
+      transformedVec ~== expectedVec absTol 1e-5,
       s"Expected transformed vector $expectedVec but found $transformedVec")
   }
 
@@ -62,7 +62,7 @@ class ElementwiseProductSuite extends SparkFunSuite with MLlibTestSparkContext {
 
     assert(
       (data2, data2RDD.collect()).zipped
-        .forall((v1, v2) => v1 ~== v2 absTol 1E-5))
-    assert(data2(0) ~== Vectors.sparse(3, Seq((1, 0.0), (2, -1.5))) absTol 1E-5)
+        .forall((v1, v2) => v1 ~== v2 absTol 1e-5))
+    assert(data2(0) ~== Vectors.sparse(3, Seq((1, 0.0), (2, -1.5))) absTol 1e-5)
   }
 }

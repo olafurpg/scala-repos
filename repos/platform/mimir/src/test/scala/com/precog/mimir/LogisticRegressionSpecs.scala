@@ -422,32 +422,32 @@ trait LogisticRegressionSpecs[M[+ _]]
 
       result mustEqual Set(
         (SObject(Map(
-          "model2" -> SObject(Map("fit" -> SDecimal(3.487261531994447E-19))),
-          "model1" -> SObject(Map("fit" -> SDecimal(8.644057113036095E-22)))))),
+          "model2" -> SObject(Map("fit" -> SDecimal(3.487261531994447e-19))),
+          "model1" -> SObject(Map("fit" -> SDecimal(8.644057113036095e-22)))))),
         (SObject(
           Map("model2" -> SObject(
-            Map("fit" -> SDecimal(1.5628821893349888E-18)))))),
+            Map("fit" -> SDecimal(1.5628821893349888e-18)))))),
         (SObject(
           Map(
             "model2" -> SObject(Map("fit" -> SDecimal(0.0003353501304664781))),
             "model1" -> SObject(
               Map("fit" -> SDecimal(0.000006144174602214718)))))),
         (SObject(Map(
-          "model2" -> SObject(Map("fit" -> SDecimal(4.1399375473943306E-8))),
+          "model2" -> SObject(Map("fit" -> SDecimal(4.1399375473943306e-8))),
           "model1" -> SObject(Map("fit" -> SDecimal(0.0013585199504289591)))))),
         (SObject(
           Map(
-            "model2" -> SObject(Map("fit" -> SDecimal(5.109089028037222E-12))),
+            "model2" -> SObject(Map("fit" -> SDecimal(5.109089028037222e-12))),
             "model1" -> SObject(
-              Map("fit" -> SDecimal(3.7751345441365816E-11)))))),
+              Map("fit" -> SDecimal(3.7751345441365816e-11)))))),
         (SObject(Map(
-          "model2" -> SObject(Map("fit" -> SDecimal(1.0261879630648827E-10))),
-          "model1" -> SObject(Map("fit" -> SDecimal(6.305116760146985E-16)))))),
+          "model2" -> SObject(Map("fit" -> SDecimal(1.0261879630648827e-10))),
+          "model1" -> SObject(Map("fit" -> SDecimal(6.305116760146985e-16)))))),
         (SObject(
           Map(
-            "model2" -> SObject(Map("fit" -> SDecimal(2.543665647376276E-13))),
+            "model2" -> SObject(Map("fit" -> SDecimal(2.543665647376276e-13))),
             "model1" -> SObject(
-              Map("fit" -> SDecimal(1.1548224173015786E-17)))))),
+              Map("fit" -> SDecimal(1.1548224173015786e-17)))))),
         (SObject(
           Map(
             "model2" -> SObject(Map("fit" -> SDecimal(0.11920292202211755))),
@@ -464,19 +464,19 @@ trait LogisticRegressionSpecs[M[+ _]]
         (SObject(
           Map("model3" -> SObject(Map("fit" -> SDecimal(0.999983298578152)))))),
         (SObject(Map(
-          "model3" -> SObject(Map("fit" -> SDecimal(2.646573631904765E-9)))))),
+          "model3" -> SObject(Map("fit" -> SDecimal(2.646573631904765e-9)))))),
         (SObject(
           Map(
             "model3" -> SObject(Map("fit" -> SDecimal(0.6224593312018546)))))),
         (SObject(Map(
-          "model3" -> SObject(Map("fit" -> SDecimal(4.1399375473943306E-8)))))),
+          "model3" -> SObject(Map("fit" -> SDecimal(4.1399375473943306e-8)))))),
         (SObject(Map(
-          "model3" -> SObject(Map("fit" -> SDecimal(5.043474082014517E-7)))))),
+          "model3" -> SObject(Map("fit" -> SDecimal(5.043474082014517e-7)))))),
         (SObject(
           Map(
             "model3" -> SObject(Map("fit" -> SDecimal(0.6224593312018546)))))),
         (SObject(Map(
-          "model3" -> SObject(Map("fit" -> SDecimal(2.289734845593124E-11)))))),
+          "model3" -> SObject(Map("fit" -> SDecimal(2.289734845593124e-11)))))),
         (SObject(
           Map("model3" -> SObject(Map("fit" -> SDecimal(0.6224593312018546))))))
       )
@@ -498,25 +498,25 @@ trait LogisticRegressionSpecs[M[+ _]]
       result mustEqual Set(
         (SObject(Map(
           "model1" -> SObject(Map("fit" -> SDecimal(0.0003353501304664781))),
-          "model3" -> SObject(Map("fit" -> SDecimal(1.522997951276035E-8)))))),
+          "model3" -> SObject(Map("fit" -> SDecimal(1.522997951276035e-8)))))),
         (SObject(Map(
-          "model1" -> SObject(Map("fit" -> SDecimal(4.1399375473943306E-8)))))),
+          "model1" -> SObject(Map("fit" -> SDecimal(4.1399375473943306e-8)))))),
         (SObject(
           Map("model1" -> SObject(
-            Map("fit" -> SDecimal(1.0261879630648827E-10)))))),
+            Map("fit" -> SDecimal(1.0261879630648827e-10)))))),
         (SObject(
           Map(
             "model1" -> SObject(Map("fit" -> SDecimal(0.11920292202211755)))))),
         (SObject(
           Map(
-            "model2" -> SObject(Map("fit" -> SDecimal(8.315280276641321E-7))),
+            "model2" -> SObject(Map("fit" -> SDecimal(8.315280276641321e-7))),
             "model1" -> SObject(
               Map("fit" -> SDecimal(0.00012339457598623172)))))),
         (SObject(Map(
-          "model1" -> SObject(Map("fit" -> SDecimal(1.522997951276035E-8)))))),
+          "model1" -> SObject(Map("fit" -> SDecimal(1.522997951276035e-8)))))),
         (SObject(
           Map("model1" -> SObject(
-            Map("fit" -> SDecimal(3.7751345441365816E-11)))))),
+            Map("fit" -> SDecimal(3.7751345441365816e-11)))))),
         (SObject(
           Map(
             "model1" -> SObject(Map("fit" -> SDecimal(0.04742587317756678)))))),
@@ -527,12 +527,12 @@ trait LogisticRegressionSpecs[M[+ _]]
           Map(
             "model3" -> SObject(Map("fit" -> SDecimal(0.9939401985084158)))))),
         (SObject(Map(
-          "model2" -> SObject(Map("fit" -> SDecimal(2.319522830243569E-16)))))),
+          "model2" -> SObject(Map("fit" -> SDecimal(2.319522830243569e-16)))))),
         (SObject(
           Map(
             "model3" -> SObject(Map("fit" -> SDecimal(0.9820137900379085)))))),
         (SObject(Map(
-          "model2" -> SObject(Map("fit" -> SDecimal(3.625140919143559E-34))))))
+          "model2" -> SObject(Map("fit" -> SDecimal(3.625140919143559e-34))))))
       )
     }
   }

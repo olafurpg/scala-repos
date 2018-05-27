@@ -39,7 +39,7 @@ class FlowMapAsyncUnorderedSpec extends AkkaSpec {
           Future {
             Await.ready(latch(n), 5.seconds)
             n
-        })
+          })
         .to(Sink.fromSubscriber(c))
         .run()
       val sub = c.expectSubscription()
@@ -64,7 +64,7 @@ class FlowMapAsyncUnorderedSpec extends AkkaSpec {
           Future {
             probe.ref ! n
             n
-        })
+          })
         .to(Sink.fromSubscriber(c))
         .run()
       val sub = c.expectSubscription()
@@ -96,7 +96,7 @@ class FlowMapAsyncUnorderedSpec extends AkkaSpec {
               Await.ready(latch, 10.seconds)
               n
             }
-        })
+          })
         .to(Sink.fromSubscriber(c))
         .run()
       val sub = c.expectSubscription()
@@ -117,7 +117,7 @@ class FlowMapAsyncUnorderedSpec extends AkkaSpec {
               Await.ready(latch, 10.seconds)
               n
             }
-        })
+          })
         .to(Sink.fromSubscriber(c))
         .run()
       val sub = c.expectSubscription()
@@ -133,7 +133,7 @@ class FlowMapAsyncUnorderedSpec extends AkkaSpec {
           Future {
             if (n == 3) throw new RuntimeException("err3") with NoStackTrace
             else n
-        })
+          })
         .withAttributes(supervisionStrategy(resumingDecider))
         .runWith(TestSink.probe[Int])
         .request(10)
@@ -169,7 +169,7 @@ class FlowMapAsyncUnorderedSpec extends AkkaSpec {
               if (n == 3)
                 throw new RuntimeException("err3b") with NoStackTrace
               else n
-          })
+            })
           .withAttributes(supervisionStrategy(resumingDecider))
           .grouped(10)
           .runWith(Sink.head),

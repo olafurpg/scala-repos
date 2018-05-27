@@ -29,8 +29,8 @@ trait IterateeFunctions {
                       h <- k2(in)
                       t <- this.repeatBuild[E, A, F](iter)
                     } yield mon.append(acc, mon.append(F.point(h), t)))
-            )
-        ),
+              )
+          ),
         empty = cont(step(acc)),
         eof = done(acc, eofInput)
       )

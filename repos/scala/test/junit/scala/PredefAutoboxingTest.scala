@@ -25,10 +25,10 @@ class PredefAutoboxingTest {
     assertEquals(Predef.Long2long(null), 0L)
 
   @Test def unboxNullFloat() =
-    assertEquals(Predef.Float2float(null), 0F, 0F)
+    assertEquals(Predef.Float2float(null), 0f, 0f)
 
   @Test def unboxNullDouble() =
-    assertEquals(Predef.Double2double(null), 0D, 0D)
+    assertEquals(Predef.Double2double(null), 0d, 0d)
 
   @Test def unboxNullBoolean() =
     assertEquals(Predef.Boolean2boolean(null), false)

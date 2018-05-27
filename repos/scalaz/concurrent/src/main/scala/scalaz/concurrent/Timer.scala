@@ -100,7 +100,7 @@ case class Timer(
               .get(waitTime)
               .map(current => (waitTime, timedCallback :: current))
               .getOrElse((waitTime, List(timedCallback)))
-        }
+          }
         Future.async(listen)
       } else {
         Future.now(value)

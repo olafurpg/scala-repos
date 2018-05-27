@@ -33,8 +33,7 @@ private[http] class HttpResponseRendererFactory(
         val bytes = (new ByteArrayRendering(32) ~~ h ~~ CrLf).get
         _ ~~ bytes
       case None ⇒
-        _ ⇒
-          ()
+        _ ⇒ ()
     }
 
   // as an optimization we cache the Date header of the last second here

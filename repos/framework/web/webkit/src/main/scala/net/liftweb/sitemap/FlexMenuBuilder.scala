@@ -143,11 +143,9 @@ trait FlexMenuBuilder {
   protected def renderSelfLinked(
       item: MenuItem,
       renderInner: Seq[MenuItem] => NodeSeq): Elem =
-    buildInnerTag(
-      <xml:group>{renderLink(item.uri, item.text, item.path,
-      item.current)}{renderInner(item.kids)}</xml:group>,
-      item.path,
-      item.current)
+    buildInnerTag(<xml:group>{
+      renderLink(item.uri, item.text, item.path, item.current)
+    }{renderInner(item.kids)}</xml:group>, item.path, item.current)
 
   /**
     * Render the currently selected menu item, but with no a link back to self
@@ -181,11 +179,9 @@ trait FlexMenuBuilder {
   protected def renderItemInPath(
       item: MenuItem,
       renderInner: Seq[MenuItem] => NodeSeq): Elem =
-    buildInnerTag(
-      <xml:group>{renderLink(item.uri, item.text, item.path,
-      item.current)}{renderInner(item.kids)}</xml:group>,
-      item.path,
-      item.current)
+    buildInnerTag(<xml:group>{
+      renderLink(item.uri, item.text, item.path, item.current)
+    }{renderInner(item.kids)}</xml:group>, item.path, item.current)
 
   /**
     * Render a menu item that's neither in the path nor
@@ -193,11 +189,9 @@ trait FlexMenuBuilder {
   protected def renderItem(
       item: MenuItem,
       renderInner: Seq[MenuItem] => NodeSeq): Elem =
-    buildInnerTag(
-      <xml:group>{renderLink(item.uri, item.text, item.path,
-      item.current)}{renderInner(item.kids)}</xml:group>,
-      item.path,
-      item.current)
+    buildInnerTag(<xml:group>{
+      renderLink(item.uri, item.text, item.path, item.current)
+    }{renderInner(item.kids)}</xml:group>, item.path, item.current)
 
   /**
     * Render the outer tag for a group of menu items

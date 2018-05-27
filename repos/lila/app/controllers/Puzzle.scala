@@ -84,7 +84,7 @@ object Puzzle extends LilaController {
         api = _ =>
           fuccess {
             Ok(JsData history ui)
-        }
+          }
       )
     }
   }
@@ -128,7 +128,7 @@ object Puzzle extends LilaController {
               case (None, _) => NotFound(noMorePuzzleJson)
             }
           }
-      }
+        }
     ) map (_ as JSON)
   }
 
@@ -184,7 +184,7 @@ object Puzzle extends LilaController {
                     win = data.isWin.some,
                     animationDuration = env.AnimationDuration))
               }
-        }
+          }
       ) map (_ as JSON)
     }
   }
@@ -198,7 +198,7 @@ object Puzzle extends LilaController {
           env.api.attempt.vote(attempt, vote == 1) map {
             case (p, a) =>
               Ok(play.api.libs.json.Json.arr(a.vote, p.vote.sum))
-        }
+          }
       ) map (_ as JSON)
     }
   }

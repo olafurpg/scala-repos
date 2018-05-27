@@ -163,7 +163,11 @@ sealed trait Matrix2[R, C, V] extends Serializable {
     lazy val newPipe = toTypedPipe
       .map {
         case (r, c, x) =>
-          (r, c, if (mon.isNonZero(x)) { ring.one } else { ring.zero })
+          (r, c, if (mon.isNonZero(x)) {
+            ring.one
+          } else {
+            ring.zero
+          })
       }
       .filter { kv =>
         ring.isNonZero(kv._3)

@@ -97,7 +97,7 @@ class PageRankSuite extends SparkFunSuite with LocalSparkContext {
             pr -
               (resetProb + (1.0 - resetProb) * (resetProb * (nVertices - 1))))
           val correct =
-            (vid > 0 && pr == resetProb) || (vid == 0L && p < 1.0E-5)
+            (vid > 0 && pr == resetProb) || (vid == 0L && p < 1.0e-5)
           if (!correct) 1 else 0
       }
       assert(staticErrors.sum === 0)

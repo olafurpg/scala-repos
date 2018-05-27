@@ -48,8 +48,8 @@ class FpFilterTest extends FunSuite with Checkers {
   }
 
   test("FpFilter doesn't evaluated for easy problems") {
-    val x = FpFilter.exact[Bad](1D)
-    val y = FpFilter.exact[Bad](1.2D)
+    val x = FpFilter.exact[Bad](1d)
+    val y = FpFilter.exact[Bad](1.2d)
     assert((x + y).signum == 1)
     assert((x - y).signum == -1)
     assert((x * y).signum == 1)

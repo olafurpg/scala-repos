@@ -36,9 +36,11 @@ abstract class MappedTextarea[T <: Mapper[T]](owner: T, maxLen: Int)
       Full(appendFieldId(<textarea name={funcName}
 	               rows={textareaRows.toString}
 	               cols={textareaCols.toString}>{
-	   get match {
-	     case null => ""
-	     case s => s}}</textarea>))
+        get match {
+          case null => ""
+          case s    => s
+        }
+      }</textarea>))
     }
   }
 

@@ -406,7 +406,7 @@ final class RhinoJSEnv private (
             setCallback(cb)
           case _ =>
             sys.error("First argument to init must be a function")
-      }
+        }
     )
 
     comObj.addFunction("close", _ => {

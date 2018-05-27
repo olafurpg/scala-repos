@@ -397,8 +397,8 @@ class StackClientTest
         assert(dtab == baseDtab)
         Activity.value(
           NameTree.Union(
-            NameTree.Weighted(1D, NameTree.Leaf(Name.bound(addr1))),
-            NameTree.Weighted(1D, NameTree.Leaf(Name.bound(addr2)))))
+            NameTree.Weighted(1d, NameTree.Leaf(Name.bound(addr1))),
+            NameTree.Weighted(1d, NameTree.Leaf(Name.bound(addr2)))))
       }
     }
 

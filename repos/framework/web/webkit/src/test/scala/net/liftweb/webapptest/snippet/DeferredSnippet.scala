@@ -43,6 +43,6 @@ class DeferredSnippet {
     val inActor: Boolean = Thread.currentThread.getStackTrace
       .exists(_.getClassName.contains("net.liftweb.actor."))
 
-    <span id={"actor_"+inActor}>stackWhack</span>
+    <span id={"actor_" + inActor}>stackWhack</span>
   }
 }

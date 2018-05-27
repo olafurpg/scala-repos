@@ -19,7 +19,7 @@ object Lobby extends LilaController {
             Json.obj(
               "lobby" -> Json.obj("version" -> Env.lobby.history.version)
             ))
-      }
+        }
     )
   }
 
@@ -45,7 +45,7 @@ object Lobby extends LilaController {
         ctx.me.fold(Env.lobby.seekApi.forAnon)(Env.lobby.seekApi.forUser) map {
           seeks =>
             Ok(JsArray(seeks.map(_.render)))
-      }
+        }
     )
   }
 

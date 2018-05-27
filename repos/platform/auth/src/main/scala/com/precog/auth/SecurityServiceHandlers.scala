@@ -75,7 +75,7 @@ class SecurityServiceHandlers(
         findAllAPIKeys(authAPIKey) map { keySet =>
           ok(keySet.nonEmpty.option(keySet))
         }
-    }
+      }
 
     val metadata = DescriptionMetadata(
       "Retrieves the children of the authorizing API key.")
@@ -99,7 +99,7 @@ class SecurityServiceHandlers(
           } yield {
             response.toEither.merge
           }
-      }
+        }
   }
 
   object CreateAPIKeyHandler extends CreateHandler {
@@ -162,7 +162,7 @@ class SecurityServiceHandlers(
         } getOrElse {
           Promise successful badRequest("Missing API key from request URL.")
         }
-    }
+      }
 
     val metadata = DescriptionMetadata(
       "Returns the details of the API key specified in the path.")
@@ -181,7 +181,7 @@ class SecurityServiceHandlers(
         } getOrElse {
           Promise successful badRequest("Missing API key from request URL.")
         }
-    }
+      }
 
     val metadata = DescriptionMetadata("Deletes the specified API key.")
   }
@@ -200,7 +200,7 @@ class SecurityServiceHandlers(
         } getOrElse {
           Promise successful badRequest("Missing API key from request URL.")
         }
-    }
+      }
 
     val metadata = DescriptionMetadata(
       "Returns the set of grants associated with the API key resource specified by the URL path.")
@@ -241,7 +241,7 @@ class SecurityServiceHandlers(
           response <- (for (apiKey <- apiKeyV; content <- contentV)
             yield create(apiKey, content)).sequence[Future, R]
         } yield response.toEither.merge
-    }
+      }
 
     val metadata = DescriptionMetadata(
       "Adds a new grant to the API key resource specified by the URL path.")
@@ -268,7 +268,7 @@ class SecurityServiceHandlers(
           Promise successful badRequest(
             "Missing API key or grant ID from request URL")
         }
-    }
+      }
 
     val metadata = DescriptionMetadata(
       "Deletes the grant resource specified by the URL path from the API key resource specified by the URL path.")
@@ -282,7 +282,7 @@ class SecurityServiceHandlers(
         findAllAPIKeys(authAPIKey) map { allKeys =>
           ok(Some(allKeys.flatMap(_.grants)))
         }
-    }
+      }
 
     val metadata = DescriptionMetadata(
       "Returns the list of grants available to the authorizing API key.")
@@ -334,7 +334,7 @@ class SecurityServiceHandlers(
         } getOrElse {
           Promise successful badRequest("Missing grant ID from request URL.")
         }
-    }
+      }
 
     val metadata = DescriptionMetadata(
       "Returns the details of the grant resource specified in the request URL.")
@@ -352,7 +352,7 @@ class SecurityServiceHandlers(
         } getOrElse {
           Promise successful badRequest("Missing grant ID from request URL.")
         }
-    }
+      }
 
     val metadata = DescriptionMetadata(
       "Returns the set of child grants derived from the grant resource specified in the request URL.")
@@ -401,7 +401,7 @@ class SecurityServiceHandlers(
             yield create(authAPIKey, parentId, content))
             .sequence[Future, R]
         } yield response.toEither.merge
-    }
+      }
 
     val metadata = DescriptionMetadata(
       "Creates a new grant as a child of the grant resource specified in the request URL, and deriving its permissions therefrom.")
@@ -442,7 +442,7 @@ class SecurityServiceHandlers(
         } getOrElse {
           Promise successful badRequest("Missing grant ID from request URL.")
         }
-    }
+      }
 
     val metadata = DescriptionMetadata(
       "Deletes the grant resource specified in the request URL.")
@@ -471,7 +471,7 @@ class SecurityServiceHandlers(
               "Invalid date provided to 'at parameter.",
               Some(e.message))
         }
-    }
+      }
 
     val metadata = AndMetadata(
       AboutMetadata(

@@ -23,6 +23,7 @@ import java.io.Writer
   * @author David Bernard
   * @author Gilles Dubochet */
 abstract class HtmlPage extends Page { thisPage =>
+
   /** The title of this page. */
   protected def title: String
 
@@ -32,7 +33,10 @@ abstract class HtmlPage extends Page { thisPage =>
   /** The page description */
   protected def description: String =
     // unless overwritten, will display the title in a spaced format, keeping - and .
-    title.replaceAll("[^a-zA-Z0-9\\.\\-]+", " ").replaceAll("\\-+", " - ").replaceAll(" +", " ")
+    title
+      .replaceAll("[^a-zA-Z0-9\\.\\-]+", " ")
+      .replaceAll("\\-+", " - ")
+      .replaceAll(" +", " ")
 
   /** The page keywords */
   protected def keywords: String =
@@ -52,13 +56,15 @@ abstract class HtmlPage extends Page { thisPage =>
         <head>
           <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
           <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-          <title>{ title }</title>
-          <meta name="description" content={ description }/>
-          <meta name="keywords" content={ keywords }/>
-          <meta http-equiv="content-type" content={ "text/html; charset=" + site.encoding }/>
-          { headers }
+          <title>{title}</title>
+          <meta name="description" content={description}/>
+          <meta name="keywords" content={keywords}/>
+          <meta http-equiv="content-type" content={
+        "text/html; charset=" + site.encoding
+      }/>
+          {headers}
         </head>
-        { body }
+        {body}
       </html>
 
     writeFile(site) { (w: Writer) =>
@@ -87,77 +93,106 @@ abstract class HtmlPage extends Page { thisPage =>
     body.blocks flatMap (blockToHtml(_))
 
   def blockToHtml(block: Block): NodeSeq = block match {
-    case Title(in, 1) => <h3>{ inlineToHtml(in) }</h3>
-    case Title(in, 2) => <h4>{ inlineToHtml(in) }</h4>
-    case Title(in, 3) => <h5>{ inlineToHtml(in) }</h5>
-    case Title(in, _) => <h6>{ inlineToHtml(in) }</h6>
-    case Paragraph(in) => <p>{ inlineToHtml(in) }</p>
+    case Title(in, 1)  => <h3>{inlineToHtml(in)}</h3>
+    case Title(in, 2)  => <h4>{inlineToHtml(in)}</h4>
+    case Title(in, 3)  => <h5>{inlineToHtml(in)}</h5>
+    case Title(in, _)  => <h6>{inlineToHtml(in)}</h6>
+    case Paragraph(in) => <p>{inlineToHtml(in)}</p>
     case Code(data) =>
-      <pre>{ SyntaxHigh(data) }</pre> //<pre>{ scala.xml.Text(data) }</pre>
+      <pre>{SyntaxHigh(data)}</pre> //<pre>{ scala.xml.Text(data) }</pre>
     case UnorderedList(items) =>
-      <ul>{ listItemsToHtml(items) }</ul>
+      <ul>{listItemsToHtml(items)}</ul>
     case OrderedList(items, listStyle) =>
-      <ol class={ listStyle }>{ listItemsToHtml(items) }</ol>
+      <ol class={listStyle}>{listItemsToHtml(items)}</ol>
     case DefinitionList(items) =>
-      <dl>{items map { case (t, d) => <dt>{ inlineToHtml(t) }</dt><dd>{ blockToHtml(d) }</dd> } }</dl>
+      <dl>{
+        items map {
+          case (t, d) => <dt>{inlineToHtml(t)}</dt><dd>{blockToHtml(d)}</dd>
+        }
+      }</dl>
     case HorizontalRule() =>
       <hr/>
   }
 
   def listItemsToHtml(items: Seq[Block]) =
-    items.foldLeft(xml.NodeSeq.Empty){ (xmlList, item) =>
+    items.foldLeft(xml.NodeSeq.Empty) { (xmlList, item) =>
       item match {
-        case OrderedList(_, _) | UnorderedList(_) =>  // html requires sub ULs to be put into the last LI
-          xmlList.init ++ <li>{ xmlList.last.child ++ blockToHtml(item) }</li>
+        case OrderedList(_, _) |
+            UnorderedList(_) => // html requires sub ULs to be put into the last LI
+          xmlList.init ++ <li>{xmlList.last.child ++ blockToHtml(item)}</li>
         case Paragraph(inline) =>
-          xmlList :+ <li>{ inlineToHtml(inline) }</li>  // LIs are blocks, no need to use Ps
+          xmlList :+ <li>{inlineToHtml(inline)}</li> // LIs are blocks, no need to use Ps
         case block =>
-          xmlList :+ <li>{ blockToHtml(block) }</li>
+          xmlList :+ <li>{blockToHtml(block)}</li>
       }
-  }
+    }
 
   def inlineToHtml(inl: Inline): NodeSeq = inl match {
-    case Chain(items) => items flatMap (inlineToHtml(_))
-    case Italic(in) => <i>{ inlineToHtml(in) }</i>
-    case Bold(in) => <b>{ inlineToHtml(in) }</b>
-    case Underline(in) => <u>{ inlineToHtml(in) }</u>
-    case Superscript(in) => <sup>{ inlineToHtml(in) }</sup>
-    case Subscript(in) => <sub>{ inlineToHtml(in) }</sub>
-    case Link(raw, title) => <a href={ raw } target="_blank">{ inlineToHtml(title) }</a>
-    case Monospace(in) => <code>{ inlineToHtml(in) }</code>
-    case Text(text) => scala.xml.Text(text)
-    case Summary(in) => inlineToHtml(in)
-    case HtmlTag(tag) => scala.xml.Unparsed(tag)
+    case Chain(items)    => items flatMap (inlineToHtml(_))
+    case Italic(in)      => <i>{inlineToHtml(in)}</i>
+    case Bold(in)        => <b>{inlineToHtml(in)}</b>
+    case Underline(in)   => <u>{inlineToHtml(in)}</u>
+    case Superscript(in) => <sup>{inlineToHtml(in)}</sup>
+    case Subscript(in)   => <sub>{inlineToHtml(in)}</sub>
+    case Link(raw, title) =>
+      <a href={raw} target="_blank">{inlineToHtml(title)}</a>
+    case Monospace(in)            => <code>{inlineToHtml(in)}</code>
+    case Text(text)               => scala.xml.Text(text)
+    case Summary(in)              => inlineToHtml(in)
+    case HtmlTag(tag)             => scala.xml.Unparsed(tag)
     case EntityLink(target, link) => linkToHtml(target, link, hasLinks = true)
   }
 
   def linkToHtml(text: Inline, link: LinkTo, hasLinks: Boolean) = link match {
     case LinkToTpl(dtpl: TemplateEntity) =>
       if (hasLinks)
-        <a href={ relativeLinkTo(dtpl) } class="extype" name={ dtpl.qualifiedName }>{ inlineToHtml(text) }</a>
+        <a href={
+          relativeLinkTo(dtpl)
+        } class="extype" name={
+          dtpl.qualifiedName
+        }>{
+          inlineToHtml(text)
+        }</a>
       else
-        <span class="extype" name={ dtpl.qualifiedName }>{ inlineToHtml(text) }</span>
+        <span class="extype" name={
+          dtpl.qualifiedName
+        }>{
+          inlineToHtml(text)
+        }</span>
     case LinkToMember(mbr: MemberEntity, inTpl: TemplateEntity) =>
       if (hasLinks)
-        <a href={ relativeLinkTo(inTpl) + "#" + mbr.signature } class="extmbr" name={ mbr.qualifiedName }>{ inlineToHtml(text) }</a>
+        <a href={
+          relativeLinkTo(inTpl) + "#" + mbr.signature
+        } class="extmbr" name={
+          mbr.qualifiedName
+        }>{
+          inlineToHtml(text)
+        }</a>
       else
-        <span class="extmbr" name={ mbr.qualifiedName }>{ inlineToHtml(text) }</span>
+        <span class="extmbr" name={
+          mbr.qualifiedName
+        }>{
+          inlineToHtml(text)
+        }</span>
     case Tooltip(tooltip) =>
-      <span class="extype" name={ tooltip }>{ inlineToHtml(text) }</span>
+      <span class="extype" name={tooltip}>{inlineToHtml(text)}</span>
     case LinkToExternal(name, url) =>
-      <a href={ url } class="extype" target="_top">{ inlineToHtml(text) }</a>
+      <a href={url} class="extype" target="_top">{inlineToHtml(text)}</a>
     case _ =>
       inlineToHtml(text)
   }
 
-  def typeToHtml(tpes: List[model.TypeEntity], hasLinks: Boolean): NodeSeq = tpes match {
-    case Nil =>
-      NodeSeq.Empty
-    case List(tpe) =>
-      typeToHtml(tpe, hasLinks)
-    case tpe :: rest =>
-      typeToHtml(tpe, hasLinks) ++ scala.xml.Text(" with ") ++ typeToHtml(rest, hasLinks)
-  }
+  def typeToHtml(tpes: List[model.TypeEntity], hasLinks: Boolean): NodeSeq =
+    tpes match {
+      case Nil =>
+        NodeSeq.Empty
+      case List(tpe) =>
+        typeToHtml(tpe, hasLinks)
+      case tpe :: rest =>
+        typeToHtml(tpe, hasLinks) ++ scala.xml.Text(" with ") ++ typeToHtml(
+          rest,
+          hasLinks)
+    }
 
   def typeToHtml(tpe: model.TypeEntity, hasLinks: Boolean): NodeSeq = {
     val string = tpe.name
@@ -169,7 +204,9 @@ abstract class HtmlPage extends Page { thisPage =>
       else if (inPos == starts.head)
         toLinksIn(inPos, starts)
       else {
-        scala.xml.Text(string.slice(inPos, starts.head)) ++ toLinksIn(starts.head, starts)
+        scala.xml.Text(string.slice(inPos, starts.head)) ++ toLinksIn(
+          starts.head,
+          starts)
       }
     }
     def toLinksIn(inPos: Int, starts: List[Int]): NodeSeq = {
@@ -183,10 +220,14 @@ abstract class HtmlPage extends Page { thisPage =>
       scala.xml.Text(string)
   }
 
-  def typesToHtml(tpess: List[model.TypeEntity], hasLinks: Boolean, sep: NodeSeq): NodeSeq = tpess match {
-    case Nil         => NodeSeq.Empty
-    case tpe :: Nil  => typeToHtml(tpe, hasLinks)
-    case tpe :: tpes => typeToHtml(tpe, hasLinks) ++ sep ++ typesToHtml(tpes, hasLinks, sep)
+  def typesToHtml(
+      tpess: List[model.TypeEntity],
+      hasLinks: Boolean,
+      sep: NodeSeq): NodeSeq = tpess match {
+    case Nil        => NodeSeq.Empty
+    case tpe :: Nil => typeToHtml(tpe, hasLinks)
+    case tpe :: tpes =>
+      typeToHtml(tpe, hasLinks) ++ sep ++ typesToHtml(tpes, hasLinks, sep)
   }
 
   def hasPage(e: DocTemplateEntity) = {
@@ -197,7 +238,9 @@ abstract class HtmlPage extends Page { thisPage =>
   def templateToHtml(tpl: TemplateEntity, name: String = null) = tpl match {
     case dTpl: DocTemplateEntity =>
       if (hasPage(dTpl)) {
-        <a href={ relativeLinkTo(dTpl) } class="extype" name={ dTpl.qualifiedName }>{ if (name eq null) dTpl.name else name }</a>
+        <a href={relativeLinkTo(dTpl)} class="extype" name={dTpl.qualifiedName}>{
+          if (name eq null) dTpl.name else name
+        }</a>
       } else {
         scala.xml.Text(if (name eq null) dTpl.name else name)
       }
@@ -206,25 +249,27 @@ abstract class HtmlPage extends Page { thisPage =>
   }
 
   /** Returns the HTML code that represents the templates in `tpls` as a list of hyperlinked names. */
-  def templatesToHtml(tplss: List[TemplateEntity], sep: NodeSeq): NodeSeq = tplss match {
-    case Nil         => NodeSeq.Empty
-    case tpl :: Nil  => templateToHtml(tpl)
-    case tpl :: tpls => templateToHtml(tpl) ++ sep ++ templatesToHtml(tpls, sep)
-  }
+  def templatesToHtml(tplss: List[TemplateEntity], sep: NodeSeq): NodeSeq =
+    tplss match {
+      case Nil        => NodeSeq.Empty
+      case tpl :: Nil => templateToHtml(tpl)
+      case tpl :: tpls =>
+        templateToHtml(tpl) ++ sep ++ templatesToHtml(tpls, sep)
+    }
 
   object Image extends Enumeration {
     val Trait, Class, Type, Object, Package = Value
   }
 
   /** Returns the _big image name and the alt attribute
-   *  corresponding to the DocTemplate Entity (upper left icon) */
+    *  corresponding to the DocTemplate Entity (upper left icon) */
   def docEntityKindToBigImage(ety: DocTemplateEntity) = {
     def entityToImage(e: DocTemplateEntity) =
-      if (e.isTrait)                              Image.Trait
-      else if (e.isClass)                         Image.Class
+      if (e.isTrait) Image.Trait
+      else if (e.isClass) Image.Class
       else if (e.isAbstractType || e.isAliasType) Image.Type
-      else if (e.isObject)                        Image.Object
-      else if (e.isPackage)                       Image.Package
+      else if (e.isObject) Image.Object
+      else if (e.isPackage) Image.Package
       else {
         // FIXME: an entity *should* fall into one of the above categories,
         // but AnyRef is somehow not
@@ -232,8 +277,8 @@ abstract class HtmlPage extends Page { thisPage =>
       }
 
     val image = entityToImage(ety)
-    val companionImage = ety.companion filter {
-      e => e.visibility.isPublic && ! e.inSource.isEmpty
+    val companionImage = ety.companion filter { e =>
+      e.visibility.isPublic && !e.inSource.isEmpty
     } map { entityToImage }
 
     (image, companionImage) match {
@@ -246,22 +291,22 @@ abstract class HtmlPage extends Page { thisPage =>
 
   def permalink(template: Entity, isSelf: Boolean = true): Elem =
     <span class="permalink">
-      <a href={ memberToUrl(template, isSelf) } title="Permalink">
+      <a href={memberToUrl(template, isSelf)} title="Permalink">
         <i class="material-icons">&#xE157;</i>
       </a>
     </span>
 
-  def docEntityKindToCompanionTitle(ety: DocTemplateEntity, baseString: String = "See companion") =
-    ety.companion match{
-          case Some(companion) =>
-	    s"$baseString${
-		if(companion.isObject) " object"
-		else if(companion.isTrait) " trait"
-		else if(companion.isClass) " class"
-		else ""
-		}"
-	  case None => baseString
-	}
+  def docEntityKindToCompanionTitle(
+      ety: DocTemplateEntity,
+      baseString: String = "See companion") =
+    ety.companion match {
+      case Some(companion) =>
+        s"$baseString${if (companion.isObject) " object"
+        else if (companion.isTrait) " trait"
+        else if (companion.isClass) " class"
+        else ""}"
+      case None => baseString
+    }
 
   def companionAndPackage(tpl: DocTemplateEntity): NodeSeq =
     <span class="morelinks">{
@@ -272,22 +317,27 @@ abstract class HtmlPage extends Page { thisPage =>
             else if (companionTpl.isTrait) s"trait ${companionTpl.name}"
             else s"class ${companionTpl.name}"
           <div>
-            Companion <a href={relativeLinkTo(companionTpl)} title={docEntityKindToCompanionTitle(tpl)}>{objClassTrait}</a>
+            Companion <a href={relativeLinkTo(companionTpl)} title={
+            docEntityKindToCompanionTitle(tpl)
+          }>{objClassTrait}</a>
           </div>
         case None => NodeSeq.Empty
       }
     }</span>
 
   private def memberToUrl(template: Entity, isSelf: Boolean = true): String = {
-    val (signature: Option[String], containingTemplate: TemplateEntity) = template match {
-      case dte: DocTemplateEntity if (!isSelf) => (Some(dte.signature), dte.inTemplate)
-      case dte: DocTemplateEntity => (None, dte)
-      case me: MemberEntity => (Some(me.signature), me.inTemplate)
-      case tpl => (None, tpl)
-    }
+    val (signature: Option[String], containingTemplate: TemplateEntity) =
+      template match {
+        case dte: DocTemplateEntity if (!isSelf) =>
+          (Some(dte.signature), dte.inTemplate)
+        case dte: DocTemplateEntity => (None, dte)
+        case me: MemberEntity       => (Some(me.signature), me.inTemplate)
+        case tpl                    => (None, tpl)
+      }
 
     val templatePath = templateToPath(containingTemplate)
-    val url = "../" * (templatePath.size - 1) + templatePath.reverse.mkString("/")
+    val url = "../" * (templatePath.size - 1) + templatePath.reverse.mkString(
+      "/")
     url + signature.map("#" + _).getOrElse("")
   }
 }

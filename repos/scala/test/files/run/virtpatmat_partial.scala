@@ -52,7 +52,7 @@ object Test extends App {
           case GTGTEQ   => GTEQ
           case GTGT     => GT
           case GTEQ     => ASSIGN
-      }
+        }
       if (closers isDefinedAt in) println(closers(in))
       else println("undefined")
     }
@@ -80,7 +80,7 @@ object Test extends App {
           case GTGTEQ   => GTEQ
           case GTGT     => GT
           case GTEQ     => ASSIGN
-      }
+        }
       if (closers isDefinedAt in) println(closers(in))
       else println("undefined")
     }

@@ -25,7 +25,7 @@ object Test1 {
         case (Up, Up) | (Down, Down) => false
         case (Down, Up)              => true
         case (Up, Down)              => false
-    }
+      }
   }
 }
 
@@ -40,7 +40,7 @@ object Test2 {
     (d1: Base, d2: Base) =>
       (d1) match {
         case Up | Down => false
-    }
+      }
   }
 }
 
@@ -53,7 +53,7 @@ object Test3 {
     (d1: Base, d2: Base) =>
       (d1, d2) match {
         case (Down, Down) => false
-    }
+      }
   }
 }
 
@@ -71,5 +71,5 @@ object Test4 {
       case (Up, Up) | (Down, Down) => false
       case (Down, Test4.Base.Up)   => true
       case (Up, Down)              => false
-  }
+    }
 }

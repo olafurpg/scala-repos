@@ -171,14 +171,14 @@ class ByteArrayInput(data: Array[Byte]) extends BinaryInput {
 
   def getLong() = {
     var res = (0: Long)
-    res |= (data(idx).toLong << 56) & 0xFFFFFFFFFFFFFFFFL
-    res |= (data(idx + 1).toLong << 48) & 0x00FFFFFFFFFFFFFFL
-    res |= (data(idx + 2).toLong << 40) & 0x0000FFFFFFFFFFFFL
-    res |= (data(idx + 3).toLong << 32) & 0x000000FFFFFFFFFFL
-    res |= (data(idx + 4).toLong << 24) & 0x00000000FFFFFFFFL
-    res |= (data(idx + 5).toLong << 16) & 0x0000000000FFFFFFL
-    res |= (data(idx + 6).toLong << 8) & 0x000000000000FFFFL
-    res |= (data(idx + 7).toLong) & 0x00000000000000FFL
+    res |= (data(idx).toLong << 56) & 0XFFFFFFFFFFFFFFFFL
+    res |= (data(idx + 1).toLong << 48) & 0X00FFFFFFFFFFFFFFL
+    res |= (data(idx + 2).toLong << 40) & 0X0000FFFFFFFFFFFFL
+    res |= (data(idx + 3).toLong << 32) & 0X000000FFFFFFFFFFL
+    res |= (data(idx + 4).toLong << 24) & 0X00000000FFFFFFFFL
+    res |= (data(idx + 5).toLong << 16) & 0X0000000000FFFFFFL
+    res |= (data(idx + 6).toLong << 8) & 0X000000000000FFFFL
+    res |= (data(idx + 7).toLong) & 0X00000000000000FFL
     idx += 8
     res
   }

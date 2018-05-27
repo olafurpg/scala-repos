@@ -191,7 +191,9 @@ package json {
     def endEntry(): Unit = {
       unindent()
       if (primitives.contains(tags.pop().key)) () // do nothing
-      else { appendLine(); append("}") }
+      else {
+        appendLine(); append("}")
+      }
       // Always undo this state.
       isIgnoringFields = false
     }

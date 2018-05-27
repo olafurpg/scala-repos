@@ -87,7 +87,7 @@ object ListHelpersSpec extends Specification with ListHelpers {
         i >= 2 match {
           case true  => Full(3)
           case false => Empty
-      }
+        }
       first(List(1, 2, 3))(f) must_== Full(3)
     }
   }

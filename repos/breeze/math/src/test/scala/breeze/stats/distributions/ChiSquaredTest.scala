@@ -42,7 +42,7 @@ class ChiSquaredTest
     for (shape <- arbitrary[Double].map { _.abs % 200.0 + 4.2 }) yield shape
   }
 
-  def paramsClose(p: Double, b: Double) = breeze.numerics.closeTo(p, b, 5E-2)
+  def paramsClose(p: Double, b: Double) = breeze.numerics.closeTo(p, b, 5e-2)
 
   def asDouble(x: Double) = x
 
@@ -54,7 +54,7 @@ class ChiSquaredTest
          }) yield new ChiSquared(shape)(new RandBasis(new MersenneTwister(0)))
   }
 
-  override val VARIANCE_TOLERANCE: Double = 1E-2
+  override val VARIANCE_TOLERANCE: Double = 1e-2
 
   test("endpoint, k > 2") {
     val g = new ChiSquared(3)

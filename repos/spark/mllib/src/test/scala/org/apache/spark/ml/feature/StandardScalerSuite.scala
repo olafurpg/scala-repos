@@ -64,7 +64,7 @@ class StandardScalerSuite
     df.select("standardized_features", "expected").collect().foreach {
       case Row(vector1: Vector, vector2: Vector) =>
         assert(
-          vector1 ~== vector2 absTol 1E-5,
+          vector1 ~== vector2 absTol 1e-5,
           "The vector value is not correct after standardization.")
     }
   }

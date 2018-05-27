@@ -36,7 +36,11 @@ trait Monoid[F] extends Semigroup[F] { self =>
     eq.equal(a, zero)
 
   final def ifEmpty[B](a: F)(t: => B)(f: => B)(implicit eq: Equal[F]): B =
-    if (isMZero(a)) { t } else { f }
+    if (isMZero(a)) {
+      t
+    } else {
+      f
+    }
 
   final def onNotEmpty[B](a: F)(
       v: => B)(implicit eq: Equal[F], mb: Monoid[B]): B =

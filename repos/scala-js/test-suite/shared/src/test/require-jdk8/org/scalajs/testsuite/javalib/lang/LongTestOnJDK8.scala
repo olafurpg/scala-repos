@@ -303,10 +303,10 @@ class LongTestOnJDK8 {
     assertTrue(compare(10, 9) > 0)
     assertEquals(0, compare(3, 3))
     assertEquals(0, compare(-1L, -1L))
-    assertTrue(compare(0xe6b28004865df12L, -1L) < 0)
-    assertTrue(compare(-1L, 0xe6b28004865df12L) > 0)
-    assertTrue(compare(0xe6b28004865df12L, 3) > 0)
-    assertTrue(compare(3, 0xe6b28004865df12L) < 0)
+    assertTrue(compare(0XE6B28004865DF12L, -1L) < 0)
+    assertTrue(compare(-1L, 0XE6B28004865DF12L) > 0)
+    assertTrue(compare(0XE6B28004865DF12L, 3) > 0)
+    assertTrue(compare(3, 0XE6B28004865DF12L) < 0)
   }
 
   @Test def divideUnsigned(): Unit = {

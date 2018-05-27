@@ -91,8 +91,8 @@ class LinearAlgebraTest
     val idx = argsort(lambda)
 
     idx.zipWithIndex.map { i =>
-      lambda(i._1) should be(eigVals(i._2) +- 1E-6)
-      vectorsNearlyEqual(evs(::, i._1), eigVect(::, i._2), 1E-6)
+      lambda(i._1) should be(eigVals(i._2) +- 1e-6)
+      vectorsNearlyEqual(evs(::, i._1), eigVect(::, i._2), 1e-6)
     }
   }
 
@@ -109,7 +109,7 @@ class LinearAlgebraTest
       (-0.6170, -0.7506, 42.4964, 45.1620, 5.3107),
       (-0.0638, -0.3979, -0.6275, 54.5694, 8.8282)
     )
-    matricesNearlyEqual(m, aux, 1E-4)
+    matricesNearlyEqual(m, aux, 1e-4)
   }
 
   test("det") {
@@ -124,7 +124,7 @@ class LinearAlgebraTest
     det(C) should be(0.0 +- 1e-6)
 
     val D = DenseMatrix((-1, 1, -1), (1, 2, 3), (3, -10, 1))
-    det(D) should be(-8.0 +- 1E-6)
+    det(D) should be(-8.0 +- 1e-6)
   }
 
   test("logdet") {
@@ -152,7 +152,7 @@ class LinearAlgebraTest
 
   test("cond") {
     val A = DenseMatrix((1.0, 0.0, -1.0), (0.0, 1.0, 0.0), (1.0, 0.0, 1.0))
-    assert((cond(A) - math.sqrt(2)).abs < 1E-6, cond(A))
+    assert((cond(A) - math.sqrt(2)).abs < 1e-6, cond(A))
 
     A(0, 0) = -1.0 // row 0 and row 2 are linearly dependent now
     assert(cond(A) === Double.PositiveInfinity)
@@ -338,7 +338,7 @@ class LinearAlgebraTest
     val A = DenseMatrix((1.0, 1.0, 1.0), (4.0, 2.0, 1.0), (16.0, 4.0, 1.0))
     val QRP(_QQ, _RR, _P, _) = qrp(A)
     val ap = A * convert(_P, Double)
-    assert(max(abs(_QQ * _RR - ap)) < 1E-8)
+    assert(max(abs(_QQ * _RR - ap)) < 1e-8)
   }
 
   test("qr reduced A[m, n], m < n") {
@@ -481,7 +481,7 @@ class LinearAlgebraTest
     assert(w === DenseVector(1.0, 1.0))
     assert(wi === DenseVector(1.0, -1.0))
     assert(max(abs(
-      v - diag(DenseVector(0.7071067811865475, -0.7071067811865475)))) < 1E-7)
+      v - diag(DenseVector(0.7071067811865475, -0.7071067811865475)))) < 1e-7)
     // TODO, we seem to throw out VI... these seems bad...
   }
 
@@ -496,8 +496,8 @@ class LinearAlgebraTest
     val SVD(u, s, vt) = svd(m)
 
     // u and vt are unitary
-    trace(u.t * u) should be(u.rows.toDouble +- 1E-5)
-    trace(vt * vt.t) should be(vt.rows.toDouble +- 1E-5)
+    trace(u.t * u) should be(u.rows.toDouble +- 1e-5)
+    trace(vt * vt.t) should be(vt.rows.toDouble +- 1e-5)
 
     // s is sorted by size of singular value, and be nonnegative
     for (i <- 1 until s.length) {
@@ -516,8 +516,8 @@ class LinearAlgebraTest
     val SVD(u, s, vt) = svd(m)
 
     // u and vt are unitary
-    trace(u.t * u) should be(u.rows.toDouble +- 1E-5)
-    trace(vt * vt.t) should be(vt.rows.toDouble +- 1E-5)
+    trace(u.t * u) should be(u.rows.toDouble +- 1e-5)
+    trace(vt * vt.t) should be(vt.rows.toDouble +- 1e-5)
 
     // s is sorted by size of singular value, and be nonnegative
     for (i <- 1 until s.length) {
@@ -537,8 +537,8 @@ class LinearAlgebraTest
     val SVD(u, s, vt) = svd(m)
 
     // u and vt are unitary
-    trace(u.t * u) should be(u.rows.toFloat +- 1E-5f)
-    trace(vt * vt.t) should be(vt.rows.toFloat +- 1E-5f)
+    trace(u.t * u) should be(u.rows.toFloat +- 1e-5f)
+    trace(vt * vt.t) should be(vt.rows.toFloat +- 1e-5f)
 
     // s is sorted by size of singular value, and be nonnegative
     for (i <- 1 until s.length) {
@@ -551,7 +551,7 @@ class LinearAlgebraTest
     val reM: DenseMatrix[Float] = u * ss * vt
     // matricesNearlyEqual(reM, m)
     for (i <- 0 until reM.rows; j <- 0 until reM.cols)
-      reM(i, j) should be(m(i, j) +- 1E-6f)
+      reM(i, j) should be(m(i, j) +- 1e-6f)
   }
 
   test("svd float A(m, n), m < n") {
@@ -560,8 +560,8 @@ class LinearAlgebraTest
     val SVD(u, s, vt) = svd(m)
 
     // u and vt are unitary
-    trace(u.t * u) should be(u.rows.toFloat +- 1E-5f)
-    trace(vt * vt.t) should be(vt.rows.toFloat +- 1E-5f)
+    trace(u.t * u) should be(u.rows.toFloat +- 1e-5f)
+    trace(vt * vt.t) should be(vt.rows.toFloat +- 1e-5f)
 
     // s is sorted by size of singular value, and be nonnegative
     for (i <- 1 until s.length) {
@@ -574,7 +574,7 @@ class LinearAlgebraTest
     val reM: DenseMatrix[Float] = u * ss * vt
     // matricesNearlyEqual(reM, m)
     for (i <- 0 until reM.rows; j <- 0 until reM.cols)
-      reM(i, j) should be(m(i, j) +- 1E-5f)
+      reM(i, j) should be(m(i, j) +- 1e-5f)
   }
 
   test("svd reduced A(m, n), m > n") {
@@ -582,8 +582,8 @@ class LinearAlgebraTest
     val SVD(u, s, vt) = svd.reduced(m)
 
     // u and vt are unitary
-    trace(u.t * u) should be(u.cols.toDouble +- 1E-5)
-    trace(vt * vt.t) should be(vt.rows.toDouble +- 1E-5)
+    trace(u.t * u) should be(u.cols.toDouble +- 1e-5)
+    trace(vt * vt.t) should be(vt.rows.toDouble +- 1e-5)
 
     // s is sorted by size of singular value, and be nonnegative
     for (i <- 1 until s.length) {
@@ -602,8 +602,8 @@ class LinearAlgebraTest
     val SVD(u, s, vt) = svd.reduced(m)
 
     // u and vt are unitary
-    trace(u.t * u) should be(u.cols.toDouble +- 1E-5)
-    trace(vt * vt.t) should be(vt.rows.toDouble +- 1E-5)
+    trace(u.t * u) should be(u.cols.toDouble +- 1e-5)
+    trace(vt * vt.t) should be(vt.rows.toDouble +- 1e-5)
 
     // s is sorted by size of singular value, and be nonnegative
     for (i <- 1 until s.length) {
@@ -622,8 +622,8 @@ class LinearAlgebraTest
     val SVD(u, s, vt) = svd.reduced(m)
 
     // u and vt are unitary
-    trace(u.t * u) should be(u.cols.toDouble +- 1E-5)
-    trace(vt * vt.t) should be(vt.rows.toDouble +- 1E-5)
+    trace(u.t * u) should be(u.cols.toDouble +- 1e-5)
+    trace(vt * vt.t) should be(vt.rows.toDouble +- 1e-5)
 
     // s is sorted by size of singular value, and be nonnegative
     for (i <- 1 until s.length) {
@@ -642,8 +642,8 @@ class LinearAlgebraTest
     val SVD(u, s, vt) = svd.reduced(m)
 
     // u and vt are unitary
-    trace(u.t * u) should be(u.cols.toFloat +- 1E-5f)
-    trace(vt * vt.t) should be(vt.rows.toFloat +- 1E-5f)
+    trace(u.t * u) should be(u.cols.toFloat +- 1e-5f)
+    trace(vt * vt.t) should be(vt.rows.toFloat +- 1e-5f)
 
     // s is sorted by size of singular value, and be nonnegative
     for (i <- 1 until s.length) {
@@ -656,7 +656,7 @@ class LinearAlgebraTest
     val reM: DenseMatrix[Float] = u * ss * vt
     // matricesNearlyEqual(reM, m)
     for (i <- 0 until reM.rows; j <- 0 until reM.cols)
-      reM(i, j) should be(m(i, j) +- 1E-6f)
+      reM(i, j) should be(m(i, j) +- 1e-6f)
   }
 
   test("svd reduced float A(m, n), m = n") {
@@ -664,8 +664,8 @@ class LinearAlgebraTest
     val SVD(u, s, vt) = svd.reduced(m)
 
     // u and vt are unitary
-    trace(u.t * u) should be(u.cols.toFloat +- 1E-5f)
-    trace(vt * vt.t) should be(vt.rows.toFloat +- 1E-5f)
+    trace(u.t * u) should be(u.cols.toFloat +- 1e-5f)
+    trace(vt * vt.t) should be(vt.rows.toFloat +- 1e-5f)
 
     // s is sorted by size of singular value, and be nonnegative
     for (i <- 1 until s.length) {
@@ -678,7 +678,7 @@ class LinearAlgebraTest
     val reM: DenseMatrix[Float] = u * ss * vt
     // matricesNearlyEqual(reM, m)
     for (i <- 0 until reM.rows; j <- 0 until reM.cols)
-      reM(i, j) should be(m(i, j) +- 1E-5f)
+      reM(i, j) should be(m(i, j) +- 1e-5f)
   }
 
   test("svd reduced float A(m, n), m < n") {
@@ -687,8 +687,8 @@ class LinearAlgebraTest
     val SVD(u, s, vt) = svd.reduced(m)
 
     // u and vt are unitary
-    trace(u.t * u) should be(u.cols.toFloat +- 1E-5f)
-    trace(vt * vt.t) should be(vt.rows.toFloat +- 1E-5f)
+    trace(u.t * u) should be(u.cols.toFloat +- 1e-5f)
+    trace(vt * vt.t) should be(vt.rows.toFloat +- 1e-5f)
 
     // s is sorted by size of singular value, and be nonnegative
     for (i <- 1 until s.length) {
@@ -701,7 +701,7 @@ class LinearAlgebraTest
     val reM: DenseMatrix[Float] = u * ss * vt
     // matricesNearlyEqual(reM, m)
     for (i <- 0 until reM.rows; j <- 0 until reM.cols)
-      reM(i, j) should be(m(i, j) +- 1E-5f)
+      reM(i, j) should be(m(i, j) +- 1e-5f)
   }
 
   test("svd and svdr singular values are equal") {
@@ -776,21 +776,21 @@ class LinearAlgebraTest
       for (i <- 0 until m1.cols) {
         val v1 = if (m1(::, i).valueAt(0) > 0) m1(::, i) else -m1(::, i)
         val v2 = if (m2(::, i).valueAt(0) > 0) m2(::, i) else -m2(::, i)
-        assert(max(abs(v1 - v2)) < 1E-5)
-        assert(abs(norm(v1) - 1.0) < 1E-5)
-        assert(abs(norm(v2) - 1.0) < 1E-5)
+        assert(max(abs(v1 - v2)) < 1e-5)
+        assert(abs(norm(v1) - 1.0) < 1e-5)
+        assert(abs(norm(v2) - 1.0) < 1e-5)
       }
     }
 
     val SVD(u1, s1, vt1) = svd(m1)
     val SVD(u2, s2, vt2) = svd(m2, 2)
-    assert(max(abs(s1.slice(0, 2) - s2)) < 1E-5)
+    assert(max(abs(s1.slice(0, 2) - s2)) < 1e-5)
     checkCols(u1(::, 0 until 2), u2)
     checkCols(vt1(0 until 2, ::).t, vt2.t)
 
     val SVD(u1t, s1t, vt1t) = svd(m1.t)
     val SVD(u2t, s2t, vt2t) = svd(m2.t, 2)
-    assert(max(abs(s1t.slice(0, 2) - s2t)) < 1E-5)
+    assert(max(abs(s1t.slice(0, 2) - s2t)) < 1e-5)
     checkCols(u1t(::, 0 until 2), u2t)
     checkCols(vt1t(0 until 2, ::).t, vt2t.t)
   }
@@ -799,12 +799,12 @@ class LinearAlgebraTest
     val X = DenseMatrix((.7, .2), (.3, .8))
     assert(mpow(X, 1) === X)
     assert(
-      max(abs(mpow(X, .5) - DenseMatrix((.82426, 0.11716), (.17574, 0.88284)))) < 1E-5,
+      max(abs(mpow(X, .5) - DenseMatrix((.82426, 0.11716), (.17574, 0.88284)))) < 1e-5,
       mpow(X, .5))
   }
 
   test("diff test") {
-    val testThreshold = 1.0E-15
+    val testThreshold = 1.0e-15
     val xDouble = DenseVector(.7, .2, .3, .8)
     assert(norm(diff(xDouble) - DenseVector(-0.5, 0.1, 0.5)) < testThreshold)
     assert(norm(diff(xDouble, 2) - DenseVector(0.6, 0.4)) < testThreshold)
@@ -815,7 +815,7 @@ class LinearAlgebraTest
   }
 
   test("diff slice vector test") {
-    val testThreshold = 1.0E-15
+    val testThreshold = 1.0e-15
     val xDouble = {
       val temp = DenseVector(.7, .2, .3, .8)
       temp(IndexedSeq(0, 1, 2, 3))
@@ -897,9 +897,9 @@ class LinearAlgebraTest
 
   test("accumulate test") {
     val xDouble = DenseVector(.7, .2, .3, .8)
-    assert(norm(accumulate(xDouble) - DenseVector(.7, .9, 1.2, 2.0)) < 1.0E-15)
+    assert(norm(accumulate(xDouble) - DenseVector(.7, .9, 1.2, 2.0)) < 1.0e-15)
     val xInt = DenseVector(7, 2, 3, 8)
-    assert(norm(accumulate(xInt) - DenseVector(7, 9, 12, 20)) < 1.0E-15)
+    assert(norm(accumulate(xInt) - DenseVector(7, 9, 12, 20)) < 1.0e-15)
     val xEmpty = DenseVector[Long]()
     assert(accumulate(xEmpty) == DenseVector[Long]())
   }
@@ -978,14 +978,14 @@ class LinearAlgebraTest
   def vectorsNearlyEqual(
       A: DenseVector[Double],
       B: DenseVector[Double],
-      threshold: Double = 1E-6) {
+      threshold: Double = 1e-6) {
     for (i <- 0 until A.length) A(i) should be(B(i) +- threshold)
   }
 
   def matricesNearlyEqual(
       A: DenseMatrix[Double],
       B: DenseMatrix[Double],
-      threshold: Double = 1E-6) {
+      threshold: Double = 1e-6) {
     for (i <- 0 until A.rows; j <- 0 until A.cols)
       A(i, j) should be(B(i, j) +- threshold)
   }
@@ -993,7 +993,7 @@ class LinearAlgebraTest
   def matricesNearlyEqual_Float(
       A: DenseMatrix[Float],
       B: DenseMatrix[Float],
-      threshold: Float = 1E-6f) {
+      threshold: Float = 1e-6f) {
     for (i <- 0 until A.rows; j <- 0 until A.cols)
       A(i, j) should be(B(i, j) +- threshold)
   }

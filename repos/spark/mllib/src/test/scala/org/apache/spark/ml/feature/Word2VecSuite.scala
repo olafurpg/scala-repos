@@ -90,7 +90,7 @@ class Word2VecSuite
     model.transform(docDF).select("result", "expected").collect().foreach {
       case Row(vector1: Vector, vector2: Vector) =>
         assert(
-          vector1 ~== magicExp absTol 1E-5,
+          vector1 ~== magicExp absTol 1e-5,
           "Transformed vector is different with expected.")
     }
   }
@@ -149,7 +149,7 @@ class Word2VecSuite
     realVectors.zip(magicExpected).foreach {
       case (real, expected) =>
         assert(
-          real ~== expected absTol 1E-5,
+          real ~== expected absTol 1e-5,
           "Actual vector is different from expected.")
     }
   }
@@ -184,7 +184,7 @@ class Word2VecSuite
     assert(synonyms.toArray === Array("b", "c"))
     expectedSimilarity.zip(similarity).map {
       case (expected, actual) =>
-        assert(math.abs((expected - actual) / expected) < 1E-5)
+        assert(math.abs((expected - actual) / expected) < 1e-5)
     }
   }
 
@@ -233,7 +233,7 @@ class Word2VecSuite
       .collect()
       .unzip
     // The similarity score should be very different with the larger window
-    assert(math.abs(similarity(5) - similarityLarger(5) / similarity(5)) > 1E-5)
+    assert(math.abs(similarity(5) - similarityLarger(5) / similarity(5)) > 1e-5)
   }
 
   test("Word2Vec read/write") {

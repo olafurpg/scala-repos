@@ -11,7 +11,7 @@ object RandomBenchmarks extends MyRunner(classOf[RandomBenchmarks])
 
 class RandomBenchmarks extends MyBenchmark with BenchmarkData {
   def intsToLong(x: Int, y: Int): Long =
-    ((x & 0xffffffffL) << 32) | (y & 0xffffffffL)
+    ((x & 0XFFFFFFFFL) << 32) | (y & 0XFFFFFFFFL)
 
   val ints16: Array[Int] = Array(
     -269317507, 81307275, 584521692, 2079271747, -1808083612, 1064281324,

@@ -94,7 +94,7 @@ class EngineManifestSerializer
                     t match {
                       case JString(file) => file
                       case _             => ""
-                  }))
+                    }))
                 case JField("engineFactory", JString(engineFactory)) =>
                   enginemanifest.copy(engineFactory = engineFactory)
                 case _ => enginemanifest
@@ -113,9 +113,10 @@ class EngineManifestSerializer
                 .map(x => JString(x))
                 .getOrElse(JNothing)) :: JField(
               "files",
-              JArray(enginemanifest.files
-                .map(x => JString(x))
-                .toList)) :: JField(
+              JArray(
+                enginemanifest.files
+                  .map(x => JString(x))
+                  .toList)) :: JField(
               "engineFactory",
               JString(enginemanifest.engineFactory)) :: Nil)
       }))

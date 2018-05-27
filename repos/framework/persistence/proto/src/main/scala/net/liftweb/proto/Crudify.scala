@@ -676,9 +676,11 @@ trait Crudify {
     if (first < rowsPerPage) {
       ClearNodes
     } else {
-      "^ <*>" #> <a href={listPathString+
-                  "?first="+(0L max (first -
-                                     rowsPerPage.toLong))}></a>
+      "^ <*>" #> <a href={
+        listPathString +
+          "?first=" + (0L max (first -
+          rowsPerPage.toLong))
+      }></a>
     }
   }
 
@@ -691,8 +693,10 @@ trait Crudify {
     if (first < rowsPerPage) {
       ClearNodes
     } else {
-      "^ <*>" #> <a href={listPathString+"?first="+(first +
-                                            rowsPerPage.toLong)}></a>
+      "^ <*>" #> <a href={
+        listPathString + "?first=" + (first +
+          rowsPerPage.toLong)
+      }></a>
     }
   }
 

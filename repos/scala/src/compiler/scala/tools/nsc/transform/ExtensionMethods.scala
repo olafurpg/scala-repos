@@ -301,7 +301,7 @@ abstract class ExtensionMethods extends Transform with TypingTransformers {
                 localTyper.typedPos(rhs.pos)(
                   gen.mkForwarder(callPrefix, mmap(vparamss)(_.symbol))
                 )
-            ))
+              ))
         case _ =>
           super.transform(tree)
       }

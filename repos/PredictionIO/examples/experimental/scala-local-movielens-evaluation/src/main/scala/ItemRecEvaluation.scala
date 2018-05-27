@@ -44,7 +44,7 @@ object ItemRecEvaluation1 {
       booleanData = true,
       itemSimilarity = "LogLikelihoodSimilarity",
       weighted = false,
-      threshold = 4.9E-324,
+      threshold = 4.9e-324,
       nearestN = 10,
       unseenOnly = false,
       freshness = 0,

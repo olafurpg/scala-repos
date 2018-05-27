@@ -42,7 +42,7 @@ class AddBenchmarks extends MyBenchmark with BenchmarkData {
   }
 
   def addFloatsDirect(data: Array[Float]): Float = {
-    var total = 0.0F
+    var total = 0.0f
     var i = 0
     val len = data.length
     while (i < len) { total += data(i); i += 1 }
@@ -66,7 +66,7 @@ class AddBenchmarks extends MyBenchmark with BenchmarkData {
   }
 
   def addFastComplexes(data: Array[Long]): Long = {
-    var total = FastComplex(0.0F, 0.0F)
+    var total = FastComplex(0.0f, 0.0f)
     var i = 0
     val len = data.length
     while (i < len) { total = FastComplex.add(total, data(i)); i += 1 }

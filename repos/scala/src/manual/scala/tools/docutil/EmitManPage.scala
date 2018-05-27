@@ -72,7 +72,9 @@ object EmitManPage {
             emitText(d.term)
             out.println
             emitText(d.description)
-            if (n > 1) { out.println; n -= 1 }
+            if (n > 1) {
+              out.println; n -= 1
+            }
           }
 
         case Link(label, url) =>

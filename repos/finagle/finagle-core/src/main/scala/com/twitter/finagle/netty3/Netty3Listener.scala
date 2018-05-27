@@ -360,7 +360,7 @@ case class Netty3Listener[In, Out](
           logger,
           scopedStatsReceiver,
           closer.activeChannels
-      )
+        )
       val bootstrap = new ServerBootstrap(channelFactory)
       bootstrap.setOptions(bootstrapOptions.asJava)
       bootstrap.setPipelineFactory(

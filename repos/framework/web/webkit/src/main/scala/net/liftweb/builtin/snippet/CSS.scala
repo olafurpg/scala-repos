@@ -27,11 +27,9 @@ import scala.xml._
 object CSS extends DispatchSnippet {
   def dispatch: DispatchIt = {
     case "blueprint" =>
-      _ =>
-        blueprint
+      _ => blueprint
     case "fancyType" =>
-      _ =>
-        fancyType
+      _ => fancyType
   }
 
   /**
@@ -46,11 +44,15 @@ object CSS extends DispatchSnippet {
     */
   def blueprint: NodeSeq = {
     <xml:group>
-      <link rel="stylesheet" href={"/" + LiftRules.resourceServerPath +
-                                   "/blueprint/screen.css"} type="text/css"
+      <link rel="stylesheet" href={
+      "/" + LiftRules.resourceServerPath +
+        "/blueprint/screen.css"
+    } type="text/css"
         media="screen, projection"/>
-      <link rel="stylesheet" href={"/" + LiftRules.resourceServerPath +
-                                   "/blueprint/print.css"} type="text/css" media="print"/>
+      <link rel="stylesheet" href={
+      "/" + LiftRules.resourceServerPath +
+        "/blueprint/print.css"
+    } type="text/css" media="print"/>
     </xml:group> ++ Unparsed(
       """
   <!--[if IE]><link rel="stylesheet" href=""" + '"' +
@@ -71,8 +73,10 @@ object CSS extends DispatchSnippet {
     * (screen media)
     */
   def fancyType: NodeSeq = {
-    <link rel="stylesheet" href={"/" + LiftRules.resourceServerPath +
-                                 "/blueprint/plugins/fancy-type/screen.css"}
+    <link rel="stylesheet" href={
+      "/" + LiftRules.resourceServerPath +
+        "/blueprint/plugins/fancy-type/screen.css"
+    }
       type="text/css" media="screen, projection"/>
   }
 }

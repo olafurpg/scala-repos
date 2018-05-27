@@ -117,7 +117,7 @@ object ByteBufferPool {
       State(s =>
         fa(s) match {
           case (s, a) => f(a)(s)
-      })
+        })
 
     def getBuffer(min: Int): ByteBufferPoolS[ByteBuffer] =
       ByteBufferPool.acquire(min)

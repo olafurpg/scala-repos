@@ -246,43 +246,39 @@ case class Window(
                     subexpressionEliminationEnabled),
                 offset)
 
-          // Growing Frame.
+            // Growing Frame.
           case ("AGGREGATE", frameType, None, Some(high)) =>
-            target: MutableRow =>
-              {
-                new UnboundedPrecedingWindowFunctionFrame(
-                  target,
-                  processor,
-                  createBoundOrdering(frameType, high))
-              }
+            target: MutableRow => {
+              new UnboundedPrecedingWindowFunctionFrame(
+                target,
+                processor,
+                createBoundOrdering(frameType, high))
+            }
 
           // Shrinking Frame.
           case ("AGGREGATE", frameType, Some(low), None) =>
-            target: MutableRow =>
-              {
-                new UnboundedFollowingWindowFunctionFrame(
-                  target,
-                  processor,
-                  createBoundOrdering(frameType, low))
-              }
+            target: MutableRow => {
+              new UnboundedFollowingWindowFunctionFrame(
+                target,
+                processor,
+                createBoundOrdering(frameType, low))
+            }
 
           // Moving Frame.
           case ("AGGREGATE", frameType, Some(low), Some(high)) =>
-            target: MutableRow =>
-              {
-                new SlidingWindowFunctionFrame(
-                  target,
-                  processor,
-                  createBoundOrdering(frameType, low),
-                  createBoundOrdering(frameType, high))
-              }
+            target: MutableRow => {
+              new SlidingWindowFunctionFrame(
+                target,
+                processor,
+                createBoundOrdering(frameType, low),
+                createBoundOrdering(frameType, high))
+            }
 
           // Entire Partition Frame.
           case ("AGGREGATE", frameType, None, None) =>
-            target: MutableRow =>
-              {
-                new UnboundedWindowFunctionFrame(target, processor)
-              }
+            target: MutableRow => {
+              new UnboundedWindowFunctionFrame(target, processor)
+            }
         }
 
         // Keep track of the number of expressions. This is a side-effect in a map...

@@ -131,13 +131,13 @@ object Team extends LilaController {
         err =>
           forms.anyCaptcha map { captcha =>
             BadRequest(html.team.form(err, captcha))
-        },
+          },
         data =>
           api.create(data, me) ?? {
             _ map { team =>
               Redirect(routes.Team.show(team.id)): Result
             }
-        }
+          }
       )
     }
   }
@@ -183,7 +183,7 @@ object Team extends LilaController {
         err =>
           forms.anyCaptcha map { captcha =>
             BadRequest(html.team.requestForm(team, err, captcha))
-        },
+          },
         setup =>
           api.createRequest(team, setup, me) inject Redirect(
             routes.Team.show(team.id))

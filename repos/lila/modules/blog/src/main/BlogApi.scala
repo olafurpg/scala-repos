@@ -40,7 +40,7 @@ final class BlogApi(prismicUrl: String, collection: String) {
       case 'DEBUG => logger debug message
       case 'ERROR => logger error message
       case _      => logger info message
-  }
+    }
 
   private val fetchPrismicApi = AsyncCache.single[Api](
     f = Api.get(prismicUrl, cache = cache, logger = prismicLogger),

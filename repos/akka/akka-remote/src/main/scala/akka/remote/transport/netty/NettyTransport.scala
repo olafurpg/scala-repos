@@ -620,7 +620,9 @@ class NettyTransport(
           log.error(
             "failed to bind to {}, shutting down Netty transport",
             address)
-          try { shutdown() } catch { case NonFatal(e) ⇒ } // ignore possible exception during shutdown
+          try {
+            shutdown()
+          } catch { case NonFatal(e) ⇒ } // ignore possible exception during shutdown
           throw e
         }
       }

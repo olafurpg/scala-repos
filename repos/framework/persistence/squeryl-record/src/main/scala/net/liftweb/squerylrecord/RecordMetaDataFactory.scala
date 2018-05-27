@@ -240,8 +240,7 @@ class RecordMetaDataFactory extends FieldMetaDataFactory {
       .get(null)
       .asInstanceOf[MetaRecord[_]]
 
-    () =>
-      metaRecord.createRecord.asInstanceOf[AnyRef]
+    () => metaRecord.createRecord.asInstanceOf[AnyRef]
   }
 
   /**

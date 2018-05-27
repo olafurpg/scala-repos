@@ -115,21 +115,27 @@ private[ui] abstract class ExecutionTable(
       <td sorttable_customkey={duration.toString}>
         {UIUtils.formatDuration(duration)}
       </td>
-      {if (showRunningJobs) {
+      {
+      if (showRunningJobs) {
         <td>
           {runningJobs}
         </td>
-      }}
-      {if (showSucceededJobs) {
+      }
+    }
+      {
+      if (showSucceededJobs) {
         <td>
           {succeededJobs}
         </td>
-      }}
-      {if (showFailedJobs) {
+      }
+    }
+      {
+      if (showFailedJobs) {
         <td>
           {failedJobs}
         </td>
-      }}
+      }
+    }
       {detailCell(executionUIData.physicalPlanDescription)}
     </tr>
   }
@@ -180,8 +186,13 @@ private[ui] abstract class ExecutionTable(
   def toNodeSeq: Seq[Node] = {
     <div>
       <h4>{tableName}</h4>
-      {UIUtils.listingTable[SQLExecutionUIData](
-        header, row(currentTime, _), executionUIDatas, id = Some(tableId))}
+      {
+      UIUtils.listingTable[SQLExecutionUIData](
+        header,
+        row(currentTime, _),
+        executionUIDatas,
+        id = Some(tableId))
+    }
     </div>
   }
 

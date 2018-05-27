@@ -39,8 +39,7 @@ object InterpretedPredicate {
       case n: Nondeterministic => n.setInitialValues()
       case _                   =>
     }
-    (r: InternalRow) =>
-      expression.eval(r).asInstanceOf[Boolean]
+    (r: InternalRow) => expression.eval(r).asInstanceOf[Boolean]
   }
 }
 

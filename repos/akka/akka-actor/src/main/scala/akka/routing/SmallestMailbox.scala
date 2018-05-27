@@ -66,8 +66,8 @@ class SmallestMailboxRoutingLogic extends RoutingLogic {
         if (isSuspended(target)) Long.MaxValue - 1
         else {
           //Just about better than the DeadLetters
-          (if (isProcessingMessage(target)) 1l else 0l) +
-            (if (!hasMessages(target)) 0l
+          (if (isProcessingMessage(target)) 1L else 0L) +
+            (if (!hasMessages(target)) 0L
              else {
                //Race between hasMessages and numberOfMessages here, unfortunate the numberOfMessages returns 0 if unknown
                val noOfMsgs: Long = if (deep) numberOfMessages(target) else 0

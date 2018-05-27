@@ -128,6 +128,6 @@ object Probes {
         override def postStop() = log("postStop")(super.postStop())
         override def decide(t: Throwable) = log("decide")(super.decide(t))
         override def restart() = log("restart")(super.restart())
-    })
+      })
   }
 }

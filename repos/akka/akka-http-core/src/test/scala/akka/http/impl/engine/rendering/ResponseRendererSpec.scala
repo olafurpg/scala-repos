@@ -675,7 +675,7 @@ class ResponseRendererSpec
                  |${if (resCD) "" else "Content-Length: 6\n"}
                  |${if (headReq) "" else "ENTITY"}""",
             close
-        ))
+          ))
     }
   }
 

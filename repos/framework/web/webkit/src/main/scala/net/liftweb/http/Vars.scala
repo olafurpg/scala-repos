@@ -271,7 +271,7 @@ abstract class ContainerVar[T](dflt: => T)(
         localGet(s, bn) match {
           case Full(b: Boolean) => Full(b)
           case _                => Empty
-      }) openOr false
+        }) openOr false
     S.session.foreach(s => localSet(s, bn, true))
     old
   }
@@ -282,7 +282,7 @@ abstract class ContainerVar[T](dflt: => T)(
       localGet(s, bn) match {
         case Full(b: Boolean) => Full(b)
         case _                => Empty
-    }) openOr false)
+      }) openOr false)
   }
 
   protected override def registerCleanupFunc(in: LiftSession => Unit): Unit =
@@ -387,8 +387,7 @@ object RequestVar {
     val funcs = RequestVarHandler.instancesOfGroup(group).map(_.snapshot())
 
     // return a function that applies all the restore functions
-    () =>
-      funcs.foreach(_.apply())
+    () => funcs.foreach(_.apply())
   }
 }
 
@@ -436,8 +435,7 @@ abstract class RequestVar[T](dflt: => T)
   def snapshot(): () => Unit = {
     if (set_?) {
       val v = this.get
-      () =>
-        this.set(v)
+      () => this.set(v)
     } else { () =>
       this.remove()
     }
@@ -677,7 +675,7 @@ private[http] trait CoreRequestVarHandler {
                         logger.warn("RequestVar %s was set but not read".format(
                           key.replace(VarConstants.varPrefix, "")))
                       case _ =>
-                  })
+                    })
               }
 
               ret

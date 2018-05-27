@@ -437,7 +437,7 @@ class ScalaTypedHandler extends TypedHandlerDelegate {
           .exists {
             case _: ScParameterClause | _: ScArgumentExprList => true
             case _                                            => false
-        }
+          }
     )
   }
 
@@ -459,7 +459,7 @@ class ScalaTypedHandler extends TypedHandlerDelegate {
             case _: ScFunction | _: ScVariable | _: ScValue | _: ScTypeAlias =>
               true
             case _ => false
-        }
+          }
     )
   }
 

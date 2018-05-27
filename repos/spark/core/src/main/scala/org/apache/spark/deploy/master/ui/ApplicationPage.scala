@@ -73,13 +73,15 @@ private[ui] class ApplicationPage(parent: MasterWebUI)
             <li><strong>User:</strong> {app.desc.user}</li>
             <li><strong>Cores:</strong>
             {
-              if (app.desc.maxCores.isEmpty) {
-                "Unlimited (%s granted)".format(app.coresGranted)
-              } else {
-                "%s (%s granted, %s left)".format(
-                  app.desc.maxCores.get, app.coresGranted, app.coresLeft)
-              }
-            }
+      if (app.desc.maxCores.isEmpty) {
+        "Unlimited (%s granted)".format(app.coresGranted)
+      } else {
+        "%s (%s granted, %s left)".format(
+          app.desc.maxCores.get,
+          app.coresGranted,
+          app.coresLeft)
+      }
+    }
             </li>
             <li>
               <strong>Executor Memory:</strong>
@@ -97,11 +99,11 @@ private[ui] class ApplicationPage(parent: MasterWebUI)
           <h4> Executor Summary </h4>
           {executorsTable}
           {
-            if (removedExecutors.nonEmpty) {
-              <h4> Removed Executors </h4> ++
-              removedExecutorsTable
-            }
-          }
+      if (removedExecutors.nonEmpty) {
+        <h4> Removed Executors </h4> ++
+          removedExecutorsTable
+      }
+    }
         </div>
       </div>;
     UIUtils.basicSparkPage(content, "Application: " + app.desc.name)
@@ -117,10 +119,20 @@ private[ui] class ApplicationPage(parent: MasterWebUI)
       <td>{executor.memory}</td>
       <td>{executor.state}</td>
       <td>
-        <a href={"%s/logPage?appId=%s&executorId=%s&logType=stdout"
-          .format(executor.worker.webUiAddress, executor.application.id, executor.id)}>stdout</a>
-        <a href={"%s/logPage?appId=%s&executorId=%s&logType=stderr"
-          .format(executor.worker.webUiAddress, executor.application.id, executor.id)}>stderr</a>
+        <a href={
+      "%s/logPage?appId=%s&executorId=%s&logType=stdout"
+        .format(
+          executor.worker.webUiAddress,
+          executor.application.id,
+          executor.id)
+    }>stdout</a>
+        <a href={
+      "%s/logPage?appId=%s&executorId=%s&logType=stderr"
+        .format(
+          executor.worker.webUiAddress,
+          executor.application.id,
+          executor.id)
+    }>stderr</a>
       </td>
     </tr>
   }

@@ -126,7 +126,7 @@ class DataInputStream(in: InputStream)
   def readLong(): Long = {
     val hi = readInt().toLong
     val lo = readInt().toLong
-    (hi << 32) | (lo & 0xFFFFFFFFL)
+    (hi << 32) | (lo & 0XFFFFFFFFL)
   }
 
   def readShort(): Short = {
